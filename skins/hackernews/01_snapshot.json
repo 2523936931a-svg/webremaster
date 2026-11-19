@@ -1,0 +1,1127 @@
+{
+  "siteId": "hackernews",
+  "url": "https://news.ycombinator.com/",
+  "matchPatterns": [
+    "https://news.ycombinator.com/*"
+  ],
+  "capturedAt": "2026-11-19T06:17:36.231Z",
+  "title": "Hacker News",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "hasFramesetOrIframes": false,
+  "sameOriginFrames": [],
+  "domSkeletonHtml": "<html data-wr-crop=\"L3\"><head></head><body><center><table id=\"hnmain\"><tbody><tr><td><table><tbody><tr><td><a><img src=\"y18.svg\"></a></td><td><span><b><a>Hacke…</a></b><a>new</a>|<a>past</a>|<a>comme…</a>|<a>ask</a>|<a>show</a>|<a>jobs</a>|<a>submit</a></span></td><td><span><a>login</a></span></td></tr></tbody></table></td></tr><tr></tr><tr id=\"bigbox\"><td><table><tbody><tr id=\"50552424\"><td><span>1.</span></td><td><center><a id=\"up_50552424\"><div></div></a></center></td><td><span><a>Gemin…</a><span>(<a><span>blog.…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50552424\">670 p…</span>by<a>yigit…</a><span><a>8 hou…</a></span><span id=\"unv_50552424\"></span>|<a>hide</a>|<a>574 c…</a></span></td></tr><tr></tr><tr id=\"50547374\"><td><span>2.</span></td><td><center><a id=\"up_50547374\"><div></div></a></center></td><td><span><a>Unaut…</a><span>(<a><span>wiz.io</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50547374\">1261 …</span>by<a>speed…</a><span><a>14 ho…</a></span><span id=\"unv_50547374\"></span>|<a>hide</a>|<a>549 c…</a></span></td></tr><tr></tr><tr id=\"50554038\"><td><span>3.</span></td><td><center><a id=\"up_50554038\"><div></div></a></center></td><td><span><a>Multi…</a><span>(<a><span>ruby-…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50554038\">178 p…</span>by<a>runes…</a><span><a>6 hou…</a></span><span id=\"unv_50554038\"></span>|<a>hide</a>|<a>53 co…</a></span></td></tr><tr></tr><tr id=\"50554935\"><td><span>4.</span></td><td><center><a id=\"up_50554935\"><div></div></a></center></td><td><span><a>Unrea…</a><span>(<a><span>ut200…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50554935\">109 p…</span>by<a>TheAc…</a><span><a>4 hou…</a></span><span id=\"unv_50554935\"></span>|<a>hide</a>|<a>49 co…</a></span></td></tr><tr></tr><tr id=\"50548021\"><td><span>5.</span></td><td><center><a id=\"up_50548021\"><div></div></a></center></td><td><span><a>Seven…</a><span>(<a><span>micro…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50548021\">501 p…</span>by<a>gmays</a><span><a>14 ho…</a></span><span id=\"unv_50548021\"></span>|<a>hide</a>|<a>335 c…</a></span></td></tr><tr></tr><tr id=\"50518303\"><td><span>6.</span></td><td><center><a id=\"up_50518303\"><div></div></a></center></td><td><span><a>Axele…</a><span>(<a><span>futur…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50518303\">8 poi…</span>by<a>muxam…</a><span><a>1 hou…</a></span><span id=\"unv_50518303\"></span>|<a>hide</a>|<a>discu…</a></span></td></tr><tr></tr><tr id=\"50547620\"><td><span>7.</span></td><td><center><a id=\"up_50547620\"><div></div></a></center></td><td><span><a>Insid…</a><span>(<a><span>insid…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50547620\">622 p…</span>by<a>gyre0…</a><span><a>14 ho…</a></span><span id=\"unv_50547620\"></span>|<a>hide</a>|<a>203 c…</a></span></td></tr><tr></tr><tr id=\"50530088\"><td><span>8.</span></td><td><center><a id=\"up_50530088\"><div></div></a></center></td><td><span><a>Camer…</a><span>(<a><span>camer…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50530088\">16 po…</span>by<a>booko…</a><span><a>2 hou…</a></span><span id=\"unv_50530088\"></span>|<a>hide</a>|<a>3 com…</a></span></td></tr><tr></tr><tr id=\"50553225\"><td><span>9.</span></td><td><center><a id=\"up_50553225\"><div></div></a></center></td><td><span><a>LLM a…</a><span>(<a><span>slowc…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50553225\">140 p…</span>by<a>ioma8</a><span><a>7 hou…</a></span><span id=\"unv_50553225\"></span>|<a>hide</a>|<a>38 co…</a></span></td></tr><tr></tr><tr id=\"50551046\"><td><span>10.</span></td><td><center><a id=\"up_50551046\"><div></div></a></center></td><td><span><a>Daisy…</a><span>(<a><span>radix…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50551046\">178 p…</span>by<a>de_sty</a><span><a>10 ho…</a></span><span id=\"unv_50551046\"></span>|<a>hide</a>|<a>57 co…</a></span></td></tr><tr></tr><tr id=\"50525260\"><td><span>11.</span></td><td><center><a id=\"up_50525260\"><div></div></a></center></td><td><span><a>Dumpi…</a><span>(<a><span>kusha…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50525260\">91 po…</span>by<a>kusha</a><span><a>7 hou…</a></span><span id=\"unv_50525260\"></span>|<a>hide</a>|<a>34 co…</a></span></td></tr><tr></tr><tr id=\"50542441\"><td><span>12.</span></td><td><center><a id=\"up_50542441\"><div></div></a></center></td><td><span><a>Mosqu…</a><span>(<a><span>rural…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50542441\">30 po…</span>by<a>akbar…</a><span><a>3 hou…</a></span><span id=\"unv_50542441\"></span>|<a>hide</a>|<a>1 com…</a></span></td></tr><tr></tr><tr id=\"50554908\"><td><span>13.</span></td><td><center><a id=\"up_50554908\"><div></div></a></center></td><td><span><a>Previ…</a><span>(<a><span>arxiv…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50554908\">36 po…</span>by<a>dalmo3</a><span><a>4 hou…</a></span><span id=\"unv_50554908\"></span>|<a>hide</a>|<a>6 com…</a></span></td></tr><tr></tr><tr id=\"50546914\"><td><span>14.</span></td><td><center><a id=\"up_50546914\"><div></div></a></center></td><td><span><a>The C…</a><span>(<a><span>cam.a…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50546914\">259 p…</span>by<a>DeepL…</a><span><a>15 ho…</a></span><span id=\"unv_50546914\"></span>|<a>hide</a>|<a>186 c…</a></span></td></tr><tr></tr><tr id=\"50550415\"><td><span>15.</span></td><td><center><a id=\"up_50550415\"><div></div></a></center></td><td><span><a>Genie…</a><span>(<a><span>blog.…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50550415\">224 p…</span>by<a>leumon</a><span><a>11 ho…</a></span><span id=\"unv_50550415\"></span>|<a>hide</a>|<a>154 c…</a></span></td></tr><tr></tr><tr id=\"50554374\"><td><span>16.</span></td><td><center><a id=\"up_50554374\"><div></div></a></center></td><td><span><a>Gemin…</a><span>(<a><span>micjm…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50554374\">199 p…</span>by<a>seize…</a><span><a>5 hou…</a></span><span id=\"unv_50554374\"></span>|<a>hide</a>|<a>67 co…</a></span></td></tr><tr></tr><tr id=\"50554009\"><td><span>17.</span></td><td><center><a id=\"up_50554009\"><div></div></a></center></td><td><span><a>Palo …</a><span>(<a><span>paloa…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50554009\">42 po…</span>by<a>alpb</a><span><a>6 hou…</a></span><span id=\"unv_50554009\"></span>|<a>hide</a>|<a>9 com…</a></span></td></tr><tr></tr><tr id=\"50554045\"><td><span>18.</span></td><td><center><a id=\"up_50554045\"><div></div></a></center></td><td><span><a>We ne…</a><span>(<a><span>viole…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50554045\">400 p…</span>by<a>ExMac…</a><span><a>6 hou…</a></span><span id=\"unv_50554045\"></span>|<a>hide</a>|<a>208 c…</a></span></td></tr><tr></tr><tr id=\"50549493\"><td><span>19.</span></td><td><center><a id=\"up_50549493\"><div></div></a></center></td><td><span><a>Advan…</a><span>(<a><span>opena…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50549493\">189 p…</span>by<a>vighn…</a><span><a>12 ho…</a></span><span id=\"unv_50549493\"></span>|<a>hide</a>|<a>118 c…</a></span></td></tr><tr></tr><tr id=\"50547980\"><td><span>20.</span></td><td><center><a id=\"up_50547980\"><div></div></a></center></td><td><span><a>Show …</a><span>(<a><span>exitp…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50547980\">195 p…</span>by<a>zeroc…</a><span><a>14 ho…</a></span><span id=\"unv_50547980\"></span>|<a>hide</a>|<a>58 co…</a></span></td></tr><tr></tr><tr id=\"50523377\"><td><span>21.</span></td><td><center><a id=\"up_50523377\"><div></div></a></center></td><td><span><a>Show …</a><span>(<a><span>githu…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50523377\">75 po…</span>by<a>aryam…</a><span><a>8 hou…</a></span><span id=\"unv_50523377\"></span>|<a>hide</a>|<a>3 com…</a></span></td></tr><tr></tr><tr id=\"50548161\"><td><span>22.</span></td><td><center><a id=\"up_50548161\"><div></div></a></center></td><td><span><a>Show …</a><span>(<a><span>rshek…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50548161\">180 p…</span>by<a>raj-s…</a><span><a>13 ho…</a></span><span id=\"unv_50548161\"></span>|<a>hide</a>|<a>45 co…</a></span></td></tr><tr></tr><tr id=\"50510385\"><td><span>23.</span></td><td><center><a id=\"up_50510385\"><div></div></a></center></td><td><span><a>Cuttl…</a><span>(<a><span>fb.com</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50510385\">60 po…</span>by<a>acoss…</a><span><a>9 hou…</a></span><span id=\"unv_50510385\"></span>|<a>hide</a>|<a>12 co…</a></span></td></tr><tr></tr><tr id=\"50547777\"><td><span>24.</span></td><td><center><a id=\"up_50547777\"><div></div></a></center></td><td><span><a>AI ag…</a><span>(<a><span>europ…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50547777\">433 p…</span>by<a>Betel…</a><span><a>14 ho…</a></span><span id=\"unv_50547777\"></span>|<a>hide</a>|<a>188 c…</a></span></td></tr><tr></tr><tr id=\"50549188\"><td><span>25.</span></td><td><center><a id=\"up_50549188\"><div></div></a></center></td><td><span><a>Launc…</a></span></td></tr><tr><td></td><td><span><span id=\"score_50549188\">48 po…</span>by<a>ashriv</a><span><a>12 ho…</a></span><span id=\"unv_50549188\"></span>|<a>hide</a>|<a>43 co…</a></span></td></tr><tr></tr><tr id=\"50546967\"><td><span>26.</span></td><td><center><a id=\"up_50546967\"><div></div></a></center></td><td><span><a>The x…</a><span>(<a><span>pikum…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50546967\">164 p…</span>by<a>ibobev</a><span><a>15 ho…</a></span><span id=\"unv_50546967\"></span>|<a>hide</a>|<a>51 co…</a></span></td></tr><tr></tr><tr id=\"50545958\"><td><span>27.</span></td><td><center><a id=\"up_50545958\"><div></div></a></center></td><td><span><a>DNS r…</a><span>(<a><span>techs…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50545958\">642 p…</span>by<a>ritza…</a><span><a>16 ho…</a></span><span id=\"unv_50545958\"></span>|<a>hide</a>|<a>250 c…</a></span></td></tr><tr></tr><tr id=\"50524227\"><td><span>28.</span></td><td><center><a id=\"up_50524227\"><div></div></a></center></td><td><span><a>A Col…</a><span>(<a><span>nasa.…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50524227\">45 po…</span>by<a>waway…</a><span><a>8 hou…</a></span><span id=\"unv_50524227\"></span>|<a>hide</a>|<a>5 com…</a></span></td></tr><tr></tr><tr id=\"50554941\"><td><span>29.</span></td><td><center><a id=\"up_50554941\"><div></div></a></center></td><td><span><a>FailT…</a><span>(<a><span>githu…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50554941\">20 po…</span>by<a>ri4dh</a><span><a>4 hou…</a></span><span id=\"unv_50554941\"></span>|<a>hide</a>|<a>4 com…</a></span></td></tr><tr></tr><tr id=\"50548004\"><td><span>30.</span></td><td><center><a id=\"up_50548004\"><div></div></a></center></td><td><span><a>KVM: …</a><span>(<a><span>cve.o…</span></a>)</span></span></td></tr><tr><td></td><td><span><span id=\"score_50548004\">184 p…</span>by<a>Kozmi…</a><span><a>14 ho…</a></span><span id=\"unv_50548004\"></span>|<a>hide</a>|<a>121 c…</a></span></td></tr><tr></tr><tr></tr><tr><td></td><td><a>More</a></td></tr></tbody></table></td></tr><tr><td><img src=\"s.gif\"><table><tbody><tr><td></td></tr></tbody></table><br><center><span><a>Guide…</a>|<a>FAQ</a>|<a>Lists</a>|<a>API</a>|<a>Secur…</a>|<a>Legal</a>|<a>Apply…</a>|<a>Conta…</a></span><br><br><form action=\"//hn.algolia.com/\">Searc…<input></form></center></td></tr></tbody></table></center></body></html>",
+  "repeatedGroups": [
+    {
+      "groupId": "grp-bigbox-td-table-tbody-tr-athing",
+      "containerSelector": "#bigbox > td > table > tbody",
+      "itemSelector": "#bigbox > td > table > tbody > tr.athing",
+      "pairingMode": "paired-next-sibling",
+      "companionSelector": "#bigbox > td > table > tbody > tr.athing + tr",
+      "totalCount": 30,
+      "sampleItemsHtml": [
+        "<tr class=\"athing submission\" id=\"50552424\"><td align=\"right\" valign=\"top\" class=\"title\"><span class=\"rank\">1.</span></td><td valign=\"top\" class=\"votelinks\"><center><a id=\"up_50552424\" href=\"vote?id=50552424&amp;how=up&amp;goto=news\"><div class=\"votearrow\" title=\"upvote\"></div></a></center></td><td class=\"title\"><span class=\"titleline\"><a href=\"https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/\">Gemini 4 Neon</a><span class=\"sitebit comhead\"> (<a href=\"from?site=blog.google\"><span class=\"sitestr\">blog.google</span></a>)</span></span></td></tr>",
+        "<tr class=\"athing submission\" id=\"50547374\"><td align=\"right\" valign=\"top\" class=\"title\"><span class=\"rank\">2.</span></td><td valign=\"top\" class=\"votelinks\"><center><a id=\"up_50547374\" href=\"vote?id=50547374&amp;how=up&amp;goto=news\"><div class=\"votearrow\" title=\"upvote\"></div></a></center></td><td class=\"title\"><span class=\"titleline\"><a href=\"https://www.wiz.io/blog/nginx-http2-rce-vulnerabilities\">Unauthenticated remote code execution in Nginx</a><span class=\"sitebit comhead\"> (<a href=\"from?site=wiz.io\"><span class=\"sitestr\">wiz.io</span></a>)</span></span></td></tr>",
+        "<tr class=\"athing submission\" id=\"50554038\"><td align=\"right\" valign=\"top\" class=\"title\"><span class=\"rank\">3.</span></td><td valign=\"top\" class=\"votelinks\"><center><a id=\"up_50554038\" href=\"vote?id=50554038&amp;how=up&amp;goto=news\"><div class=\"votearrow\" title=\"upvote\"></div></a></center></td><td class=\"title\"><span class=\"titleline\"><a href=\"https://www.ruby-lang.org/en/news/2026/11/18/multiple-vulnerabilities-in-regexp-and-string/\">Multiple vulnerabilities in Regexp and String case conversion</a><span class=\"sitebit comhead\"> (<a href=\"from?site=ruby-lang.org\"><span class=\"sitestr\">ruby-lang.org</span></a>)</span></span></td></tr>"
+      ]
+    },
+    {
+      "groupId": "grp-hnmain-tbody-tr-nth-of-type-4-td-center-span-yclinks-a",
+      "containerSelector": "#hnmain > tbody > tr:nth-of-type(4) > td > center > span.yclinks",
+      "itemSelector": "#hnmain > tbody > tr:nth-of-type(4) > td > center > span.yclinks > a",
+      "pairingMode": "single",
+      "totalCount": 8,
+      "sampleItemsHtml": [
+        "<a href=\"newsguidelines.html\">Guidelines</a>",
+        "<a href=\"newsfaq.html\">FAQ</a>",
+        "<a href=\"lists\">Lists</a>"
+      ]
+    },
+    {
+      "groupId": "grp-hnmain-tbody-tr-nth-of-type-1-td-table-tbody-tr-td-nth-of-type-2-span-pageto",
+      "containerSelector": "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop",
+      "itemSelector": "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop > a",
+      "pairingMode": "single",
+      "totalCount": 7,
+      "sampleItemsHtml": [
+        "<a href=\"newest\">new</a>",
+        "<a href=\"front\">past</a>",
+        "<a href=\"newcomments\">comments</a>"
+      ]
+    },
+    {
+      "groupId": "grp-hnmain-tbody-tr",
+      "containerSelector": "#hnmain > tbody",
+      "itemSelector": "#hnmain > tbody > tr",
+      "pairingMode": "single",
+      "totalCount": 4,
+      "sampleItemsHtml": [
+        "<tr><td bgcolor=\"#ff6600\"><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"padding:2px\"><tbody><tr><td style=\"width:18px;padding-right:4px\"><a href=\"https://news.ycombinator.com\"><img src=\"y18.svg\" width=\"18\" height=\"18\" style=\"border:1px white solid; display:block\"></a></td><td style=\"line-height:12pt; height:10px;\"><span class=\"pagetop\"><b class=\"hnname\"><a href=\"news\">Hacker News</a></b><a href=\"newest\">new</a> | <a href=\"front\">past</a> | <a href=\"newcomments\">comments</a> | <a href=\"ask\">ask</a> | <a href=\"show\">show</a> | <a href=\"jobs\">jobs</a> | <a href=\"submit\" rel=\"nofollow\">submit</a></span></td><td style=\"text-align:right;padding-right:4px;\"><span class=\"pagetop\"><a href=\"login?goto=news\">login</a></span></td></tr></tbody></table></td></tr>",
+        "<tr style=\"height:10px\"></tr>",
+        "<tr id=\"bigbox\"><td><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody><tr class=\"athing submission\" id=\"50552424\"><td align=\"right\" valign=\"top\" class=\"title\"><span class=\"rank\">1.</span></td><td valign=\"top\" class=\"votelinks\"><center><a id=\"up_50552424\" href=\"vote?id=50552424&amp;how=up&amp;goto=news\"><div class=\"votearrow\" title=\"upvote\"></div></a></center></td><td class=\"title\"><span class=\"titleline\"><a href=\"https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/\">Gemini 4 Neon</a><span class=\"sitebit comhead\"> (<a href=\"from?site=blog.google\"><span class=\"sitestr\">blog.google</span></a>)</span></span></td></tr><tr><td colspan=\"2\"></td><td class=\"subtext\"><span class=\"subline\"><span class=\"score\" id=\"score_50552424\">670 points</span> by <a href=\"user?id=yigitdemirag\">yigitdemirag</a> <span class=\"age\" title=\"2026-11-18T21:34:07\"><a href=\"item?id=50552424\">8 hours ago</a></span> <span id=\"unv_50552424\"></span> | <a href=\"hide?id=50552424&amp;goto=news\">hide</a> | <a href=\"item?id=50552424\">574&nbsp;comments</a></span></td></tr><tr class=\"spacer\" style=\"height:5px\"></tr><tr class=\"athing submission\" id=\"50547374\"><!--wr:truncated-->"
+      ]
+    },
+    {
+      "groupId": "grp-hnmain-tbody-tr-nth-of-type-1-td-table-tbody-tr-td",
+      "containerSelector": "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr",
+      "itemSelector": "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td",
+      "pairingMode": "single",
+      "totalCount": 3,
+      "sampleItemsHtml": [
+        "<td style=\"width:18px;padding-right:4px\"><a href=\"https://news.ycombinator.com\"><img src=\"y18.svg\" width=\"18\" height=\"18\" style=\"border:1px white solid; display:block\"></a></td>",
+        "<td style=\"line-height:12pt; height:10px;\"><span class=\"pagetop\"><b class=\"hnname\"><a href=\"news\">Hacker News</a></b><a href=\"newest\">new</a> | <a href=\"front\">past</a> | <a href=\"newcomments\">comments</a> | <a href=\"ask\">ask</a> | <a href=\"show\">show</a> | <a href=\"jobs\">jobs</a> | <a href=\"submit\" rel=\"nofollow\">submit</a></span></td>",
+        "<td style=\"text-align:right;padding-right:4px;\"><span class=\"pagetop\"><a href=\"login?goto=news\">login</a></span></td>"
+      ]
+    },
+    {
+      "groupId": "grp-bigbox-td-table-tbody-tr-nth-of-type-2-td-subtext-nth-of-type-2-span-subline",
+      "containerSelector": "#bigbox > td > table > tbody > tr:nth-of-type(2) > td.subtext:nth-of-type(2) > span.subline",
+      "itemSelector": "#bigbox > td > table > tbody > tr:nth-of-type(2) > td.subtext:nth-of-type(2) > span.subline > a",
+      "pairingMode": "single",
+      "totalCount": 3,
+      "sampleItemsHtml": [
+        "<a href=\"user?id=yigitdemirag\">yigitdemirag</a>",
+        "<a href=\"hide?id=50552424&amp;goto=news\">hide</a>",
+        "<a href=\"item?id=50552424\">574&nbsp;comments</a>"
+      ]
+    },
+    {
+      "groupId": "grp-bigbox-td-table-tbody-tr-nth-of-type-5-td-subtext-nth-of-type-2-span-subline",
+      "containerSelector": "#bigbox > td > table > tbody > tr:nth-of-type(5) > td.subtext:nth-of-type(2) > span.subline",
+      "itemSelector": "#bigbox > td > table > tbody > tr:nth-of-type(5) > td.subtext:nth-of-type(2) > span.subline > a",
+      "pairingMode": "single",
+      "totalCount": 3,
+      "sampleItemsHtml": [
+        "<a href=\"user?id=speedping\">speedping</a>",
+        "<a href=\"hide?id=50547374&amp;goto=news\">hide</a>",
+        "<a href=\"item?id=50547374\">549&nbsp;comments</a>"
+      ]
+    },
+    {
+      "groupId": "grp-bigbox-td-table-tbody-tr-nth-of-type-8-td-subtext-nth-of-type-2-span-subline",
+      "containerSelector": "#bigbox > td > table > tbody > tr:nth-of-type(8) > td.subtext:nth-of-type(2) > span.subline",
+      "itemSelector": "#bigbox > td > table > tbody > tr:nth-of-type(8) > td.subtext:nth-of-type(2) > span.subline > a",
+      "pairingMode": "single",
+      "totalCount": 3,
+      "sampleItemsHtml": [
+        "<a href=\"user?id=runesoerensen\">runesoerensen</a>",
+        "<a href=\"hide?id=50554038&amp;goto=news\">hide</a>",
+        "<a href=\"item?id=50554038\">53&nbsp;comments</a>"
+      ]
+    },
+    {
+      "groupId": "grp-bigbox-td-table-tbody-tr-nth-of-type-11-td-subtext-nth-of-type-2-span-sublin",
+      "containerSelector": "#bigbox > td > table > tbody > tr:nth-of-type(11) > td.subtext:nth-of-type(2) > span.subline",
+      "itemSelector": "#bigbox > td > table > tbody > tr:nth-of-type(11) > td.subtext:nth-of-type(2) > span.subline > a",
+      "pairingMode": "single",
+      "totalCount": 3,
+      "sampleItemsHtml": [
+        "<a href=\"user?id=TheAceOfHearts\">TheAceOfHearts</a>",
+        "<a href=\"hide?id=50554935&amp;goto=news\">hide</a>",
+        "<a href=\"item?id=50554935\">49&nbsp;comments</a>"
+      ]
+    },
+    {
+      "groupId": "grp-bigbox-td-table-tbody-tr-nth-of-type-14-td-subtext-nth-of-type-2-span-sublin",
+      "containerSelector": "#bigbox > td > table > tbody > tr:nth-of-type(14) > td.subtext:nth-of-type(2) > span.subline",
+      "itemSelector": "#bigbox > td > table > tbody > tr:nth-of-type(14) > td.subtext:nth-of-type(2) > span.subline > a",
+      "pairingMode": "single",
+      "totalCount": 3,
+      "sampleItemsHtml": [
+        "<a href=\"user?id=gmays\">gmays</a>",
+        "<a href=\"hide?id=50548021&amp;goto=news\">hide</a>",
+        "<a href=\"item?id=50548021\">335&nbsp;comments</a>"
+      ]
+    },
+    {
+      "groupId": "grp-bigbox-td-table-tbody-tr-nth-of-type-17-td-subtext-nth-of-type-2-span-sublin",
+      "containerSelector": "#bigbox > td > table > tbody > tr:nth-of-type(17) > td.subtext:nth-of-type(2) > span.subline",
+      "itemSelector": "#bigbox > td > table > tbody > tr:nth-of-type(17) > td.subtext:nth-of-type(2) > span.subline > a",
+      "pairingMode": "single",
+      "totalCount": 3,
+      "sampleItemsHtml": [
+        "<a href=\"user?id=muxamilian\">muxamilian</a>",
+        "<a href=\"hide?id=50518303&amp;goto=news\">hide</a>",
+        "<a href=\"item?id=50518303\">discuss</a>"
+      ]
+    },
+    {
+      "groupId": "grp-bigbox-td-table-tbody-tr-nth-of-type-20-td-subtext-nth-of-type-2-span-sublin",
+      "containerSelector": "#bigbox > td > table > tbody > tr:nth-of-type(20) > td.subtext:nth-of-type(2) > span.subline",
+      "itemSelector": "#bigbox > td > table > tbody > tr:nth-of-type(20) > td.subtext:nth-of-type(2) > span.subline > a",
+      "pairingMode": "single",
+      "totalCount": 3,
+      "sampleItemsHtml": [
+        "<a href=\"user?id=gyre007\">gyre007</a>",
+        "<a href=\"hide?id=50547620&amp;goto=news\">hide</a>",
+        "<a href=\"item?id=50547620\">203&nbsp;comments</a>"
+      ]
+    }
+  ],
+  "interactiveElements": [
+    {
+      "id": "a-0",
+      "tag": "a",
+      "label": "https://news.ycombinator.com",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(1) > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 104.8,
+        "y": 10,
+        "width": 20,
+        "height": 20
+      }
+    },
+    {
+      "id": "a-1",
+      "tag": "a",
+      "label": "Hacker News",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop > b.hnname > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 129.8,
+        "y": 12,
+        "width": 98,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-2",
+      "tag": "a",
+      "label": "new",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop > a:nth-of-type(1)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 232.8,
+        "y": 12,
+        "width": 27.3,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-3",
+      "tag": "a",
+      "label": "past",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop > a:nth-of-type(2)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 275.53,
+        "y": 12,
+        "width": 28.52,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-4",
+      "tag": "a",
+      "label": "comments",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop > a:nth-of-type(3)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 319.48,
+        "y": 12,
+        "width": 69.55,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-5",
+      "tag": "a",
+      "label": "ask",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop > a:nth-of-type(4)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 404.47,
+        "y": 12,
+        "width": 22.84,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-6",
+      "tag": "a",
+      "label": "show",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop > a:nth-of-type(5)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 442.75,
+        "y": 12,
+        "width": 34.39,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-7",
+      "tag": "a",
+      "label": "jobs",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop > a:nth-of-type(6)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 492.58,
+        "y": 12,
+        "width": 27.94,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-8",
+      "tag": "a",
+      "label": "submit",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(2) > span.pagetop > a:nth-of-type(7)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 535.95,
+        "y": 12,
+        "width": 45.56,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-9",
+      "tag": "a",
+      "label": "login",
+      "selectors": [
+        "#hnmain > tbody > tr:nth-of-type(1) > td > table > tbody > tr > td:nth-of-type(3) > span.pagetop > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 1139.03,
+        "y": 12,
+        "width": 32.16,
+        "height": 16
+      }
+    },
+    {
+      "id": "up_50552424",
+      "tag": "a",
+      "label": "vote?id=50552424&how=up&goto=news",
+      "selectors": [
+        "#up_50552424"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 124.61,
+        "y": 45,
+        "width": 14,
+        "height": 10
+      }
+    },
+    {
+      "id": "a-11",
+      "tag": "a",
+      "label": "Gemini 4 Neon",
+      "selectors": [
+        "#\\35 0552424 > td.title:nth-of-type(3) > span.titleline > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 138.61,
+        "y": 43.5,
+        "width": 99.28,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-12",
+      "tag": "a",
+      "label": "blog.google",
+      "selectors": [
+        "#\\35 0552424 > td.title:nth-of-type(3) > span.titleline > span.sitebit.comhead > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 246.48,
+        "y": 45.5,
+        "width": 62.06,
+        "height": 13
+      }
+    },
+    {
+      "id": "a-13",
+      "tag": "a",
+      "label": "yigitdemirag",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(2) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(1)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 206.05,
+        "y": 61,
+        "width": 58.38,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-14",
+      "tag": "a",
+      "label": "8 hours ago",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(2) > td.subtext:nth-of-type(2) > span.subline > span.age:nth-of-type(2) > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 267.7,
+        "y": 61,
+        "width": 55.89,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-15",
+      "tag": "a",
+      "label": "hide",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(2) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(2)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 334.41,
+        "y": 61,
+        "width": 19.84,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-16",
+      "tag": "a",
+      "label": "574 comments",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(2) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(3)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 365.06,
+        "y": 61,
+        "width": 69.75,
+        "height": 11
+      }
+    },
+    {
+      "id": "up_50547374",
+      "tag": "a",
+      "label": "vote?id=50547374&how=up&goto=news",
+      "selectors": [
+        "#up_50547374"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 124.61,
+        "y": 80,
+        "width": 14,
+        "height": 10
+      }
+    },
+    {
+      "id": "a-18",
+      "tag": "a",
+      "label": "Unauthenticated remote code execution in Nginx",
+      "selectors": [
+        "#\\35 0547374 > td.title:nth-of-type(3) > span.titleline > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 138.61,
+        "y": 78.5,
+        "width": 327.44,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-19",
+      "tag": "a",
+      "label": "wiz.io",
+      "selectors": [
+        "#\\35 0547374 > td.title:nth-of-type(3) > span.titleline > span.sitebit.comhead > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 474.64,
+        "y": 80.5,
+        "width": 30.53,
+        "height": 13
+      }
+    },
+    {
+      "id": "a-20",
+      "tag": "a",
+      "label": "speedping",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(5) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(1)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 211.97,
+        "y": 96,
+        "width": 47.7,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-21",
+      "tag": "a",
+      "label": "14 hours ago",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(5) > td.subtext:nth-of-type(2) > span.subline > span.age:nth-of-type(2) > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 262.95,
+        "y": 96,
+        "width": 61.83,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-22",
+      "tag": "a",
+      "label": "hide",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(5) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(2)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 335.59,
+        "y": 96,
+        "width": 19.84,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-23",
+      "tag": "a",
+      "label": "549 comments",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(5) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(3)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 366.25,
+        "y": 96,
+        "width": 69.75,
+        "height": 11
+      }
+    },
+    {
+      "id": "up_50554038",
+      "tag": "a",
+      "label": "vote?id=50554038&how=up&goto=news",
+      "selectors": [
+        "#up_50554038"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 124.61,
+        "y": 115,
+        "width": 14,
+        "height": 10
+      }
+    },
+    {
+      "id": "a-25",
+      "tag": "a",
+      "label": "Multiple vulnerabilities in Regexp and String case conversion",
+      "selectors": [
+        "#\\35 0554038 > td.title:nth-of-type(3) > span.titleline > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 138.61,
+        "y": 113.5,
+        "width": 406.17,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-26",
+      "tag": "a",
+      "label": "ruby-lang.org",
+      "selectors": [
+        "#\\35 0554038 > td.title:nth-of-type(3) > span.titleline > span.sitebit.comhead > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 553.38,
+        "y": 115.5,
+        "width": 73.11,
+        "height": 13
+      }
+    },
+    {
+      "id": "a-27",
+      "tag": "a",
+      "label": "runesoerensen",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(8) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(1)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 206.05,
+        "y": 131,
+        "width": 69.2,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-28",
+      "tag": "a",
+      "label": "6 hours ago",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(8) > td.subtext:nth-of-type(2) > span.subline > span.age:nth-of-type(2) > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 278.53,
+        "y": 131,
+        "width": 55.89,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-29",
+      "tag": "a",
+      "label": "hide",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(8) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(2)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 345.23,
+        "y": 131,
+        "width": 19.84,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-30",
+      "tag": "a",
+      "label": "53 comments",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(8) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(3)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 375.89,
+        "y": 131,
+        "width": 63.83,
+        "height": 11
+      }
+    },
+    {
+      "id": "up_50554935",
+      "tag": "a",
+      "label": "vote?id=50554935&how=up&goto=news",
+      "selectors": [
+        "#up_50554935"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 124.61,
+        "y": 150,
+        "width": 14,
+        "height": 10
+      }
+    },
+    {
+      "id": "a-32",
+      "tag": "a",
+      "label": "Unreal Tournament 2004 in the Browser",
+      "selectors": [
+        "#\\35 0554935 > td.title:nth-of-type(3) > span.titleline > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 138.61,
+        "y": 148.5,
+        "width": 268.98,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-33",
+      "tag": "a",
+      "label": "ut2004.dev",
+      "selectors": [
+        "#\\35 0554935 > td.title:nth-of-type(3) > span.titleline > span.sitebit.comhead > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 416.19,
+        "y": 150.5,
+        "width": 61.23,
+        "height": 13
+      }
+    },
+    {
+      "id": "a-34",
+      "tag": "a",
+      "label": "TheAceOfHearts",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(11) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(1)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 206.05,
+        "y": 166,
+        "width": 75.33,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-35",
+      "tag": "a",
+      "label": "4 hours ago",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(11) > td.subtext:nth-of-type(2) > span.subline > span.age:nth-of-type(2) > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 284.66,
+        "y": 166,
+        "width": 55.89,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-36",
+      "tag": "a",
+      "label": "hide",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(11) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(2)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 351.36,
+        "y": 166,
+        "width": 19.84,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-37",
+      "tag": "a",
+      "label": "49 comments",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(11) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(3)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 382.02,
+        "y": 166,
+        "width": 63.83,
+        "height": 11
+      }
+    },
+    {
+      "id": "up_50548021",
+      "tag": "a",
+      "label": "vote?id=50548021&how=up&goto=news",
+      "selectors": [
+        "#up_50548021"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 124.61,
+        "y": 185,
+        "width": 14,
+        "height": 10
+      }
+    },
+    {
+      "id": "a-39",
+      "tag": "a",
+      "label": "Seven new models at scalable price-performance",
+      "selectors": [
+        "#\\35 0548021 > td.title:nth-of-type(3) > span.titleline > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 138.61,
+        "y": 183.5,
+        "width": 329.83,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-40",
+      "tag": "a",
+      "label": "microsoft.ai",
+      "selectors": [
+        "#\\35 0548021 > td.title:nth-of-type(3) > span.titleline > span.sitebit.comhead > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 477.03,
+        "y": 185.5,
+        "width": 63.05,
+        "height": 13
+      }
+    },
+    {
+      "id": "a-41",
+      "tag": "a",
+      "label": "gmays",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(14) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(1)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 206.05,
+        "y": 201,
+        "width": 30.81,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-42",
+      "tag": "a",
+      "label": "14 hours ago",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(14) > td.subtext:nth-of-type(2) > span.subline > span.age:nth-of-type(2) > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 240.14,
+        "y": 201,
+        "width": 61.83,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-43",
+      "tag": "a",
+      "label": "hide",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(14) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(2)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 312.78,
+        "y": 201,
+        "width": 19.84,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-44",
+      "tag": "a",
+      "label": "335 comments",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(14) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(3)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 343.44,
+        "y": 201,
+        "width": 69.75,
+        "height": 11
+      }
+    },
+    {
+      "id": "up_50518303",
+      "tag": "a",
+      "label": "vote?id=50518303&how=up&goto=news",
+      "selectors": [
+        "#up_50518303"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 124.61,
+        "y": 220,
+        "width": 14,
+        "height": 10
+      }
+    },
+    {
+      "id": "a-46",
+      "tag": "a",
+      "label": "Axelera Titania Brings Native FP8 and FP4 to In-Memory Compute",
+      "selectors": [
+        "#\\35 0518303 > td.title:nth-of-type(3) > span.titleline > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 138.61,
+        "y": 218.5,
+        "width": 442.67,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-47",
+      "tag": "a",
+      "label": "futurumgroup.com",
+      "selectors": [
+        "#\\35 0518303 > td.title:nth-of-type(3) > span.titleline > span.sitebit.comhead > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 589.88,
+        "y": 220.5,
+        "width": 100.33,
+        "height": 13
+      }
+    },
+    {
+      "id": "a-48",
+      "tag": "a",
+      "label": "muxamilian",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(17) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(1)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 194.19,
+        "y": 236,
+        "width": 54.38,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-49",
+      "tag": "a",
+      "label": "1 hour ago",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(17) > td.subtext:nth-of-type(2) > span.subline > span.age:nth-of-type(2) > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 251.84,
+        "y": 236,
+        "width": 51.03,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-50",
+      "tag": "a",
+      "label": "hide",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(17) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(2)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 313.69,
+        "y": 236,
+        "width": 19.84,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-51",
+      "tag": "a",
+      "label": "discuss",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(17) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(3)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 344.34,
+        "y": 236,
+        "width": 33.73,
+        "height": 11
+      }
+    },
+    {
+      "id": "up_50547620",
+      "tag": "a",
+      "label": "vote?id=50547620&how=up&goto=news",
+      "selectors": [
+        "#up_50547620"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 124.61,
+        "y": 255,
+        "width": 14,
+        "height": 10
+      }
+    },
+    {
+      "id": "a-53",
+      "tag": "a",
+      "label": "Inside Deutsche Bank",
+      "selectors": [
+        "#\\35 0547620 > td.title:nth-of-type(3) > span.titleline > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 138.61,
+        "y": 253.5,
+        "width": 145.91,
+        "height": 16
+      }
+    },
+    {
+      "id": "a-54",
+      "tag": "a",
+      "label": "inside-db.com",
+      "selectors": [
+        "#\\35 0547620 > td.title:nth-of-type(3) > span.titleline > span.sitebit.comhead > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 293.11,
+        "y": 255.5,
+        "width": 75.44,
+        "height": 13
+      }
+    },
+    {
+      "id": "a-55",
+      "tag": "a",
+      "label": "gyre007",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(20) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(1)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 206.05,
+        "y": 271,
+        "width": 38.67,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-56",
+      "tag": "a",
+      "label": "14 hours ago",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(20) > td.subtext:nth-of-type(2) > span.subline > span.age:nth-of-type(2) > a"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 248,
+        "y": 271,
+        "width": 61.83,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-57",
+      "tag": "a",
+      "label": "hide",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(20) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(2)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 320.64,
+        "y": 271,
+        "width": 19.84,
+        "height": 11
+      }
+    },
+    {
+      "id": "a-58",
+      "tag": "a",
+      "label": "203 comments",
+      "selectors": [
+        "#bigbox > td > table > tbody > tr:nth-of-type(20) > td.subtext:nth-of-type(2) > span.subline > a:nth-of-type(3)"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 351.3,
+        "y": 271,
+        "width": 69.75,
+        "height": 11
+      }
+    },
+    {
+      "id": "up_50530088",
+      "tag": "a",
+      "label": "vote?id=50530088&how=up&goto=news",
+      "selectors": [
+        "#up_50530088"
+      ],
+      "hasCsrfOrHiddenInputs": false,
+      "isCaptchaOrCanvas": false,
+      "boundingBox": {
+        "x": 124.61,
+        "y": 290,
+        "width": 14,
+        "height": 10
+      }
+    }
+  ],
+  "originalItemCountHint": 30,
+  "beforeScreenshotPath": "D:\\黑科技\\WebRemaster\\skins\\hackernews\\before.png"
+}

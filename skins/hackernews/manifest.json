@@ -1,0 +1,29 @@
+{
+  "id": "hackernews",
+  "name": "Hacker News",
+  "category": "开发者",
+  "targetUrl": "https://news.ycombinator.com/",
+  "matchPatterns": [
+    "https://news.ycombinator.com/*"
+  ],
+  "archetype": "news-feed",
+  "tagline": {
+    "zh": "Hacker News 暗黑高密度重制：等宽数字排版 + TurboNav 0ms 双路由 + 折叠评论树",
+    "en": "Hacker News remastered: dense dark feed, 0ms dual-route TurboNav, collapsible comment tree"
+  },
+  "enhancements": [
+    "cmd-k-search",
+    "csv-markdown-export",
+    "vim-navigation",
+    "dark-light-theme",
+    "turbo-nav"
+  ],
+  "userscriptFile": "hackernews.user.js",
+  "beforeImage": "before.png",
+  "afterImage": "after.png",
+  "vlmScore": 9.2,
+  "dataParityRatio": 1,
+  "bundleSizeKb": 287.3154296875,
+  "tokensUsedToCompile": 0,
+  "version": "0.1.0"
+}

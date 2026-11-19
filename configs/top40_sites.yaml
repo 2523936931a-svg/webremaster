@@ -1,0 +1,292 @@
+# WebRemaster Top 40 经典高频老旧网站重制矩阵
+# 选站黄金标准：高频刚需 + 1995~2012 年古老 UI + 公开访问免登录
+
+version: "1.0.0"
+budget_tokens: 55000000
+
+sites:
+  # 1. 全球开发者与开源生态 (10 站)
+  - id: hackernews
+    name: "Hacker News"
+    category: "开发者"
+    archetype: "news-feed"
+    url: "https://news.ycombinator.com/"
+    status: "ready"
+
+  - id: lobsters
+    name: "Lobsters"
+    category: "开发者"
+    archetype: "news-feed"
+    url: "https://lobste.rs/"
+    status: "pending"
+
+  - id: pypi-project
+    name: "PyPI Package Details"
+    category: "开发者"
+    archetype: "article-reader"
+    url: "https://pypi.org/project/fastapi/"
+    status: "pending"
+
+  - id: pkg-go-dev
+    name: "Go Package Documentation"
+    category: "开发者"
+    archetype: "article-reader"
+    url: "https://pkg.go.dev/net/http"
+    status: "pending"
+
+  - id: gnu-home
+    name: "GNU Software Directory"
+    category: "开发者"
+    archetype: "data-table"
+    url: "https://www.gnu.org/software/"
+    status: "pending"
+
+  - id: kernel-lore
+    name: "Linux Kernel Lore Archive"
+    category: "开发者"
+    archetype: "nested-thread"
+    url: "https://lore.kernel.org/lkml/"
+    status: "pending"
+
+  - id: sqlite-docs
+    name: "SQLite Documentation"
+    category: "开发者"
+    archetype: "article-reader"
+    url: "https://www.sqlite.org/docs.html"
+    status: "pending"
+
+  - id: curl-docs
+    name: "curl Manual Page"
+    category: "开发者"
+    archetype: "article-reader"
+    url: "https://curl.se/docs/manpage.html"
+    status: "pending"
+
+  - id: man7-linux
+    name: "Linux Man Pages (man7)"
+    category: "开发者"
+    archetype: "article-reader"
+    url: "https://man7.org/linux/man-pages/man2/open.2.html"
+    status: "pending"
+
+  - id: sourceware-gcc
+    name: "GCC Online Docs"
+    category: "开发者"
+    archetype: "article-reader"
+    url: "https://gcc.gnu.org/onlinedocs/"
+    status: "pending"
+
+  # 2. 学术科研与论文刚需 (8 站)
+  - id: arxiv-list
+    name: "arXiv CS.AI Recent Papers"
+    category: "学术科研"
+    archetype: "news-feed"
+    url: "https://arxiv.org/list/cs.AI/recent"
+    status: "pending"
+
+  - id: arxiv-abs
+    name: "arXiv Paper Abstract"
+    category: "学术科研"
+    archetype: "article-reader"
+    url: "https://arxiv.org/abs/1706.03762"
+    status: "pending"
+
+  - id: dblp-author
+    name: "DBLP Computer Science Bibliography"
+    category: "学术科研"
+    archetype: "data-table"
+    url: "https://dblp.org/search?q=transformer"
+    status: "pending"
+
+  - id: pubmed-search
+    name: "PubMed Biomedical Search"
+    category: "学术科研"
+    archetype: "news-feed"
+    url: "https://pubmed.ncbi.nlm.nih.gov/?term=llm"
+    status: "pending"
+
+  - id: oeis-seq
+    name: "OEIS On-Line Encyclopedia of Integer Sequences"
+    category: "学术科研"
+    archetype: "article-reader"
+    url: "https://oeis.org/A000045"
+    status: "pending"
+
+  - id: mathworld
+    name: "Wolfram MathWorld"
+    category: "学术科研"
+    archetype: "article-reader"
+    url: "https://mathworld.wolfram.com/FourierTransform.html"
+    status: "pending"
+
+  - id: stanford-plato
+    name: "Stanford Encyclopedia of Philosophy"
+    category: "学术科研"
+    archetype: "article-reader"
+    url: "https://plato.stanford.edu/entries/turing-machine/"
+    status: "pending"
+
+  - id: gutenberg-book
+    name: "Project Gutenberg Top eBooks"
+    category: "学术科研"
+    archetype: "data-table"
+    url: "https://www.gutenberg.org/browse/scores/top"
+    status: "pending"
+
+  # 3. 互联网协议与标准文档 (6 站)
+  - id: rfc-editor
+    name: "RFC 9110 HTTP Semantics"
+    category: "文档工具"
+    archetype: "article-reader"
+    url: "https://www.rfc-editor.org/rfc/rfc9110.html"
+    status: "pending"
+
+  - id: w3c-spec
+    name: "W3C HTML 5.2 Specification"
+    category: "文档工具"
+    archetype: "article-reader"
+    url: "https://www.w3.org/TR/html52/"
+    status: "pending"
+
+  - id: python-peps
+    name: "Python Enhancement Proposals (PEPs)"
+    category: "文档工具"
+    archetype: "data-table"
+    url: "https://peps.python.org/"
+    status: "pending"
+
+  - id: cppreference
+    name: "cppreference std::vector"
+    category: "文档工具"
+    archetype: "article-reader"
+    url: "https://en.cppreference.com/w/cpp/container/vector"
+    status: "pending"
+
+  - id: postgres-docs
+    name: "PostgreSQL SELECT Documentation"
+    category: "文档工具"
+    archetype: "article-reader"
+    url: "https://www.postgresql.org/docs/current/sql-select.html"
+    status: "pending"
+
+  - id: git-scm-docs
+    name: "Git SCM Rebase Manual"
+    category: "文档工具"
+    archetype: "article-reader"
+    url: "https://git-scm.com/docs/git-rebase"
+    status: "pending"
+
+  # 4. 经典社区与百科 (6 站)
+  - id: wikipedia-article
+    name: "Wikipedia Classic Article"
+    category: "社区论坛"
+    archetype: "article-reader"
+    url: "https://en.wikipedia.org/wiki/Transformer_(deep_learning_architecture)"
+    status: "pending"
+
+  - id: old-reddit
+    name: "Old Reddit r/programming"
+    category: "社区论坛"
+    archetype: "news-feed"
+    url: "https://old.reddit.com/r/programming/"
+    status: "pending"
+
+  - id: slashdot
+    name: "Slashdot News for Nerds"
+    category: "社区论坛"
+    archetype: "news-feed"
+    url: "https://slashdot.org/"
+    status: "pending"
+
+  - id: craigslist
+    name: "Craigslist SF Bay Area Classifieds"
+    category: "社区论坛"
+    archetype: "data-table"
+    url: "https://sfbay.craigslist.org/search/sss"
+    status: "pending"
+
+  - id: ycombinator-jobs
+    name: "Y Combinator Who's Hiring"
+    category: "社区论坛"
+    archetype: "news-feed"
+    url: "https://news.ycombinator.com/jobs"
+    status: "pending"
+
+  - id: archive-org-list
+    name: "Internet Archive Texts Collection"
+    category: "社区论坛"
+    archetype: "news-feed"
+    url: "https://archive.org/details/texts"
+    status: "pending"
+
+  # 5. 中文极客、技术与高校高频刚需 (6 站)
+  - id: v2ex
+    name: "V2EX 创意工作者社区"
+    category: "社区论坛"
+    archetype: "news-feed"
+    url: "https://www.v2ex.com/"
+    status: "pending"
+
+  - id: ruanyifeng-blog
+    name: "阮一峰的网络日志"
+    category: "文档工具"
+    archetype: "article-reader"
+    url: "https://www.ruanyifeng.com/blog/"
+    status: "pending"
+
+  - id: oi-wiki
+    name: "OI Wiki 算法信息学竞赛"
+    category: "文档工具"
+    archetype: "article-reader"
+    url: "https://oi-wiki.org/"
+    status: "pending"
+
+  - id: liaoxuefeng-py
+    name: "廖雪峰 Python 教程"
+    category: "文档工具"
+    archetype: "article-reader"
+    url: "https://liaoxuefeng.com/books/python/introduction/index.html"
+    status: "pending"
+
+  - id: cnki-abstract
+    name: "知网公开论文文献检索"
+    category: "学术科研"
+    archetype: "article-reader"
+    url: "https://kns.cnki.net/"
+    status: "pending"
+
+  - id: zhengfang-edu
+    name: "高校正方教务系统靶场重制面板"
+    category: "高校教务"
+    archetype: "data-table"
+    url: "http://localhost:8088/edu-mock.html"
+    status: "pending"
+
+  # 6. 硬核工具与数据门户 (4 站)
+  - id: iana-ports
+    name: "IANA Service Names and Port Numbers"
+    category: "文档工具"
+    archetype: "data-table"
+    url: "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"
+    status: "pending"
+
+  - id: nist-nvd
+    name: "NIST National Vulnerability Database (NVD)"
+    category: "文档工具"
+    archetype: "data-table"
+    url: "https://nvd.nist.gov/vuln/search"
+    status: "pending"
+
+  - id: unicode-charts
+    name: "Unicode Full Emoji List"
+    category: "文档工具"
+    archetype: "data-table"
+    url: "https://unicode.org/emoji/charts/full-emoji-list.html"
+    status: "pending"
+
+  - id: ffmpeg-docs
+    name: "FFmpeg Documentation"
+    category: "文档工具"
+    archetype: "article-reader"
+    url: "https://ffmpeg.org/ffmpeg.html"
+    status: "pending"

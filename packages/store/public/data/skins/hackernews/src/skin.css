@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@source "./";
+/* ui-kit 组件的 Tailwind 类名必须被扫描进产物，否则布局塌陷为裸 div */
+@source "../../../packages/ui-kit/src";
+
+:root {
+  --wr-accent: #f97316;
+}
+
+/* HackerNews 重制皮肤专属微调 */
+.wr-hn-root {
+  min-height: 100vh;
+  background: #0b0f17;
+}
+.wr-hn-skin {
+  min-height: 100vh;
+}

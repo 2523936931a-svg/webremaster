@@ -1,0 +1,19 @@
+{
+  "siteId": "hackernews",
+  "themeIdentity": {
+    "brandAccentHex": "#F97316",
+    "darkBgHex": "#0B0F17",
+    "lightBgHex": "#F5F6F8",
+    "aestheticStyle": "Linear 级暗黑高密度信息流：等宽数字排版 + 暖橙品牌点缀 + 毛玻璃顶栏"
+  },
+  "layoutStrategy": "单列 FeedListCard 信息流（紧凑模式）+ Sticky 毛玻璃顶栏；item 详情路由切换 NestedThreadTree 彩虹折叠评论树；TurboNav 0ms 无刷新双路由",
+  "keyEnhancements": [
+    "FeedListCard 高密度重排（等宽数字 + 域名胶囊 + Vim 选中光环）",
+    "NestedThreadTree 可折叠彩虹评论树",
+    "TurboNav 0ms SPA（悬停预取 + LRU 缓存）",
+    "Cmd+K 全局瞬搜与命令面板（导出 CSV/Markdown、点赞、切原版）",
+    "暗黑/浅色双主题（localStorage 持久化）",
+    "Alt+Shift+R 三态活体分屏对比"
+  ],
+  "componentBlueprint": "RemasterShell(毛玻璃顶栏 + CommandPalette + EscapePill + DiagnosticsDrawer) > feed 路由: FeedListCard × 30（data-wr-item，等宽 rank/score/comments，域名胶囊）；thread 路由: NestedThreadTree(comtr 缩进 s.gif/40 → 彩虹引导线折叠)；数据层 createOriginStore + extractFieldWithCascade(4 级降级) → useSyncExternalStore"
+}

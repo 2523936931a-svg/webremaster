@@ -1,0 +1,127 @@
+{
+  "siteId": "hackernews",
+  "siteName": "Hacker News",
+  "matchPatterns": [
+    "https://news.ycombinator.com/*"
+  ],
+  "routes": [
+    {
+      "routeId": "feed",
+      "urlRegex": "^https://news\\.ycombinator\\.com/(?:news|newest|front|ask|show|jobs|shownew|active|best)?/?$",
+      "domFingerprintSelector": "tr.athing",
+      "archetype": "news-feed",
+      "primaryListContainer": "#bigbox",
+      "primaryItemSelector": "tr.athing",
+      "pairingMode": "paired-next-sibling",
+      "itemFields": [
+        {
+          "fieldName": "title",
+          "fieldType": "string",
+          "selectors": ["td.title > span.titleline > a", "td.title > a"],
+          "relativeTo": "self",
+          "attribute": "textContent",
+          "required": true
+        },
+        {
+          "fieldName": "url",
+          "fieldType": "url",
+          "selectors": ["td.title > span.titleline > a", "td.title > a"],
+          "relativeTo": "self",
+          "attribute": "href",
+          "required": false
+        },
+        {
+          "fieldName": "points",
+          "fieldType": "number",
+          "selectors": ["td.subtext span.score", "td.subtext span.subline > span.score"],
+          "relativeTo": "next-sibling",
+          "attribute": "textContent",
+          "regexExtract": "(\\d+)",
+          "required": true
+        },
+        {
+          "fieldName": "author",
+          "fieldType": "string",
+          "selectors": ["td.subtext a.hnuser"],
+          "relativeTo": "next-sibling",
+          "attribute": "textContent",
+          "required": false
+        },
+        {
+          "fieldName": "age",
+          "fieldType": "string",
+          "selectors": ["td.subtext span.age"],
+          "relativeTo": "next-sibling",
+          "attribute": "textContent",
+          "required": false
+        },
+        {
+          "fieldName": "comments",
+          "fieldType": "number",
+          "selectors": ["td.subtext span.subline a:last-child"],
+          "relativeTo": "next-sibling",
+          "attribute": "textContent",
+          "regexExtract": "(\\d+)",
+          "required": false
+        }
+      ],
+      "actions": [
+        {
+          "actionId": "upvote",
+          "description": "给当前条目投赞成票（原生点击，保留 HN 会话语义）",
+          "kind": "click",
+          "targetSelectors": ["tr.athing a[href^='vote']"]
+        },
+        {
+          "actionId": "hide",
+          "description": "隐藏当前条目",
+          "kind": "click",
+          "targetSelectors": ["tr.athing ~ tr a[href^='hide']"]
+        }
+      ]
+    },
+    {
+      "routeId": "thread",
+      "urlRegex": "^https://news\\.ycombinator\\.com/item\\?id=",
+      "domFingerprintSelector": "tr.athing.comtr",
+      "archetype": "forum-thread",
+      "primaryListContainer": "#bigbox",
+      "primaryItemSelector": "tr.athing.comtr",
+      "pairingMode": "single",
+      "itemFields": [
+        {
+          "fieldName": "author",
+          "fieldType": "string",
+          "selectors": ["a.hnuser"],
+          "relativeTo": "self",
+          "attribute": "textContent",
+          "required": false
+        },
+        {
+          "fieldName": "body",
+          "fieldType": "string",
+          "selectors": ["span.commtext"],
+          "relativeTo": "self",
+          "attribute": "textContent",
+          "required": false
+        },
+        {
+          "fieldName": "age",
+          "fieldType": "string",
+          "selectors": ["span.age"],
+          "relativeTo": "self",
+          "attribute": "textContent",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "enableTurboNav": true,
+  "recommendedPowerUps": [
+    "cmd-k-search",
+    "csv-markdown-export",
+    "vim-navigation",
+    "dark-light-theme",
+    "turbo-nav"
+  ]
+}

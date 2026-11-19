@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+*.tsbuildinfo
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# webremaster caches
+.wr-cache/
+storageState.json
+
+# test & tooling
+coverage/
+*.log
+
+# os
+.DS_Store
+Thumbs.db
