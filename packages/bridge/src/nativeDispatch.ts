@@ -71,6 +71,21 @@ export function nativeSetInputValue(el: InputLike, value: string): void {
     safeDispatch(el, new Event("input", { bubbles: true, cancelable: true }));
   }
   safeDispatch(el, new Event("change", { bubbles: true }));
+
+  // jQuery / 原生框架兼容：如果原站存在 jQuery，补发其专属事件，保证旧版组件响应
+  try {
+    const w = (typeof window !== "undefined" ? window : globalThis) as unknown as {
+      $?: (target: unknown) => { trigger?: (event: string) => void };
+      jQuery?: (target: unknown) => { trigger?: (event: string) => void };
+    };
+    const jq = w.$ ?? w.jQuery;
+    if (typeof jq === "function") {
+      jq(el).trigger?.("input");
+      jq(el).trigger?.("change");
+    }
+  } catch {
+    /* 忽略非标宿主环境异常 */
+  }
 }
 
 export function nativeTriggerClick(el: Element): void {

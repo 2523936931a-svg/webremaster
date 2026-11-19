@@ -159,7 +159,7 @@ function finalizeOptions(skinsDir: string, overrides: Partial<{ vlmScore: number
 describe("buildProgram（结构锁定）", () => {
   const program = buildProgram();
 
-  it("程序名 wr / 版本 0.1.0 / 六条命令名称与顺序", () => {
+  it("程序名 wr / 版本 0.1.0 / 命令名称与顺序", () => {
     expect(program.name()).toBe("wr");
     expect(program.version()).toBe("0.1.0");
     expect(program.commands.map((command) => command.name())).toEqual([
@@ -169,11 +169,13 @@ describe("buildProgram（结构锁定）", () => {
       "verify-skin",
       "finalize-skin",
       "compile",
+      "sync-artifacts",
     ]);
   });
 
-  it("六条命令都带必填位置参数（Argument.required）", () => {
-    for (const command of program.commands) {
+  it("前六条原子命令都带必填位置参数（Argument.required）", () => {
+    const positionalCommands = program.commands.filter((c) => c.name() !== "sync-artifacts");
+    for (const command of positionalCommands) {
       expect(command.registeredArguments.length).toBeGreaterThan(0);
       for (const argument of command.registeredArguments) {
         expect(argument.required).toBe(true);
@@ -182,7 +184,8 @@ describe("buildProgram（结构锁定）", () => {
   });
 
   it("必填参数缺失即拒绝（CommanderError，不触发 handler）", async () => {
-    for (const command of program.commands) {
+    const positionalCommands = program.commands.filter((c) => c.name() !== "sync-artifacts");
+    for (const command of positionalCommands) {
       // commander 对缺失位置参数报 "missing required argument"，对缺失必填选项报 "required option ... not specified"
       await expect(command.parseAsync([], { from: "user" })).rejects.toThrow(
         /missing required argument|required option .+ not specified/,

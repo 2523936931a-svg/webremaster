@@ -44,6 +44,16 @@ export const SkinDetailModal: React.FC<SkinDetailModalProps> = ({ skin, lang, on
     fetchSource();
   }, [skin]);
 
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [onClose]);
+
   if (!skin) return null;
 
   const tagline = lang === "zh" ? skin.tagline.zh : skin.tagline.en;

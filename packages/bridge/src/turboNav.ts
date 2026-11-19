@@ -18,6 +18,8 @@ export interface TurboNavigatorOptions {
 interface FetchLike {
   ok: boolean;
   text(): Promise<string>;
+  arrayBuffer?(): Promise<ArrayBuffer>;
+  headers?: { get(name: string): string | null };
 }
 
 type FetchFn = (url: string, init?: { credentials?: string; headers?: Record<string, string> }) => Promise<FetchLike>;
@@ -164,6 +166,57 @@ export class TurboNavigator {
     }
   }
 
+  private async decodeResponse(response: FetchLike): Promise<string> {
+    // 优先尝试探测字符集，防止 GBK / GB2312 / ISO-8859-1 老旧中文站点乱码
+    if (typeof response.arrayBuffer === "function") {
+      try {
+        const buffer = await response.arrayBuffer();
+        let charset = "utf-8";
+
+        // 1. 尝试从 content-type 响应头提取
+        if (response.headers && typeof response.headers.get === "function") {
+          const contentType = response.headers.get("content-type") || "";
+          const match = contentType.match(/charset=([a-zA-Z0-9_-]+)/i);
+          if (match && match[1]) {
+            charset = match[1].trim().toLowerCase();
+          }
+        }
+
+        // 2. 如果未指定，尝试探测 document.characterSet
+        if (charset === "utf-8" && typeof document !== "undefined" && document.characterSet) {
+          const docCharset = document.characterSet.toLowerCase();
+          if (docCharset !== "utf-8" && docCharset !== "utf8") {
+            charset = docCharset;
+          }
+        }
+
+        // 3. 初始解码前 1024 字节探测 <meta charset="...">
+        if (charset === "utf-8" && buffer.byteLength > 0 && typeof TextDecoder !== "undefined") {
+          try {
+            const snippet = new TextDecoder("ascii", { fatal: false }).decode(buffer.slice(0, 1024));
+            const metaMatch = snippet.match(/<meta[^>]+charset=["']?([a-zA-Z0-9_-]+)/i);
+            if (metaMatch && metaMatch[1]) {
+              charset = metaMatch[1].trim().toLowerCase();
+            }
+          } catch {
+            // ignore snippet decode error
+          }
+        }
+
+        if (typeof TextDecoder !== "undefined") {
+          try {
+            return new TextDecoder(charset).decode(buffer);
+          } catch {
+            return new TextDecoder("utf-8").decode(buffer);
+          }
+        }
+      } catch {
+        // arrayBuffer 异常时降级走 text()
+      }
+    }
+    return await response.text();
+  }
+
   private async fetchDocument(url: string): Promise<string | null> {
     const cached = this.getCached(url);
     if (cached !== null) return cached;
@@ -175,7 +228,7 @@ export class TurboNavigator {
         headers: { accept: "text/html,application/xhtml+xml" },
       });
       if (!response || !response.ok) return null;
-      const html = await response.text();
+      const html = await this.decodeResponse(response);
       this.setCached(url, html);
       return html;
     } catch {

@@ -49,6 +49,25 @@ const ensureStyle = (attr: string, css: string): void => {
   (document.head ?? document.documentElement).appendChild(styleEl);
 };
 
+/** 移动端/平板响应式 Viewport 注入：解决 1998 老站无 viewport 标签在现代设备呈现 980px 微缩桌面的问题 */
+const ensureRemasteredViewport = (enable: boolean): void => {
+  if (typeof document === "undefined") return;
+  const existingViewport = document.querySelector('meta[name="viewport"]');
+  if (enable) {
+    if (!existingViewport) {
+      const meta = document.createElement("meta");
+      meta.name = "viewport";
+      meta.content = "width=device-width, initial-scale=1.0, maximum-scale=5.0";
+      meta.setAttribute("data-wr-injected-viewport", "true");
+      (document.head ?? document.documentElement).appendChild(meta);
+    }
+  } else {
+    // 切换回 1998 原版视图时，移除注入的 viewport，恢复原汁原味的桌面比例排版
+    const injected = document.querySelector('meta[data-wr-injected-viewport="true"]');
+    injected?.remove();
+  }
+};
+
 class DefaultOriginManager implements OriginManager {
   private currentWrapper: HTMLElement | null = null;
   private mode: ViewMode = "remastered";
@@ -80,9 +99,15 @@ class DefaultOriginManager implements OriginManager {
     wrapper.id = "wr-origin-wrapper";
     wrapper.setAttribute("data-wr-origin", "true");
     wrapper.setAttribute("data-wr-mode", "remastered");
-    document.body.appendChild(wrapper);
+
+    const parent = document.body ?? document.documentElement;
+    if (!parent) {
+      throw new Error("OriginManager: cannot find document.body or document.documentElement");
+    }
+    parent.appendChild(wrapper);
+
     // 快照后逐个 appendChild 原址移动；跳过 wrapper 自身 / 脚本样式 / 我们的自定义元素
-    const nodes = Array.from(document.body.childNodes);
+    const nodes = Array.from(parent.childNodes);
     for (const node of nodes) {
       if (node === wrapper) continue;
       if (node.nodeType === 1) {
@@ -95,6 +120,7 @@ class DefaultOriginManager implements OriginManager {
     }
     this.currentWrapper = wrapper;
     this.mode = "remastered";
+    ensureRemasteredViewport(true);
     return wrapper;
   }
 
@@ -123,8 +149,10 @@ class DefaultOriginManager implements OriginManager {
     }
     if (mode === "original") {
       document.documentElement.setAttribute("data-wr-view", "original");
+      ensureRemasteredViewport(false);
     } else {
       document.documentElement.removeAttribute("data-wr-view");
+      ensureRemasteredViewport(true);
     }
     if (mode !== prev) {
       for (const cb of Array.from(this.callbacks)) {

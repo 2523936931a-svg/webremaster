@@ -55,15 +55,38 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      setPercent((p) => Math.max(0, p - 5));
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setPercent((p) => Math.min(100, p + 5));
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setPercent(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setPercent(100);
+    }
+  };
+
   return (
     <div className={`flex flex-col gap-3 ${className}`}>
       {/* Slider Viewport */}
       <div
         ref={containerRef}
+        tabIndex={0}
+        role="slider"
+        aria-label="Before/After Image Comparison"
+        aria-valuenow={Math.round(percent)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        onKeyDown={handleKeyDown}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        className="relative w-full aspect-[16/10] overflow-hidden rounded-xl bg-zinc-950 border border-white/10 select-none cursor-ew-resize shadow-2xl group"
+        className="relative w-full aspect-[16/10] overflow-hidden rounded-xl bg-zinc-950 border border-white/10 select-none cursor-ew-resize shadow-2xl group focus:outline-none focus:ring-2 focus:ring-sky-500/50"
       >
         {/* Layer 1: Bottom Image (Before / Legacy) */}
         <img

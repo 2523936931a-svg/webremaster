@@ -16,11 +16,25 @@ export const App: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [modalSkin, setModalSkin] = useState<SkinManifest | null>(null);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   const t = DICTIONARY[lang];
 
   useEffect(() => {
     loadStoreIndex().then((data) => setStoreIndex(data));
+
+    const handleGlobalShortcuts = (e: KeyboardEvent) => {
+      if (
+        e.key === "/" &&
+        document.activeElement?.tagName !== "INPUT" &&
+        document.activeElement?.tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleGlobalShortcuts);
+    return () => window.removeEventListener("keydown", handleGlobalShortcuts);
   }, []);
 
   const toggleLang = () => {
@@ -89,6 +103,7 @@ export const App: React.FC = () => {
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
               />
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder={t.searchPlaceholder}
                 value={searchQuery}
