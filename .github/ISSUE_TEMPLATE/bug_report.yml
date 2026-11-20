@@ -1,0 +1,47 @@
+name: "🐛 缺陷反馈 (Bug Report)"
+description: "报告在使用 WebRemaster Chrome 扩展、油猴脚本或商店时遇到的错误"
+title: "[Bug]: <Brief description>"
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你帮助 WebRemaster 变得更加稳定健壮！请在提交前确保已运行 `Alt+Shift+R` 确认是否为原站自身故障。
+
+  - type: input
+    id: affected_site
+    attributes:
+      label: 受影响的站点与 URL (Affected Site & URL)
+      placeholder: "例：https://news.ycombinator.com/item?id=..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: running_mode
+    attributes:
+      label: 运行方式 (Running Mode)
+      options:
+        - "Chrome MV3 扩展"
+        - "Tampermonkey 油猴脚本 (.user.js)"
+        - "ScriptCat 脚本猫"
+        - "Violentmonkey 暴力猴"
+        - "WebRemaster 皮肤商店 (Web Preview)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: 复现步骤 (Steps to Reproduce)
+      placeholder: "1. 打开站点...\n2. 点击...\n3. 发现..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: console_errors
+    attributes:
+      label: 浏览器控制台报错 (Console Logs & Errors)
+      render: shell
+      placeholder: "F12 打开 Console，粘贴红色报错信息..."
+    validations:
+      required: false

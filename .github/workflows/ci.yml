@@ -26,20 +26,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
-        run: pnpm typecheck
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
 
-      - name: Unit Tests
-        run: pnpm test
-
-      - name: Build Core
-        run: pnpm build
-
-      - name: Sync Artifacts
-        run: pnpm sync:artifacts
-
-      - name: Build Extension
-        run: pnpm build:ext
-
-      - name: Build Store
-        run: pnpm build:store
+      - name: Full Verification & Build Pipeline
+        run: pnpm check:all

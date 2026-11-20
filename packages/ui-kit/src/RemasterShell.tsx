@@ -14,6 +14,7 @@ import {
   EscapePill,
   getSharedOriginManager,
   useCommandPaletteHotkey,
+  cleanDistractions,
   type OriginManager,
   type PaletteCommand,
   type ViewMode,
@@ -103,10 +104,38 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
     manager.setViewMode(next);
   }, [manager, viewMode]);
 
+  const [fontSize, setFontSize] = useState<number>(16);
+
   const commands = useMemo<PaletteCommand[]>(
     () => [
       ...(props.commands ?? []),
       { id: "wr-toggle-theme", label: "切换深浅主题", keywords: "theme dark light 主题 深色 浅色", run: toggleTheme },
+      {
+        id: "wr-font-increase",
+        label: `增大字号 (+2px，当前 ${fontSize}px)`,
+        keywords: "font size bigger 增大 字号 字体",
+        run: () => setFontSize((s) => Math.min(24, s + 2)),
+      },
+      {
+        id: "wr-font-decrease",
+        label: `缩小字号 (-2px，当前 ${fontSize}px)`,
+        keywords: "font size smaller 缩小 字号 字体",
+        run: () => setFontSize((s) => Math.max(12, s - 2)),
+      },
+      {
+        id: "wr-font-reset",
+        label: "重置字号为默认 (16px)",
+        keywords: "font size reset 重置 字号 字体",
+        run: () => setFontSize(16),
+      },
+      {
+        id: "wr-clean-popups",
+        label: "清除原站浮动广告与解除滚动锁",
+        keywords: "clean popup ad banner cookie 广告 弹窗 遮罩",
+        run: () => {
+          cleanDistractions(document);
+        },
+      },
       {
         id: "wr-view-remastered",
         label: "视图：重制版",
@@ -140,13 +169,13 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
         },
       },
     ],
-    [props.commands, manager, diagnosticsOpen, toggleTheme],
+    [props.commands, manager, diagnosticsOpen, toggleTheme, fontSize],
   );
 
   return (
     <ThemeProvider mode={mode}>
       <ToastProvider>
-        <div data-wr-theme={mode} className="flex min-h-screen flex-col">
+        <div data-wr-theme={mode} className="flex min-h-screen flex-col" style={{ fontSize: `${fontSize}px` }}>
 
         <style>{THEME_CSS}</style>
         <header

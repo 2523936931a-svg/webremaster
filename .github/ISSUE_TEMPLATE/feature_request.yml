@@ -1,0 +1,28 @@
+name: "✨ 功能与能力增强建议 (Feature Request)"
+description: "建议新的 PowerUp 超级能力、UI 组件、调色板预设或 CLI 编译工具链改进"
+title: "[Feature]: <Brief description>"
+labels: ["enhancement"]
+body:
+  - type: input
+    id: feature_title
+    attributes:
+      label: 功能概要 (Feature Summary)
+      placeholder: "例：新增快捷键一键生成卡片长图分享"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_statement
+    attributes:
+      label: 解决什么场景或痛点？(What problem does this solve?)
+      placeholder: "描述你在浏览经典网站或重制过程中的具体场景..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: 期望的实现方案 (Proposed Solution)
+      placeholder: "期望的交互方式、API 设计或 UI 展现..."
+    validations:
+      required: true

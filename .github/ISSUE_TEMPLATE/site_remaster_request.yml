@@ -1,0 +1,68 @@
+name: "🏛️ 申请重制新老旧网站 (Site Remaster Proposal)"
+description: "提出一个你希望 WebRemaster 进行次世代现代化重制的高频老旧/经典网站"
+title: "[Site Request]: <Website Name>"
+labels: ["site-request", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你为 WebRemaster 社区推荐重制候选网站！
+        我们专注重制具有**高频刚需、无可替代的高价值内容、但视觉与交互停留在 1995~2010 年代**的经典网站。
+
+  - type: input
+    id: site_name
+    attributes:
+      label: 网站名称 (Site Name)
+      placeholder: "例：RFC Editor / OEIS 数列百科 / 某高校正方教务"
+    validations:
+      required: true
+
+  - type: input
+    id: site_url
+    attributes:
+      label: 目标站点完整地址 (Target Website URL)
+      placeholder: "https://www.rfc-editor.org/rfc/rfc9110.html"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 站点所属领域 (Category)
+      options:
+        - "开发者生态 (Developer & FOSS)"
+        - "学术科研与论文 (Academic & Scientific Research)"
+        - "高校与公共政务 (Campus & Government Portal)"
+        - "社区论坛与讨论 (Community & Forum Archive)"
+        - "文档工具与标准 (Documentation & RFC Standards)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: archetype
+    attributes:
+      label: 预期页面原型 (Expected Archetype)
+      options:
+        - "news-feed (新闻动态流，如 Hacker News)"
+        - "doc-reader (长篇文档与论文阅读，如 arXiv / RFC)"
+        - "data-table-portal (高密度数据表格，如教务/漏洞库)"
+        - "forum-thread (嵌套树状评论，如 Reddit / Kernel Lore)"
+        - "package-registry (组件与软件包检索，如 PyPI)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: pain_points
+    attributes:
+      label: 当前老站的核心痛点 (Pain Points of Legacy Site)
+      placeholder: "例：4K 屏字小如蚁、无移动端适配、刺眼白底、缺少搜索、表格嵌套严重等..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 老站当前截图 (Screenshots of the Legacy Website)
+      placeholder: "拖拽或粘贴老旧网站当前的糟糕截图..."
+    validations:
+      required: false

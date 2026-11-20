@@ -16,35 +16,40 @@ export const PopupApp: React.FC = () => {
   const [currentTabUrl, setCurrentTabUrl] = useState<string>("");
   const [matchedSkin, setMatchedSkin] = useState<SkinManifest | null>(null);
   const [masterEnabled, setMasterEnabled] = useState<boolean>(true);
+  const [customSkins, setCustomSkins] = useState<SkinManifest[]>([]);
   const [skinStates, setSkinStates] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     // 探测当前标签页
     if (typeof chrome !== "undefined" && chrome.tabs) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        const url = tabs[0]?.url || "";
-        setCurrentTabUrl(url);
-
-        const matched = SKIN_REGISTRY.find((skin) =>
-          skin.matchPatterns.some((pattern) => {
-            const escaped = pattern
-              .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
-              .replace(/\*/g, ".*");
-            return new RegExp(`^${escaped}$`).test(url);
-          }),
-        );
-        setMatchedSkin(matched || null);
-      });
-
-      // 读取开关存储
+      // 读取开关存储与社区自定义皮肤
       chrome.storage.local.get(null, (items) => {
         setMasterEnabled(items.master_enabled !== false);
+        const loadedCustom: SkinManifest[] = Array.isArray(items.custom_skins) ? items.custom_skins : [];
+        setCustomSkins(loadedCustom);
+
+        const allSkins = [...SKIN_REGISTRY, ...loadedCustom];
         const states: Record<string, boolean> = {};
-        for (const skin of SKIN_REGISTRY) {
+        for (const skin of allSkins) {
           states[skin.id] = items[`skin_enabled_${skin.id}`] !== false;
         }
         setSkinStates(states);
+
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          const url = tabs[0]?.url || "";
+          setCurrentTabUrl(url);
+
+          const matched = allSkins.find((skin) =>
+            skin.matchPatterns.some((pattern) => {
+              const escaped = pattern
+                .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
+                .replace(/\*/g, ".*");
+              return new RegExp(`^${escaped}$`).test(url);
+            }),
+          );
+          setMatchedSkin(matched || null);
+        });
       });
     }
   }, []);
@@ -77,7 +82,8 @@ export const PopupApp: React.FC = () => {
     }
   };
 
-  const filteredSkins = SKIN_REGISTRY.filter((skin) => {
+  const allSkins = [...SKIN_REGISTRY, ...customSkins];
+  const filteredSkins = allSkins.filter((skin) => {
     const q = searchQuery.toLowerCase();
     return (
       skin.name.toLowerCase().includes(q) ||
