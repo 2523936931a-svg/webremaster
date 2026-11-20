@@ -68,6 +68,33 @@ const ensureRemasteredViewport = (enable: boolean): void => {
   }
 };
 
+/** 借鉴 uBlock Origin / Privacy Badger：原站置于隐身 wrapper 后，静音背景媒体并停止跑马灯 CPU 消耗 */
+const defuseBackgroundOrigin = (wrapper: HTMLElement): void => {
+  try {
+    for (const media of Array.from(wrapper.querySelectorAll("audio, video"))) {
+      if (media instanceof HTMLMediaElement) {
+        media.muted = true;
+        try {
+          if (typeof navigator === "undefined" || !navigator.userAgent?.includes("jsdom")) {
+            media.pause();
+          }
+        } catch {
+          /* 忽略播放器限制 */
+        }
+      }
+    }
+    for (const marquee of Array.from(wrapper.querySelectorAll("marquee"))) {
+      try {
+        (marquee as unknown as { stop?: () => void }).stop?.();
+      } catch {
+        /* 忽略非标实现 */
+      }
+    }
+  } catch {
+    /* 忽略非标宿主环境异常 */
+  }
+};
+
 class DefaultOriginManager implements OriginManager {
   private currentWrapper: HTMLElement | null = null;
   private mode: ViewMode = "remastered";
@@ -121,6 +148,7 @@ class DefaultOriginManager implements OriginManager {
     this.currentWrapper = wrapper;
     this.mode = "remastered";
     ensureRemasteredViewport(true);
+    defuseBackgroundOrigin(wrapper);
     return wrapper;
   }
 
@@ -153,6 +181,9 @@ class DefaultOriginManager implements OriginManager {
     } else {
       document.documentElement.removeAttribute("data-wr-view");
       ensureRemasteredViewport(true);
+      if (wrapper && mode === "remastered") {
+        defuseBackgroundOrigin(wrapper);
+      }
     }
     if (mode !== prev) {
       for (const cb of Array.from(this.callbacks)) {

@@ -13,6 +13,22 @@ import {
   exportToTSV,
 } from "../src/powerups/DataExporter.js";
 import { fuzzyMatch } from "../src/powerups/CommandPalette.js";
+import {
+  getBookmarks,
+  saveBookmark,
+  removeBookmark,
+  isBookmarked,
+  toggleBookmark,
+  exportBookmarksToMarkdown,
+} from "../src/powerups/BookmarkManager.js";
+import {
+  calculateReadingStats,
+  extractArticle,
+  getReaderSettings,
+  saveReaderSettings,
+} from "../src/powerups/ReaderMode.js";
+import { cleanDistractions } from "../src/powerups/ContentCleaner.js";
+
 
 describe("DataExporter", () => {
   it("csvEscapeCell：逗号/引号/换行正确转义", () => {
@@ -107,3 +123,143 @@ describe("fuzzyMatch", () => {
     expect(tight.score).toBeGreaterThan(loose.score);
   });
 });
+
+describe("BookmarkManager", () => {
+  it("本地书签增删查与切换：零依赖且按保存时间倒序排列", () => {
+    localStorage.clear();
+    expect(getBookmarks()).toEqual([]);
+    expect(isBookmarked("item-1")).toBe(false);
+
+    // 保存第 1 个
+    saveBookmark({ id: "item-1", title: "Hacker News 首发", url: "https://news.ycombinator.com" });
+    expect(isBookmarked("item-1")).toBe(true);
+    expect(getBookmarks().length).toBe(1);
+
+    // 保存第 2 个
+    saveBookmark({ id: "item-2", title: "SQLite 文档重制", category: "文档" });
+    const list = getBookmarks();
+    expect(list.length).toBe(2);
+    expect(list[0].id).toBe("item-2"); // 最新置前
+
+    // 切换 toggle
+    const toggledOff = toggleBookmark({ id: "item-1", title: "Hacker News 首发" });
+    expect(toggledOff).toBe(false);
+    expect(isBookmarked("item-1")).toBe(false);
+
+    const toggledOn = toggleBookmark({ id: "item-1", title: "Hacker News 首发" });
+    expect(toggledOn).toBe(true);
+    expect(isBookmarked("item-1")).toBe(true);
+
+    // 移除单个
+    removeBookmark("item-2");
+    expect(getBookmarks().length).toBe(1);
+    expect(getBookmarks()[0].id).toBe("item-1");
+  });
+
+  it("exportBookmarksToMarkdown：空列表与非空列表生成标准 Markdown 稍后阅读文档", () => {
+    localStorage.clear();
+    expect(exportBookmarksToMarkdown()).toContain("暂无收藏内容");
+
+    saveBookmark({
+      id: "item-1",
+      title: "Antigravity 架构解析",
+      url: "https://example.com/arch",
+      domain: "example.com",
+      category: "架构",
+    });
+
+    const md = exportBookmarksToMarkdown();
+    expect(md).toContain("# 我的 WebRemaster 收藏夹");
+    expect(md).toContain("[Antigravity 架构解析](https://example.com/arch)");
+    expect(md).toContain("example.com");
+  });
+});
+
+describe("ReaderMode", () => {
+  it("calculateReadingStats：准确统计中英文混合字数与预估阅读分钟数", () => {
+    expect(calculateReadingStats("").wordCount).toBe(0);
+    expect(calculateReadingStats("   ").wordCount).toBe(0);
+
+    const enStats = calculateReadingStats("WebRemaster modernizes ancient web pages with shadow DOM.");
+    expect(enStats.wordCount).toBe(8);
+    expect(enStats.readingTimeMinutes).toBe(1);
+
+    const zhStats = calculateReadingStats("把老旧古董网站重制为现代化响应式页面。");
+    expect(zhStats.wordCount).toBe(19);
+    expect(zhStats.readingTimeMinutes).toBe(1);
+
+    // 较长篇幅 (600 字约 2 分钟)
+    const longText = "测试文本".repeat(150);
+    expect(calculateReadingStats(longText).readingTimeMinutes).toBe(2);
+  });
+
+  it("extractArticle：从混乱 DOM 中提取结构化文章、排除导航噪点", () => {
+    const container = document.createElement("div");
+    container.innerHTML = `
+      <header><nav>Home About Contact</nav></header>
+      <h1 class="article-title">SQLite Architecture Guide</h1>
+      <div class="byline">Dr. Richard Hipp</div>
+      <div class="sidebar">Ads and promotions</div>
+      <p>SQLite is a C-language library that implements a small, fast, self-contained, high-reliability SQL database engine.</p>
+      <p>The code for SQLite is in the public domain and is free to everyone to use for any purpose.</p>
+      <footer>Copyright 2026</footer>
+    `;
+
+    const article = extractArticle(container);
+    expect(article.title).toBe("SQLite Architecture Guide");
+    expect(article.byline).toBe("Dr. Richard Hipp");
+    expect(article.paragraphs.length).toBe(2);
+    expect(article.paragraphs[0]).toContain("SQLite is a C-language library");
+    expect(article.wordCount).toBeGreaterThan(20);
+    expect(article.excerpt).toContain("SQLite is a C-language library");
+  });
+
+  it("ReaderSettings：配置存取与字号行高安全限幅（12~28px / 1.2~2.5）", () => {
+    localStorage.clear();
+    const initial = getReaderSettings();
+    expect(initial.fontSize).toBe(18);
+    expect(initial.theme).toBe("system");
+
+    // 保存安全范围内设置
+    const saved = saveReaderSettings({ fontSize: 22, theme: "sepia", fontFamily: "serif" });
+    expect(saved.fontSize).toBe(22);
+    expect(saved.theme).toBe("sepia");
+    expect(saved.fontFamily).toBe("serif");
+
+    // 超限安全夹紧
+    const clampedMax = saveReaderSettings({ fontSize: 999, lineHeight: 99 });
+    expect(clampedMax.fontSize).toBe(28);
+    expect(clampedMax.lineHeight).toBe(2.5);
+
+    const clampedMin = saveReaderSettings({ fontSize: 2, lineHeight: 0.1 });
+    expect(clampedMin.fontSize).toBe(12);
+    expect(clampedMin.lineHeight).toBe(1.2);
+  });
+});
+
+describe("ContentCleaner", () => {
+  it("cleanDistractions：移除 Cookie 授权横幅、恢复被锁死的页面滚动", () => {
+    document.body.innerHTML = `
+      <div id="onetrust-consent-sdk">Cookie Consent Required</div>
+      <div class="cookie-banner">Accept all cookies</div>
+      <div class="modal-backdrop">Modal overlay</div>
+      <div class="main-content">Real article content</div>
+    `;
+
+    document.body.style.overflow = "hidden";
+    expect(document.querySelector("#onetrust-consent-sdk")).not.toBeNull();
+    expect(document.querySelector(".cookie-banner")).not.toBeNull();
+
+    const result = cleanDistractions(document);
+    expect(result.removedCount).toBe(3);
+    expect(result.overflowRestored).toBe(true);
+
+    // 验证已被移除
+    expect(document.querySelector("#onetrust-consent-sdk")).toBeNull();
+    expect(document.querySelector(".cookie-banner")).toBeNull();
+    expect(document.querySelector(".modal-backdrop")).toBeNull();
+    expect(document.querySelector(".main-content")).not.toBeNull();
+  });
+});
+
+

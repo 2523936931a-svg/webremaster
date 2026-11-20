@@ -12,3 +12,7 @@ export * from "./powerups/DataExporter.js";
 export * from "./powerups/CommandPalette.js";
 export * from "./powerups/EscapePill.js";
 export * from "./powerups/useVimNavigation.js";
+export * from "./powerups/BookmarkManager.js";
+export * from "./powerups/ReaderMode.js";
+export * from "./powerups/ContentCleaner.js";
+

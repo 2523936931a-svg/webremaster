@@ -59,6 +59,92 @@ const LIGHT_VARS: ThemeVars = {
   danger: "#dc2626",
 };
 
+export type ThemePaletteName =
+  | "default-dark"
+  | "default-light"
+  | "catppuccin-mocha"
+  | "tokyo-night"
+  | "nord"
+  | "sepia-book";
+
+/**
+ * 社区流行高星主题预设（Catppuccin / Tokyo Night / Nord / 护眼羊皮纸）。
+ */
+export const THEME_PALETTES: Record<ThemePaletteName, ThemeVars> = {
+  "default-dark": DARK_VARS,
+  "default-light": LIGHT_VARS,
+  "catppuccin-mocha": {
+    bg: "#1e1e2e",
+    surface: "#181825",
+    surfaceAlt: "#313244",
+    border: "rgba(205,214,244,.12)",
+    borderStrong: "rgba(205,214,244,.24)",
+    text: "#cdd6f4",
+    textSecondary: "#a6adc8",
+    textMuted: "#6c7086",
+    accent: "#cba6f7",
+    accentSoft: "rgba(203,166,247,.18)",
+    success: "#a6e3a1",
+    warning: "#f9e2af",
+    danger: "#f38ba8",
+  },
+  "tokyo-night": {
+    bg: "#1a1b26",
+    surface: "#16161e",
+    surfaceAlt: "#24283b",
+    border: "rgba(192,202,245,.12)",
+    borderStrong: "rgba(192,202,245,.22)",
+    text: "#c0caf5",
+    textSecondary: "#9aa5ce",
+    textMuted: "#565f89",
+    accent: "#7aa2f7",
+    accentSoft: "rgba(122,162,247,.16)",
+    success: "#9ece6a",
+    warning: "#e0af68",
+    danger: "#f7768e",
+  },
+  nord: {
+    bg: "#2e3440",
+    surface: "#242933",
+    surfaceAlt: "#3b4252",
+    border: "rgba(216,222,233,.12)",
+    borderStrong: "rgba(216,222,233,.22)",
+    text: "#eceff4",
+    textSecondary: "#d8dee9",
+    textMuted: "#4c566a",
+    accent: "#88c0d0",
+    accentSoft: "rgba(136,192,208,.16)",
+    success: "#a3be8c",
+    warning: "#ebcb8b",
+    danger: "#bf616a",
+  },
+  "sepia-book": {
+    bg: "#fbf0d9",
+    surface: "#f4e4c1",
+    surfaceAlt: "#ebd5ab",
+    border: "rgba(95,75,50,.15)",
+    borderStrong: "rgba(95,75,50,.28)",
+    text: "#433422",
+    textSecondary: "#5f4b32",
+    textMuted: "#876e4b",
+    accent: "#b57614",
+    accentSoft: "rgba(181,118,20,.15)",
+    success: "#427b58",
+    warning: "#b57614",
+    danger: "#cc241d",
+  },
+};
+
+function buildPaletteCssBlock(vars: ThemeVars): string {
+  return (
+    `--wr-bg:${vars.bg};--wr-surface:${vars.surface};--wr-surface-alt:${vars.surfaceAlt};` +
+    `--wr-border:${vars.border};--wr-border-strong:${vars.borderStrong};--wr-text:${vars.text};` +
+    `--wr-text-secondary:${vars.textSecondary};--wr-text-muted:${vars.textMuted};--wr-accent:${vars.accent};` +
+    `--wr-accent-soft:${vars.accentSoft};--wr-success:${vars.success};--wr-warning:${vars.warning};--wr-danger:${vars.danger};`
+  );
+}
+
+
 /** 指定模式下的字面色板。 */
 export function themeVarsFor(mode: ThemeMode): ThemeVars {
   return mode === "light" ? LIGHT_VARS : DARK_VARS;
@@ -104,8 +190,17 @@ const LIGHT_VAR_BLOCK =
 export const THEME_CSS = `
 :host{${DARK_VAR_BLOCK}}
 :host([data-wr-theme="light"]){${LIGHT_VAR_BLOCK}}
+:host([data-wr-palette="catppuccin-mocha"]){${buildPaletteCssBlock(THEME_PALETTES["catppuccin-mocha"])}}
+:host([data-wr-palette="tokyo-night"]){${buildPaletteCssBlock(THEME_PALETTES["tokyo-night"])}}
+:host([data-wr-palette="nord"]){${buildPaletteCssBlock(THEME_PALETTES["nord"])}}
+:host([data-wr-palette="sepia-book"]){${buildPaletteCssBlock(THEME_PALETTES["sepia-book"])}}
 [data-wr-theme="dark"]{${DARK_VAR_BLOCK}}
 [data-wr-theme="light"]{${LIGHT_VAR_BLOCK}}
+[data-wr-palette="catppuccin-mocha"]{${buildPaletteCssBlock(THEME_PALETTES["catppuccin-mocha"])}}
+[data-wr-palette="tokyo-night"]{${buildPaletteCssBlock(THEME_PALETTES["tokyo-night"])}}
+[data-wr-palette="nord"]{${buildPaletteCssBlock(THEME_PALETTES["nord"])}}
+[data-wr-palette="sepia-book"]{${buildPaletteCssBlock(THEME_PALETTES["sepia-book"])}}
+
 :where([data-wr-theme]){background:var(--wr-bg);color:var(--wr-text);min-height:100vh;font-size:14px;line-height:1.6;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","PingFang SC","Microsoft YaHei",sans-serif;}
 :where([data-wr-theme]) *{box-sizing:border-box;}
 :where([data-wr-theme]) button{cursor:pointer;background:none;border:none;color:inherit;font:inherit;padding:0;}

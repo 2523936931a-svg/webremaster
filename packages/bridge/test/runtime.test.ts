@@ -73,6 +73,23 @@ describe("originManager", () => {
     expect(style.parentNode).toBe(document.body);
   });
 
+  it("借鉴 uBlock：原站隐身后自动静音背景音视频与停止跑马灯，杜绝幽灵播放与 CPU 浪费", () => {
+    const manager = createOriginManager({ hotkey: false });
+    managers.push(manager);
+    const audio = document.createElement("audio");
+    audio.src = "background-music.mp3";
+    audio.muted = false;
+    document.body.appendChild(audio);
+
+    const marquee = document.createElement("marquee") as unknown as HTMLElement & { stop: () => void };
+    marquee.stop = vi.fn();
+    document.body.appendChild(marquee);
+
+    manager.captureAndHideOrigin();
+    expect(audio.muted).toBe(true);
+    expect(marquee.stop).toHaveBeenCalled();
+  });
+
   it("Alt+Shift+R 循环切换 remastered → original → split → remastered", () => {
     const manager = createOriginManager();
     managers.push(manager);

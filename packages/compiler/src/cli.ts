@@ -17,7 +17,9 @@
 import { Command, CommanderError } from "commander";
 import chalk from "chalk";
 import ora from "ora";
+import yaml from "yaml";
 import { z } from "zod";
+
 import { zodToJsonSchema } from "zod-to-json-schema";
 import {
   existsSync,
@@ -1082,6 +1084,323 @@ export async function doctorHandler(): Promise<DoctorCheck[]> {
   return checks;
 }
 
+export interface ListSitesOptions {
+  skinsDir?: string;
+  configFile?: string;
+}
+
+export interface SiteListItem {
+  id: string;
+  name: string;
+  category: string;
+  archetype: string;
+  url: string;
+  status: "compiled" | "ready" | "pending";
+}
+
+function resolveTop40ConfigFile(customPath?: string): string {
+  if (customPath) return path.resolve(customPath);
+  const candidates = [
+    path.resolve("./configs/top40_sites.yaml"),
+    path.resolve("../../configs/top40_sites.yaml"),
+    path.resolve("../configs/top40_sites.yaml"),
+  ];
+  for (const c of candidates) {
+    if (existsSync(c)) return c;
+  }
+  return candidates[0];
+}
+
+function resolveSkinsDir(customPath?: string): string {
+  if (customPath) return path.resolve(customPath);
+  const candidates = [
+    path.resolve("./skins"),
+    path.resolve("../../skins"),
+    path.resolve("../skins"),
+  ];
+  for (const c of candidates) {
+    if (existsSync(c)) return c;
+  }
+  return candidates[0];
+}
+
+export async function listHandler(options: ListSitesOptions = {}): Promise<SiteListItem[]> {
+  const configFile = resolveTop40ConfigFile(options.configFile);
+  const skinsDir = resolveSkinsDir(options.skinsDir);
+
+  let sites: Array<{ id: string; name: string; category: string; archetype: string; url: string }> = [];
+
+  if (existsSync(configFile)) {
+    try {
+      const raw = readFileSync(configFile, "utf8");
+      const parsed = yaml.parse(raw);
+      if (parsed && Array.isArray(parsed.sites)) {
+        sites = parsed.sites;
+      }
+    } catch {
+      /* ignore yaml parse error */
+    }
+  }
+
+
+  // 如果 top40 未命中或自定义 skins 目录中有额外皮肤，也合并进来
+  const knownIds = new Set(sites.map((s) => s.id));
+  if (existsSync(skinsDir)) {
+    for (const d of readdirSync(skinsDir)) {
+      const p = path.join(skinsDir, d);
+      if (statSync(p).isDirectory() && !knownIds.has(d)) {
+        sites.push({
+          id: d,
+          name: d,
+          category: "自定义",
+          archetype: "custom",
+          url: "local",
+        });
+        knownIds.add(d);
+      }
+    }
+  }
+
+  const result: SiteListItem[] = sites.map((s) => {
+    const skinPath = path.join(skinsDir, s.id);
+    const hasManifest = existsSync(path.join(skinPath, "manifest.json"));
+    const hasBundle = existsSync(path.join(skinPath, `${s.id}.user.js`));
+    const isCompiled = hasManifest && hasBundle;
+    const isReady =
+      existsSync(path.join(skinPath, "02_contract.json")) ||
+      existsSync(path.join(skinPath, "src", "entry.tsx"));
+
+    const status: "compiled" | "ready" | "pending" = isCompiled
+      ? "compiled"
+      : isReady
+      ? "ready"
+      : "pending";
+    return {
+      id: s.id,
+      name: s.name,
+      category: s.category,
+      archetype: s.archetype,
+      url: s.url,
+      status,
+    };
+  });
+
+  console.log(chalk.bold(`\n📋 WebRemaster 站点重制矩阵与进度清单 (共 ${result.length} 站)\n`));
+  const compiledCount = result.filter((r) => r.status === "compiled").length;
+  const readyCount = result.filter((r) => r.status === "ready").length;
+  const pendingCount = result.filter((r) => r.status === "pending").length;
+
+  console.log(
+    `  ${chalk.green("● 已上架 (compiled)")}: ${compiledCount}  |  ` +
+      `${chalk.yellow("◐ 开发中 (ready)")}: ${readyCount}  |  ` +
+      `${chalk.dim("○ 待开工 (pending)")}: ${pendingCount}\n`,
+  );
+
+  for (const s of result) {
+    const statusTag =
+      s.status === "compiled"
+        ? chalk.bgGreen.black(" COMPILED ")
+        : s.status === "ready"
+        ? chalk.bgYellow.black(" READY ")
+        : chalk.bgGray.white(" PENDING ");
+    console.log(
+      `  ${statusTag} ${chalk.bold(s.id.padEnd(16))} ${s.name.padEnd(26)} ${chalk.dim(s.category.padEnd(10))} ${chalk.cyan(s.archetype)}`,
+    );
+  }
+  console.log("");
+  return result;
+}
+
+export interface ScaffoldOptions {
+  siteId: string;
+  url?: string;
+  category?: string;
+  archetype?: string;
+  skinsDir?: string;
+}
+
+export async function scaffoldHandler(options: ScaffoldOptions): Promise<{ siteId: string; createdFiles: string[] }> {
+  const siteId = options.siteId.trim();
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(siteId)) {
+    throw new CliExitError(
+      `站点 ID "${siteId}" 不合法，必须为 kebab-case（仅含小写字母、数字和连字符，如 hackernews、sqlite-docs）`,
+      1,
+    );
+  }
+
+  const skinsDir = resolveSkinsDir(options.skinsDir);
+  const targetDir = path.join(skinsDir, siteId);
+  const srcDir = path.join(targetDir, "src");
+
+  if (existsSync(path.join(targetDir, "02_contract.json"))) {
+    throw new CliExitError(`站点目录 skins/${siteId} 已存在重制合同，请勿重复脚手架初始化。`, 1);
+  }
+
+  mkdirSync(srcDir, { recursive: true });
+
+  const url = options.url || `https://${siteId}.com/`;
+  let origin = "https://example.com";
+  try {
+    origin = new URL(url).origin;
+  } catch {
+    origin = "https://example.com";
+  }
+
+  const category = options.category || "开发者";
+  const rawArch = options.archetype || "doc-reader";
+  const archMap: Record<string, string> = {
+    "article-reader": "doc-reader",
+    "data-table": "data-table-portal",
+    "nested-thread": "forum-thread",
+  };
+  const normalizedArchetype = (archMap[rawArch] || rawArch) as any;
+
+  const contractData: SiteContract = SiteContractSchema.parse({
+    siteId,
+    siteName: siteId.toUpperCase(),
+    matchPatterns: [`${origin}/*`],
+    enableTurboNav: true,
+    recommendedPowerUps: ["cmd-k-search", "csv-markdown-export"],
+    routes: [
+      {
+        routeId: "main",
+        urlRegex: "^" + origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "/.*",
+        domFingerprintSelector: "body",
+        archetype: normalizedArchetype,
+        primaryListContainer: "body",
+        primaryItemSelector: "article, .item, tr, li",
+        pairingMode: "single",
+        itemFields: [
+          {
+            fieldName: "title",
+            fieldType: "string",
+            selectors: ["h1", "h2", ".title", "a"],
+            relativeTo: "self",
+            attribute: "textContent",
+            required: true,
+          },
+        ],
+      },
+    ],
+  });
+
+  const designData: UXDesignSpec = UXDesignSpecSchema.parse({
+    siteId,
+    themeIdentity: {
+      brandAccentHex: "#0ea5e9",
+      darkBgHex: "#0b0f17",
+      lightBgHex: "#ffffff",
+      aestheticStyle: "现代极简、Shadow DOM 高隔离、响应式排版",
+    },
+    layoutStrategy: "双栏响应式，桌面端展示侧边栏快捷导航，移动端自动抽屉式折叠",
+    keyEnhancements: [
+      "TurboNav 秒级预取无刷切页",
+      "本地高隐私 BookmarkManager 稍后阅读",
+      "快捷键 Cmd+K 命令面板与 Vim 模式导航",
+      "一键 CSV / Markdown 表格无损导出",
+    ],
+    componentBlueprint: "RemasterShell 承载整体框架，主体根据不同 archetype 挂载 FeedListCard 或 SmartDataTable",
+  });
+
+  const entryCode = `/**
+ * ${siteId} 重制皮肤入口
+ * Archetype: ${normalizedArchetype}
+ * Category: ${category}
+ */
+import React, { useEffect, useState } from "react";
+import { mountShadowApp, createReactiveStore } from "@webremaster/bridge";
+import { RemasterShell, FeedListCard } from "@webremaster/ui-kit";
+import "./skin.css";
+
+interface ItemData {
+  id: string;
+  title: string;
+}
+
+export function App() {
+  const [items, setItems] = useState<ItemData[]>([]);
+
+  useEffect(() => {
+    const store = createReactiveStore<ItemData[]>({
+      selector: "body",
+      extractor: () => {
+        const headings = Array.from(document.querySelectorAll("h1, h2, .title, a"));
+        return headings.slice(0, 30).map((el, idx) => ({
+          id: String(idx + 1),
+          title: el.textContent?.trim() || "无标题",
+        }));
+      },
+    });
+
+    const unsubscribe = store.subscribe((data) => {
+      if (data) setItems(data);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  return (
+    <RemasterShell siteName="${siteId.toUpperCase()}" activeArchetype="${normalizedArchetype}">
+      <main className="max-w-4xl mx-auto p-6 space-y-3">
+        {items.map((item) => (
+          <FeedListCard
+            key={item.id}
+            item={{
+              id: item.id,
+              title: item.title,
+            }}
+          />
+        ))}
+      </main>
+    </RemasterShell>
+  );
+}
+
+mountShadowApp({
+  mountId: "webremaster-skin-${siteId}",
+  Component: App,
+  styles: "",
+});
+`;
+
+  const cssCode = `@import "tailwindcss";
+
+:host {
+  all: initial;
+  display: block;
+}
+`;
+
+  const createdFiles: string[] = [];
+
+  const contractPath = path.join(targetDir, "02_contract.json");
+  writeFileSync(contractPath, `${JSON.stringify(contractData, null, 2)}\n`, "utf8");
+  createdFiles.push(contractPath);
+
+  const designPath = path.join(targetDir, "03_design.json");
+  writeFileSync(designPath, `${JSON.stringify(designData, null, 2)}\n`, "utf8");
+  createdFiles.push(designPath);
+
+  const entryPath = path.join(srcDir, "entry.tsx");
+  writeFileSync(entryPath, entryCode, "utf8");
+  createdFiles.push(entryPath);
+
+  const cssPath = path.join(srcDir, "skin.css");
+  writeFileSync(cssPath, cssCode, "utf8");
+  createdFiles.push(cssPath);
+
+  console.log(chalk.bold(`\n🎉 成功脚手架初始化站点皮肤: ${chalk.cyan(siteId)}\n`));
+  for (const f of createdFiles) {
+    console.log(`  ${chalk.green("+")} ${path.relative(process.cwd(), f)}`);
+  }
+  console.log(chalk.dim(`\n下一步：运行 wr build-skin ${siteId} 或编辑 skins/${siteId}/src/entry.tsx 开始重制。\n`));
+
+  return { siteId, createdFiles };
+}
+
+
 /* ------------------------------------------------------------------ */
 /* buildProgram：命令装配（结构锁定）                                    */
 /* ------------------------------------------------------------------ */
@@ -1241,7 +1560,38 @@ export function buildProgram(): Command {
       });
     });
 
+  registerCommand(program, "list", "查看经典网站重制进度与 Top 40 站点矩阵")
+    .option("--skins-dir <dir>", "皮肤工作区根目录", "./skins")
+    .option("--config <path>", "站点配置文件路径", "./configs/top40_sites.yaml")
+    .action(async (opts) => {
+      await guard(async () => {
+        await listHandler({
+          skinsDir: optOptionalString(opts.skinsDir),
+          configFile: optOptionalString(opts.config),
+        });
+      });
+    });
+
+  registerCommand(program, "scaffold", "快速脚手架初始化一个新站点皮肤模板（合同、设计、React 组件与样式）")
+    .argument("<siteId>", "站点 ID（kebab-case）")
+    .option("--url <url>", "目标站点 URL")
+    .option("--category <cat>", "站点分类（如 开发者、高校与学术、公共政务）")
+    .option("--archetype <archetype>", "页面原型（news-feed / doc-reader / data-table-portal / forum-thread 等）")
+    .option("--skins-dir <dir>", "皮肤工作区根目录", "./skins")
+    .action(async (siteId, opts) => {
+      await guard(async () => {
+        await scaffoldHandler({
+          siteId: optString(siteId, "siteId"),
+          url: optOptionalString(opts.url),
+          category: optOptionalString(opts.category),
+          archetype: optOptionalString(opts.archetype),
+          skinsDir: optOptionalString(opts.skinsDir),
+        });
+      });
+    });
+
   return program;
+
 }
 
 /** 命令层错误转换：CliExitError 打印主因 + 灰字细节并置退出码；其余错误按 1 退出。 */

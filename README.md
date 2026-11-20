@@ -88,9 +88,9 @@ flowchart TD
 WebRemaster/
 ├── packages/
 │   ├── schema/        # @webremaster/schema: Zod 共享类型契约 (15 tests)
-│   ├── bridge/        # @webremaster/bridge: 零依赖浏览器运行时 SDK + PowerUps (51 tests)
-│   ├── ui-kit/        # @webremaster/ui-kit: Linear 级现代组件库 (9 tests)
-│   ├── compiler/      # @webremaster/compiler: Playwright X-Ray + Vite 打包 + 6 门禁 CLI (39 tests)
+│   ├── bridge/        # @webremaster/bridge: 零依赖浏览器运行时 SDK + PowerUps (58 tests)
+│   ├── ui-kit/        # @webremaster/ui-kit: Linear 级现代组件库 + 社区多主题 (10 tests)
+│   ├── compiler/      # @webremaster/compiler: Playwright X-Ray + Vite 打包 + 6 门禁 CLI (43 tests)
 │   ├── extension/     # @webremaster/extension: Chrome & Firefox MV3 扩展 (徽标联动 / 右键菜单)
 │   └── store/         # @webremaster/store: GitHub Pages 演示大厅 (Before/After 拖拽对比) (2 tests)
 ├── skins/             # 编译产物库 (包含 hackernews 等站点的完整编译产物)
@@ -145,11 +145,26 @@ WebRemaster CLI 采用 Agent-Native 架构设计，提供高可靠的原子化�
 | 指令 | 作用描述 | 产出物 |
 | :--- | :--- | :--- |
 | `wr doctor` | 检查 Node.js / Playwright / 皮肤库依赖环境 | 终端彩色健康诊断报告 |
+| `wr list` | 查阅 Top 40 矩阵与皮肤编译上架进度 | 终端彩色矩阵进度看板 |
+| `wr scaffold <siteId>` | 自动脚手架生成合同、设计、React 19 组件与样式 | `02_contract` / `03_design` / `entry.tsx` |
 | `wr inspect <url> --id <siteId>` | 深度测绘 DOM 结构、表单控件与视口截图 | `01_snapshot.json` + `before.png` |
 | `wr build-skin <siteId>` | TypeScript strict + Vite IIFE 单文件打包 | `<siteId>.user.js` |
 | `wr verify-skin <siteId>` | 启动真浏览器执行 6 重门禁回归校验 | `after.png` + `05_verification.json` |
 | `wr finalize-skin <siteId>` | 上架终审（门禁全绿 + VLM ≥ 8.5） | `manifest.json` |
 | `wr sync-artifacts` | 将合格皮肤同步至 Chrome 扩展与皮肤大厅 | `skinsRegistry.ts` + `store_index.json` |
+
+---
+
+## ⚡ 现代开箱即用 PowerUps 插件库与主题矩阵
+
+受 GitHub 多个顶尖开源项目启发，WebRemaster 为古老网站注入现代 Web 核心能力：
+
+- 📖 **ReaderMode（借鉴 Mozilla Readability / Safari Reader）**：自动提取正文并剔除导航干扰，智能计算 WPM 预估阅读时间，支持 12~28px 字号缩放与排版调节。
+- 🔖 **BookmarkManager（借鉴 Pocket / Readwise）**：客户端本地高隐私稍后阅读书签系统，支持一键导出为标准 Markdown 清单。
+- 🛡️ **OriginDefuser & ContentCleaner（借鉴 uBlock Origin / Privacy Badger）**：隐匿原站后自动静音背景音视频并停止跑马灯；移除 Cookie 弹窗并自动解除页面滚动锁死。
+- ⚡ **TurboNav（借鉴 Hotwire Turbo / Google Quicklink）**：链接预检与无刷新 DOM 局部替换，结合弱网环境智能节流与平滑进度条。
+- ⌨️ **Vim 键盘导航与 CommandPalette**：支持 `j` / `k` 条目移动、`o` 打开、`g` / `G` 顶底跳转，以及 `Cmd+K` 跨功能指令中心。
+- 🎨 **社区顶流主题预设（借鉴 Catppuccin / Tokyo Night / Nord）**：内置 `catppuccin-mocha`、`tokyo-night`、`nord`、`sepia-book` 等经典调色盘，经 CSS 变量与 Shadow DOM 无缝穿透。
 
 ---
 
@@ -170,4 +185,5 @@ WebRemaster CLI 采用 Agent-Native 架构设计，提供高可靠的原子化�
 
 ## 📜 开源协议
 
-本项目采用 [MIT License](LICENSE) 协议开源。
+本项目采用 MIT 协议开源。
+

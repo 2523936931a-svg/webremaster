@@ -6,11 +6,13 @@ import {
   themeVars,
   THEME_CSS,
   THEME_MONO_FONT,
+  THEME_PALETTES,
   FeedListCard,
   SmartDataTable,
   DiagnosticsDrawer,
   type DiagnosticsSnapshot,
 } from "../src/index.js";
+
 
 describe("@webremaster/ui-kit", () => {
   describe("theme", () => {
@@ -41,7 +43,20 @@ describe("@webremaster/ui-kit", () => {
     it("THEME_MONO_FONT 包含常用等宽字体族", () => {
       expect(THEME_MONO_FONT).toContain("monospace");
     });
+
+    it("THEME_PALETTES 包含高星社区预设（Catppuccin、Tokyo Night、Nord、羊皮纸）且注入 THEME_CSS", () => {
+      expect(THEME_PALETTES["catppuccin-mocha"].bg).toBe("#1e1e2e");
+      expect(THEME_PALETTES["tokyo-night"].accent).toBe("#7aa2f7");
+      expect(THEME_PALETTES["nord"].bg).toBe("#2e3440");
+      expect(THEME_PALETTES["sepia-book"].bg).toBe("#fbf0d9");
+
+      expect(THEME_CSS).toContain('data-wr-palette="catppuccin-mocha"');
+      expect(THEME_CSS).toContain('data-wr-palette="tokyo-night"');
+      expect(THEME_CSS).toContain('data-wr-palette="nord"');
+      expect(THEME_CSS).toContain('data-wr-palette="sepia-book"');
+    });
   });
+
 
   describe("FeedListCard", () => {
     it("渲染条目标题、来源域名、得分与评论数", () => {

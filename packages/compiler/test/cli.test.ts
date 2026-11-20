@@ -13,12 +13,22 @@ import {
   SiteContractSchema,
   SiteSnapshotSchema,
   SkinManifestSchema,
+  UXDesignSpecSchema,
   VerificationReportSchema,
   type SiteContract,
   type SiteSnapshot,
   type VerificationReport,
 } from "@webremaster/schema";
-import { CliExitError, buildProgram, finalizeSkinHandler, doctorHandler } from "../src/cli.js";
+
+import {
+  CliExitError,
+  buildProgram,
+  finalizeSkinHandler,
+  doctorHandler,
+  listHandler,
+  scaffoldHandler,
+} from "../src/cli.js";
+
 
 const SITE_ID = "example-site";
 const createdDirs: string[] = [];
@@ -171,11 +181,15 @@ describe("buildProgram（结构锁定）", () => {
       "compile",
       "sync-artifacts",
       "doctor",
+      "list",
+      "scaffold",
     ]);
   });
 
-  it("前六条原子命令都带必填位置参数（Argument.required）", () => {
-    const positionalCommands = program.commands.filter((c) => c.name() !== "sync-artifacts" && c.name() !== "doctor");
+  it("带必填位置参数的原子命令校验（Argument.required）", () => {
+    const positionalCommands = program.commands.filter(
+      (c) => c.name() !== "sync-artifacts" && c.name() !== "doctor" && c.name() !== "list",
+    );
     for (const command of positionalCommands) {
       expect(command.registeredArguments.length).toBeGreaterThan(0);
       for (const argument of command.registeredArguments) {
@@ -185,7 +199,9 @@ describe("buildProgram（结构锁定）", () => {
   });
 
   it("必填参数缺失即拒绝（CommanderError，不触发 handler）", async () => {
-    const positionalCommands = program.commands.filter((c) => c.name() !== "sync-artifacts" && c.name() !== "doctor");
+    const positionalCommands = program.commands.filter(
+      (c) => c.name() !== "sync-artifacts" && c.name() !== "doctor" && c.name() !== "list",
+    );
     for (const command of positionalCommands) {
       // commander 对缺失位置参数报 "missing required argument"，对缺失必填选项报 "required option ... not specified"
       await expect(command.parseAsync([], { from: "user" })).rejects.toThrow(
@@ -200,6 +216,57 @@ describe("buildProgram（结构锁定）", () => {
     const nodeCheck = checks.find((c) => c.name.includes("Node.js"));
     expect(nodeCheck?.passed).toBe(true);
   });
+
+  it("listHandler 准确读取站点配置矩阵并标记重制进度状态", async () => {
+    const items = await listHandler();
+    expect(items.length).toBeGreaterThan(0);
+    const hn = items.find((i) => i.id === "hackernews");
+    expect(hn).toBeDefined();
+    expect(hn?.category).toBe("开发者");
+    // hackernews 在 skins 目录已完成编译
+    expect(hn?.status).toBe("compiled");
+  });
+
+  it("scaffoldHandler 校验非法 kebab-case 格式并拒绝", async () => {
+    await expect(scaffoldHandler({ siteId: "Invalid_ID_Site!" })).rejects.toThrow(
+      /不合法，必须为 kebab-case/,
+    );
+  });
+
+  it("scaffoldHandler 完整生成符合 Schema 规范的重制脚手架代码与配置", async () => {
+    const rootDir = mkdtempSync(path.join(tmpdir(), "wr-scaffold-test-"));
+    createdDirs.push(rootDir);
+    const skinsDir = path.join(rootDir, "skins");
+
+    const result = await scaffoldHandler({
+      siteId: "my-test-site",
+      url: "https://my-test-site.org/docs",
+      category: "高校与学术",
+      archetype: "article-reader",
+      skinsDir,
+    });
+
+    expect(result.siteId).toBe("my-test-site");
+    expect(result.createdFiles.length).toBe(4);
+
+    // 验证 02_contract.json 符合 SiteContractSchema 强类型校验
+    const contractRaw = JSON.parse(readFileSync(path.join(skinsDir, "my-test-site", "02_contract.json"), "utf8"));
+    const parsedContract = SiteContractSchema.parse(contractRaw);
+    expect(parsedContract.siteId).toBe("my-test-site");
+    expect(parsedContract.routes[0].archetype).toBe("doc-reader"); // normalized
+    expect(parsedContract.enableTurboNav).toBe(true);
+
+    // 验证 03_design.json 符合 UXDesignSpecSchema 强类型校验
+    const designRaw = JSON.parse(readFileSync(path.join(skinsDir, "my-test-site", "03_design.json"), "utf8"));
+    const parsedDesign = UXDesignSpecSchema.parse(designRaw);
+    expect(parsedDesign.siteId).toBe("my-test-site");
+    expect(parsedDesign.themeIdentity.brandAccentHex).toBe("#0ea5e9");
+
+    // 验证 entry.tsx 和 skin.css 存在
+    expect(existsSync(path.join(skinsDir, "my-test-site", "src", "entry.tsx"))).toBe(true);
+    expect(existsSync(path.join(skinsDir, "my-test-site", "src", "skin.css"))).toBe(true);
+  });
+
 
   it("finalize-skin 四个必填选项（mandatory）与行为验证", async () => {
     const command = program.commands.find((candidate) => candidate.name() === "finalize-skin");
