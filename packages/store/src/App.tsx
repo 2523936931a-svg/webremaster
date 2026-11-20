@@ -72,7 +72,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#09090b] text-[#f4f4f5]">
-      <Header lang={lang} onToggleLang={toggleLang} />
+      <Header lang={lang} onToggleLang={toggleLang} skinCount={storeIndex?.skins.length} />
 
       <main className="flex-1">
         <Hero lang={lang} />

@@ -5,9 +5,10 @@ import { Github, Globe, Sparkles, Download } from "lucide-react";
 export interface HeaderProps {
   lang: Language;
   onToggleLang: () => void;
+  skinCount?: number;
 }
 
-export const Header: React.FC<HeaderProps> = ({ lang, onToggleLang }) => {
+export const Header: React.FC<HeaderProps> = ({ lang, onToggleLang, skinCount }) => {
   const t = DICTIONARY[lang];
 
   return (
@@ -24,6 +25,12 @@ export const Header: React.FC<HeaderProps> = ({ lang, onToggleLang }) => {
               <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">
                 v0.1.0
               </span>
+              {typeof skinCount === "number" && (
+                <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  {skinCount} {lang === "zh" ? "站上架" : "Skins"}
+                </span>
+              )}
             </span>
             <span className="text-xs text-zinc-400">
               {lang === "zh" ? "老旧网站次世代重制编译器" : "Legacy Web Remaster Compiler"}

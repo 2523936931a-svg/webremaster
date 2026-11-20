@@ -210,6 +210,15 @@ describe("shadowMount", () => {
     expect(fallback?.textContent).toContain(".card");
     expect(document.querySelector("style[data-wr-host-style]")).not.toBeNull();
   });
+
+  it("mountWebRemasterRoot 重复挂载同 appId 时先清理旧 host，防止多根堆叠内存泄漏", () => {
+    const res1 = mountWebRemasterRoot("duplicate-app", "");
+    expect(document.querySelectorAll('web-remaster-root[data-wr-app="duplicate-app"]').length).toBe(1);
+
+    const res2 = mountWebRemasterRoot("duplicate-app", "");
+    expect(document.querySelectorAll('web-remaster-root[data-wr-app="duplicate-app"]').length).toBe(1);
+    expect(res2.host).not.toBe(res1.host);
+  });
 });
 
 describe("nativeDispatch", () => {

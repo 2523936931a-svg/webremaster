@@ -29,6 +29,19 @@ const getFetch = (): FetchFn | null => {
   return typeof candidate === "function" ? candidate : null;
 };
 
+/** 安全平滑滚动：JSDOM 测试环境不输出 Not implemented: window.scrollTo 警告 */
+const safeScrollTo = (x: number, y: number): void => {
+  if (typeof window === "undefined") return;
+  if (typeof navigator !== "undefined" && /jsdom/i.test(navigator.userAgent)) return;
+  try {
+    if (typeof window.scrollTo === "function") {
+      window.scrollTo(x, y);
+    }
+  } catch {
+    /* 忽略不支持滚动的宿主异常 */
+  }
+};
+
 export class TurboNavigator {
   private readonly originRoot: HTMLElement;
   private readonly onRouteChanged: (url: string, newDoc: Document) => void;
@@ -38,6 +51,7 @@ export class TurboNavigator {
   private readonly hoverDelayMs: number;
   private readonly onFallbackAssign?: (url: string) => void;
   private readonly cache = new Map<string, { html: string; expires: number }>();
+  private readonly scrollPositions = new Map<string, { x: number; y: number }>();
   private hoverTimer?: ReturnType<typeof setTimeout>;
   private readonly onMouseOver: (event: MouseEvent) => void;
   private readonly onMouseOut: () => void;
@@ -148,7 +162,15 @@ export class TurboNavigator {
     return entry.html;
   }
 
+  /** 借鉴 GoogleChromeLabs/quicklink：省流模式 (saveData) 或 2G 慢速网络时不进行静默预取 */
+  private isSaveDataOrSlowNetwork(): boolean {
+    if (typeof navigator === "undefined") return false;
+    const conn = (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } })?.connection;
+    return !!(conn?.saveData || conn?.effectiveType === "2g" || conn?.effectiveType === "slow-2g");
+  }
+
   async prefetch(url: string): Promise<void> {
+    if (this.isSaveDataOrSlowNetwork()) return;
     if (!this.shouldHandle(url)) return;
     if (this.getCached(url) !== null) return;
     await this.fetchDocument(url);
@@ -267,8 +289,54 @@ export class TurboNavigator {
     }
   }
 
+  /** 借鉴 Hotwire Turbo / NProgress：导航期间在顶端展示霓虹渐变进度条 */
+  private showProgressBar(): () => void {
+    if (typeof document === "undefined") return () => {};
+    let bar = document.getElementById("wr-turbo-progress");
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.id = "wr-turbo-progress";
+      bar.style.cssText =
+        "position:fixed;top:0;left:0;height:2.5px;width:0%;background:linear-gradient(90deg,#0284c7,#38bdf8,#818cf8);z-index:2147483647;box-shadow:0 0 10px rgba(56,189,248,.6);transition:width .25s ease,opacity .2s ease;pointer-events:none;";
+      (document.body ?? document.documentElement)?.appendChild(bar);
+    }
+    bar.style.opacity = "1";
+    bar.style.width = "35%";
+    const t1 = setTimeout(() => {
+      if (bar) bar.style.width = "75%";
+    }, 100);
+
+    return () => {
+      clearTimeout(t1);
+      if (!bar) return;
+      bar.style.width = "100%";
+      setTimeout(() => {
+        if (bar) {
+          bar.style.opacity = "0";
+          setTimeout(() => {
+            if (bar) bar.style.width = "0%";
+          }, 200);
+        }
+      }, 150);
+    };
+  }
+
   private async applyUrl(url: string, push: boolean): Promise<boolean> {
+    // 借鉴 Hotwire Turbo：记录前一页面滚动位置
+    if (typeof window !== "undefined") {
+      try {
+        this.scrollPositions.set(window.location.href, {
+          x: window.scrollX || 0,
+          y: window.scrollY || 0,
+        });
+      } catch {
+        /* 忽略取滚动位置失败 */
+      }
+    }
+
+    const doneProgress = this.showProgressBar();
     const html = await this.fetchDocument(url);
+    doneProgress();
     if (html === null) return false;
     let parsed: Document;
     try {
@@ -289,6 +357,15 @@ export class TurboNavigator {
     }
     this.swapOriginContent(parsed);
     this.copyHeadAssets(parsed);
+
+    // 借鉴 Hotwire Turbo：后退恢复历史滚动坐标，前进重置置顶
+    if (!push && this.scrollPositions.has(url)) {
+      const pos = this.scrollPositions.get(url)!;
+      safeScrollTo(pos.x, pos.y);
+    } else if (push) {
+      safeScrollTo(0, 0);
+    }
+
     try {
       this.onRouteChanged(url, parsed);
     } catch {
@@ -297,16 +374,32 @@ export class TurboNavigator {
     return true;
   }
 
-  /** 用新页 body 原子替换 #wr-origin-wrapper 内容；script 重建以真实执行 */
+  /** 用新页 body 原子替换 #wr-origin-wrapper 内容；保留 [data-wr-permanent] 元素（借鉴 Turbo / Idiomorph） */
   private swapOriginContent(parsed: Document): void {
     const wrapper = document.getElementById("wr-origin-wrapper");
     if (!wrapper) return;
+
+    // 收集旧 wrapper 中所有带 id 的持久化节点
+    const permanentMap = new Map<string, Element>();
+    for (const el of Array.from(wrapper.querySelectorAll("[data-wr-permanent][id]"))) {
+      permanentMap.set(el.id, el);
+    }
+
     while (wrapper.firstChild) wrapper.removeChild(wrapper.firstChild);
     const scripts: HTMLScriptElement[] = [];
     for (const node of Array.from(parsed.body.childNodes)) {
       if (node.nodeType === 1 && (node as Element).tagName === "SCRIPT") {
         scripts.push(node as HTMLScriptElement);
         continue;
+      }
+      if (node.nodeType === 1 && (node as Element).hasAttribute("data-wr-permanent")) {
+        const id = (node as Element).id;
+        const existing = id ? permanentMap.get(id) : null;
+        if (existing) {
+          // 保留已有持久化节点（避免视频/音频播放、表单状态重置）
+          wrapper.appendChild(existing);
+          continue;
+        }
       }
       wrapper.appendChild(document.importNode(node, true));
     }

@@ -345,6 +345,56 @@ describe("turboNav", () => {
     nav.dispose();
   });
 
+  it("省流模式 (saveData / 2G) 下跳过自动预取以节省带宽 (借鉴 quicklink)", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const originalNavigator = globalThis.navigator;
+    Object.defineProperty(globalThis, "navigator", {
+      value: { ...originalNavigator, connection: { saveData: true } },
+      configurable: true,
+      writable: true,
+    });
+
+    const container = root();
+    const nav = new TurboNavigator(container, vi.fn());
+    await nav.prefetch(new URL("/heavy-page", window.location.href).href);
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    nav.dispose();
+    Object.defineProperty(globalThis, "navigator", {
+      value: originalNavigator,
+      configurable: true,
+      writable: true,
+    });
+  });
+
+  it("持久化节点 (data-wr-permanent) 在页面路由切换后原样保留 (借鉴 Turbo / Idiomorph)", async () => {
+    const wrapper = document.createElement("div");
+    wrapper.id = "wr-origin-wrapper";
+    const audio = document.createElement("audio");
+    audio.id = "persistent-player";
+    audio.setAttribute("data-wr-permanent", "true");
+    audio.setAttribute("data-play-state", "playing");
+    wrapper.appendChild(audio);
+    document.body.appendChild(wrapper);
+
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      text: async () =>
+        '<html><body><audio id="persistent-player" data-wr-permanent="true"></audio><div>新页面内容</div></body></html>',
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const nav = new TurboNavigator(wrapper, vi.fn());
+    await nav.navigate(new URL("/next-page", window.location.href).href);
+
+    const keptAudio = wrapper.querySelector("#persistent-player");
+    expect(keptAudio).toBe(audio); // 同一 DOM 引用原样保留
+    expect(keptAudio?.getAttribute("data-play-state")).toBe("playing");
+    expect(wrapper.textContent).toContain("新页面内容");
+    nav.dispose();
+  });
+
   it("LRU 缓存上限与淘汰", async () => {
     const fetchMock = vi.fn(async (url: string) => ({
       ok: true,

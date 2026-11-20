@@ -61,6 +61,12 @@ export function mountWebRemasterRoot(appId: string, cssText?: string): ShadowMou
     return null as unknown as ShadowMountResult;
   }
 
+  // 借鉴 wxt-dev/wxt 与 Tampermonkey 规范：重复挂载或重载时，清理同 appId 孤立根节点防内存泄漏
+  const existingHost = document.querySelector(`web-remaster-root[data-wr-app="${appId}"]`);
+  if (existingHost) {
+    existingHost.remove();
+  }
+
   const host = document.createElement("web-remaster-root");
   host.setAttribute("data-wr-app", appId);
   const mountParent = document.body ?? document.documentElement;

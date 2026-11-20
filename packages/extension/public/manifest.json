@@ -3,7 +3,7 @@
   "name": "WebRemaster — Modernize Ugly Legacy Websites",
   "version": "1.0.0",
   "description": "Zero-token, Shadow-DOM React remasters for classic websites.",
-  "permissions": ["storage", "scripting", "activeTab"],
+  "permissions": ["storage", "scripting", "activeTab", "contextMenus"],
   "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup.html",

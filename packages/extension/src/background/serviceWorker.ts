@@ -120,3 +120,38 @@ ext.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
   return true;
 });
+
+// 借鉴 Refined GitHub：注册右键快捷上下文菜单
+ext.runtime.onInstalled?.addListener(() => {
+  if (!ext.contextMenus) return;
+  ext.contextMenus.removeAll?.(() => {
+    ext.contextMenus.create({
+      id: "wr-toggle-mode",
+      title: "WebRemaster: 切换原版/重制版 (Alt+Shift+R)",
+      contexts: ["page"],
+    });
+    ext.contextMenus.create({
+      id: "wr-open-store",
+      title: "WebRemaster: 浏览皮肤商店",
+      contexts: ["page"],
+    });
+  });
+});
+
+ext.contextMenus?.onClicked?.addListener(async (info, tab) => {
+  if (info.menuItemId === "wr-toggle-mode" && tab?.id) {
+    try {
+      await ext.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          window.dispatchEvent(new KeyboardEvent("keydown", { key: "R", altKey: true, shiftKey: true, bubbles: true }));
+        },
+        world: "MAIN",
+      });
+    } catch {
+      /* 忽略非标或受限页面异常 */
+    }
+  } else if (info.menuItemId === "wr-open-store") {
+    ext.tabs.create({ url: "https://webremaster.dev" });
+  }
+});
