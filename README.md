@@ -5,7 +5,7 @@
 **告别 1998 年刺眼、无排版的老旧网站。零 Token 运行时 · Shadow DOM 样式隔离 · React 19 + Tailwind v4 次世代重制编译器。**
 
 [![CI Status](https://github.com/webremaster/webremaster/actions/workflows/ci.yml/badge.svg)](https://github.com/webremaster/webremaster/actions/workflows/ci.yml)
-[![Tests Passing](https://img.shields.io/badge/Tests-117%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
+[![Tests Passing](https://img.shields.io/badge/Tests-128%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![React 19](https://img.shields.io/badge/React-19.0-61dafb.svg)](https://react.dev/)
@@ -13,7 +13,8 @@
 [![Playwright](https://img.shields.io/badge/Verified%20with-Playwright-2EAD33.svg)](https://playwright.dev/)
 [![Chrome MV3](https://img.shields.io/badge/Extension-Chrome%20MV3-orange.svg)](https://developer.chrome.com/docs/extensions/mv3/)
 
-[**🌐 在线皮肤商店 & Before/After 演示**](https://webremaster.github.io/webremaster/) · [**📦 下载 Chrome 扩展 (.zip)**](https://github.com/webremaster/webremaster/releases) · [**📖 架构设计白皮书**](#-核心架构) · [**🎯 Top 40 站点清单**](#-top-40-待重制网站矩阵)
+[**🌐 在线皮肤商店 & Before/After 演示**](https://webremaster.github.io/webremaster/) · [**📑 项目介绍书与白皮书**](docs/PROJECT_SHOWCASE.md) · [**📦 下载 Chrome 扩展 (.zip)**](https://github.com/webremaster/webremaster/releases) · [**🎯 Top 40 站点清单**](#-top-40-待重制网站矩阵)
+
 
 ---
 
