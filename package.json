@@ -8,6 +8,8 @@
   },
   "scripts": {
     "build": "pnpm --filter @webremaster/schema build && pnpm --filter @webremaster/bridge build && pnpm --filter @webremaster/ui-kit build && pnpm --filter @webremaster/compiler build",
+    "dev": "pnpm --filter @webremaster/store dev",
+    "preview": "pnpm --filter @webremaster/store preview",
     "wr": "node packages/compiler/dist/cli.js",
     "sync:artifacts": "node packages/compiler/dist/cli.js sync-artifacts --skins ./skins --ext ./packages/extension --store ./packages/store",
     "build:ext": "pnpm sync:artifacts && pnpm --filter @webremaster/extension build",
