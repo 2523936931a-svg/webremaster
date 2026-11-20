@@ -42,8 +42,8 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
               <Sparkles size={13} />
               <span>
                 {lang === "zh"
-                  ? "零 Token 编译期 AI 重制架构 · 100% 离线隐私"
-                  : "Zero-Token Compiler Architecture · 100% Offline"}
+                  ? "零 Token 编译期 AI 重制架构 · 融合 Raycast / Arc 交互"
+                  : "Zero-Token Compiler Architecture · Raycast & Arc Inspired"}
               </span>
             </div>
 
@@ -87,15 +87,15 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck size={14} className="text-sky-400 flex-shrink-0" />
-                <span>双向原生状态桥接</span>
+                <span>Portal Slot 原生虫洞</span>
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck size={14} className="text-sky-400 flex-shrink-0" />
-                <span>Playwright 6重门禁验收</span>
+                <span>Arc Zap 元素粉碎枪</span>
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck size={14} className="text-sky-400 flex-shrink-0" />
-                <span>Alt+Shift+R 0ms 逃生开关</span>
+                <span>View Transitions 0ms 转场</span>
               </div>
             </div>
           </div>

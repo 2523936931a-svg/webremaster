@@ -15,6 +15,8 @@ import {
   getSharedOriginManager,
   useCommandPaletteHotkey,
   cleanDistractions,
+  toggleElementZapper,
+  resetZappedSelectors,
   type OriginManager,
   type PaletteCommand,
   type ViewMode,
@@ -134,6 +136,22 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
         keywords: "clean popup ad banner cookie 广告 弹窗 遮罩",
         run: () => {
           cleanDistractions(document);
+        },
+      },
+      {
+        id: "wr-element-zap",
+        label: "元素粉碎枪：点击永久隐藏页面指定区域 (Zap)",
+        keywords: "zap hide remove vaporize 隐藏 消除 广告 净化 元素 粉碎",
+        run: () => {
+          toggleElementZapper();
+        },
+      },
+      {
+        id: "wr-element-unzap",
+        label: "重置所有被粉碎隐藏的元素 (Restore Zapped)",
+        keywords: "unzap restore reset 恢复 重置 还原",
+        run: () => {
+          resetZappedSelectors();
         },
       },
       {

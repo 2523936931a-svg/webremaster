@@ -355,21 +355,40 @@ export class TurboNavigator {
     } catch {
       /* 标题更新失败忽略 */
     }
-    this.swapOriginContent(parsed);
-    this.copyHeadAssets(parsed);
+    const applySwap = () => {
+      this.swapOriginContent(parsed);
+      this.copyHeadAssets(parsed);
 
-    // 借鉴 Hotwire Turbo：后退恢复历史滚动坐标，前进重置置顶
-    if (!push && this.scrollPositions.has(url)) {
-      const pos = this.scrollPositions.get(url)!;
-      safeScrollTo(pos.x, pos.y);
-    } else if (push) {
-      safeScrollTo(0, 0);
-    }
+      // 借鉴 Hotwire Turbo：后退恢复历史滚动坐标，前进重置置顶
+      if (!push && this.scrollPositions.has(url)) {
+        const pos = this.scrollPositions.get(url)!;
+        safeScrollTo(pos.x, pos.y);
+      } else if (push) {
+        safeScrollTo(0, 0);
+      }
 
-    try {
-      this.onRouteChanged(url, parsed);
-    } catch {
-      /* 回调异常不影响导航完成 */
+      try {
+        this.onRouteChanged(url, parsed);
+      } catch {
+        /* 回调异常不影响导航完成 */
+      }
+    };
+
+    // 借鉴 W3C View Transitions API：支持的原生现代浏览器自动执行平滑交叉淡入动画
+    if (
+      typeof document !== "undefined" &&
+      "startViewTransition" in document &&
+      typeof (document as any).startViewTransition === "function"
+    ) {
+      try {
+        (document as any).startViewTransition(() => {
+          applySwap();
+        });
+      } catch {
+        applySwap();
+      }
+    } else {
+      applySwap();
     }
     return true;
   }

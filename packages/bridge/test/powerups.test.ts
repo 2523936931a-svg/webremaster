@@ -40,6 +40,15 @@ import {
   definePowerUp,
   getSharedPluginHost,
 } from "../src/powerups/pluginHost.js";
+import {
+  computeResilientSelector,
+  getZappedSelectors,
+  saveZappedSelector,
+  resetZappedSelectors,
+  applyZappedSelectors,
+  toggleElementZapper,
+  stopElementZapper,
+} from "../src/powerups/ElementZapper.js";
 
 
 
@@ -399,6 +408,68 @@ describe("PluginHost", () => {
     expect(instance1).toBe(instance2);
   });
 });
+
+describe("ElementZapper (Arc Boosts Zap 元素粉碎枪)", () => {
+  it("computeResilientSelector：优先推导 id 选择器、类选择器或层级选择器", () => {
+    const container = document.createElement("div");
+    container.innerHTML = `
+      <div id="banner-ad">Ad 1</div>
+      <div class="sidebar-promo">Promo 1</div>
+      <section>
+        <p>Paragraph 1</p>
+        <p>Paragraph 2</p>
+      </section>
+    `;
+    document.body.appendChild(container);
+
+    const banner = container.querySelector("#banner-ad")!;
+    expect(computeResilientSelector(banner)).toBe("#banner-ad");
+
+    const promo = container.querySelector(".sidebar-promo")!;
+    expect(computeResilientSelector(promo)).toContain("sidebar-promo");
+
+    const p2 = container.querySelectorAll("p")[1]!;
+    expect(computeResilientSelector(p2)).toContain("nth-child(2)");
+  });
+
+  it("saveZappedSelector 与 getZappedSelectors：持久化存储并去重", () => {
+    resetZappedSelectors();
+    expect(getZappedSelectors()).toEqual([]);
+
+    saveZappedSelector("#annoying-popup");
+    saveZappedSelector("#annoying-popup"); // 重复
+    saveZappedSelector(".floating-widget");
+
+    const list = getZappedSelectors();
+    expect(list.length).toBe(2);
+    expect(list).toContain("#annoying-popup");
+    expect(list).toContain(".floating-widget");
+  });
+
+  it("applyZappedSelectors 与 resetZappedSelectors：注入隐藏样式与一键复原", () => {
+    resetZappedSelectors();
+    saveZappedSelector("#bad-element");
+    applyZappedSelectors();
+
+    const styleEl = document.getElementById("wr-zapper-styles");
+    expect(styleEl).not.toBeNull();
+    expect(styleEl?.textContent).toContain("#bad-element { display: none !important; }");
+
+    resetZappedSelectors();
+    expect(document.getElementById("wr-zapper-styles")).toBeNull();
+    expect(getZappedSelectors()).toEqual([]);
+  });
+
+  it("toggleElementZapper：启停粉碎模式状态", () => {
+    const started = toggleElementZapper();
+    expect(started).toBe(true);
+
+    const stopped = toggleElementZapper();
+    expect(stopped).toBe(false);
+    stopElementZapper();
+  });
+});
+
 
 
 
