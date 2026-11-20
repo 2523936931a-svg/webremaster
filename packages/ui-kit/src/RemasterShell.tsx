@@ -21,6 +21,8 @@ import {
 import { THEME_CSS, ThemeProvider, useThemeVars, type ThemeMode } from "./theme.js";
 import { DiagnosticsDrawer, type DiagnosticsSnapshot } from "./DiagnosticsDrawer.js";
 import { RemasterErrorBoundary } from "./RemasterErrorBoundary.js";
+import { ToastProvider } from "./Toast.js";
+
 
 
 export interface RemasterShellProps {
@@ -143,7 +145,9 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
 
   return (
     <ThemeProvider mode={mode}>
-      <div data-wr-theme={mode} className="flex min-h-screen flex-col">
+      <ToastProvider>
+        <div data-wr-theme={mode} className="flex min-h-screen flex-col">
+
         <style>{THEME_CSS}</style>
         <header
           className="sticky top-0 z-20 flex items-center gap-3 px-4 py-2.5"
@@ -234,6 +238,8 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
           />
         ) : null}
       </div>
+      </ToastProvider>
     </ThemeProvider>
   );
 }
+

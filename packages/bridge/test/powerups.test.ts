@@ -28,6 +28,14 @@ import {
   saveReaderSettings,
 } from "../src/powerups/ReaderMode.js";
 import { cleanDistractions } from "../src/powerups/ContentCleaner.js";
+import {
+  heuristicSummarize,
+  summarizeText,
+  getAIConfig,
+  saveAIConfig,
+} from "../src/powerups/AISummarizer.js";
+import { enhanceCodeBlocks } from "../src/powerups/CodeBlockEnhancer.js";
+
 
 
 describe("DataExporter", () => {
@@ -261,5 +269,56 @@ describe("ContentCleaner", () => {
     expect(document.querySelector(".main-content")).not.toBeNull();
   });
 });
+
+describe("AISummarizer", () => {
+  it("heuristicSummarize：空文本与有效长文均可稳定提取结构化摘要且不抛错", () => {
+    const empty = heuristicSummarize("");
+    expect(empty.tldr[0]).toContain("无法提取概要");
+    expect(empty.modelUsed).toBe("heuristic-offline");
+
+    const articleText =
+      "WebRemaster 是一套革命性的全网老旧丑网站现代化重制引擎。采用 Shadow DOM 与 React 19 构建纯净沙箱。" +
+      "通过活体传送门机制将原站复杂控件原样嵌入新界面。支持零闪烁揭幕和多模式双路由无缝切换。";
+    const result = heuristicSummarize(articleText, 2);
+    expect(result.tldr.length).toBeGreaterThanOrEqual(1);
+    expect(result.keyTakeaways.length).toBeGreaterThan(0);
+    expect(result.modelUsed).toBe("heuristic-offline");
+  });
+
+  it("AI 配置存取与离线降级", async () => {
+    localStorage.clear();
+    const config = getAIConfig();
+    expect(config.provider).toBe("openai");
+
+    saveAIConfig({ provider: "deepseek", apiKey: "sk-test" });
+    const updated = getAIConfig();
+    expect(updated.provider).toBe("deepseek");
+    expect(updated.apiKey).toBe("sk-test");
+
+    // 未能请求外部网络时优雅自动降级到离线算法
+    const res = await summarizeText("较短内容");
+    expect(res.modelUsed).toBe("heuristic-offline");
+  });
+});
+
+describe("CodeBlockEnhancer", () => {
+  it("enhanceCodeBlocks：自动为页面代码块挂载现代化复制按钮且幂等运行", () => {
+    const container = document.createElement("div");
+    container.innerHTML = `
+      <pre><code>SELECT * FROM users WHERE active = 1;</code></pre>
+      <pre><code>git rebase -i HEAD~3</code></pre>
+    `;
+
+    const res1 = enhanceCodeBlocks(container);
+    expect(res1.enhancedCount).toBe(2);
+    expect(container.querySelectorAll(".wr-code-copy-btn").length).toBe(2);
+
+    // 二次运行幂等
+    const res2 = enhanceCodeBlocks(container);
+    expect(res2.enhancedCount).toBe(0);
+    expect(container.querySelectorAll(".wr-code-copy-btn").length).toBe(2);
+  });
+});
+
 
 

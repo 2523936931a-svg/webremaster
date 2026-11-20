@@ -12,8 +12,11 @@ import {
   DiagnosticsDrawer,
   RemasterErrorBoundary,
   RemasterShell,
+  ToastProvider,
+  useToast,
   type DiagnosticsSnapshot,
 } from "../src/index.js";
+
 
 
 
@@ -212,5 +215,33 @@ describe("@webremaster/ui-kit", () => {
       expect(fallbackHtml).toContain("原站 DOM 选择器被重构");
     });
   });
+
+  describe("Toast", () => {
+    it("ToastProvider 挂载与静态渲染正常，无子级崩溃", () => {
+      const html = renderToString(
+        <ToastProvider>
+          <div>测试容器</div>
+        </ToastProvider>
+      );
+      expect(html).toContain("测试容器");
+      expect(html).toContain("aria-live=\"polite\"");
+    });
+
+    it("useToast 在 Provider 外部调用时返回安全空操作，不抛错", () => {
+      let toastMethods: ReturnType<typeof useToast> | null = null;
+      function TestConsumer() {
+        toastMethods = useToast();
+        return null;
+      }
+      renderToString(<TestConsumer />);
+      expect(toastMethods).not.toBeNull();
+      // 安全调用空操作
+      expect(() => {
+        toastMethods?.success("测试");
+        toastMethods?.error("错误");
+      }).not.toThrow();
+    });
+  });
 });
+
 
