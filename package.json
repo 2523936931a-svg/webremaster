@@ -17,6 +17,9 @@
     "build:all": "pnpm build && pnpm build:ext && pnpm build:store",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
+    "doctor": "node packages/compiler/dist/cli.js doctor",
+    "list": "node packages/compiler/dist/cli.js list",
+    "check:all": "pnpm typecheck && pnpm test && pnpm build:all",
     "test:all": "pnpm typecheck && pnpm test && pnpm build:all"
   }
 }

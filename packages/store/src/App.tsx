@@ -7,8 +7,10 @@ import { Hero } from "./components/Hero.js";
 import { TokenStatsBar } from "./components/TokenStatsBar.js";
 import { SkinCard } from "./components/SkinCard.js";
 import { SkinDetailModal } from "./components/SkinDetailModal.js";
+import { CommunitySkinModal } from "./components/CommunitySkinModal.js";
+import { ArchitectureComparison } from "./components/ArchitectureComparison.js";
 import { Footer } from "./components/Footer.js";
-import { Search, Filter, Layers } from "lucide-react";
+import { Search, Filter, Layers, Sparkles } from "lucide-react";
 
 export const App: React.FC = () => {
   const [lang, setLang] = useState<Language>("zh");
@@ -16,12 +18,17 @@ export const App: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [modalSkin, setModalSkin] = useState<SkinManifest | null>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   const t = DICTIONARY[lang];
 
-  useEffect(() => {
+  const refreshIndex = () => {
     loadStoreIndex().then((data) => setStoreIndex(data));
+  };
+
+  useEffect(() => {
+    refreshIndex();
 
     const handleGlobalShortcuts = (e: KeyboardEvent) => {
       if (
@@ -48,11 +55,21 @@ export const App: React.FC = () => {
     { id: "高校教务", label: t.categoryCampus },
     { id: "社区论坛", label: t.categoryCommunity },
     { id: "文档工具", label: t.categoryDocs },
+    { id: "community", label: t.customSkinBadge },
   ];
 
   const filteredSkins = (storeIndex?.skins || []).filter((skin) => {
+    const isCustom =
+      typeof window !== "undefined" &&
+      Boolean(
+        localStorage
+          .getItem("webremaster_custom_skins")
+          ?.includes(skin.id),
+      );
+
     const matchesCategory =
       selectedCategory === "all" ||
+      (selectedCategory === "community" && isCustom) ||
       skin.category === selectedCategory ||
       (selectedCategory === "开发者" && skin.category.includes("开发")) ||
       (selectedCategory === "学术科研" && (skin.category.includes("学术") || skin.category.includes("论文")));
@@ -72,7 +89,12 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#09090b] text-[#f4f4f5]">
-      <Header lang={lang} onToggleLang={toggleLang} skinCount={storeIndex?.skins.length} />
+      <Header
+        lang={lang}
+        onToggleLang={toggleLang}
+        onOpenImportModal={() => setIsImportModalOpen(true)}
+        skinCount={storeIndex?.skins.length}
+      />
 
       <main className="flex-1">
         <Hero lang={lang} />
@@ -110,6 +132,9 @@ export const App: React.FC = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-zinc-900 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-xs text-white placeholder:text-zinc-500 outline-none focus:border-sky-500/50 transition-colors"
               />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-600 border border-white/10 rounded px-1.5 py-0.5 pointer-events-none">
+                /
+              </span>
             </div>
           </div>
 
@@ -147,13 +172,20 @@ export const App: React.FC = () => {
               <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-zinc-500 mb-3">
                 <Search size={20} />
               </div>
-              <div className="text-sm font-semibold text-zinc-300">未找到匹配的皮肤</div>
+              <div className="text-sm font-semibold text-zinc-300">
+                {lang === "zh" ? "未找到匹配的皮肤" : "No matching skins found"}
+              </div>
               <div className="text-xs text-zinc-500 mt-1">
-                尝试更换关键词，或者在 GitHub 提出重制该站点的 Issue
+                {lang === "zh"
+                  ? "尝试更换关键词，或者点击右上角「导入社区皮肤」导入自制皮肤"
+                  : "Try another search term or click 'Import Custom Skin' in the header"}
               </div>
             </div>
           )}
         </section>
+
+        {/* 5 Core Superpowers & Technical Architecture Matrix */}
+        <ArchitectureComparison lang={lang} />
       </main>
 
       <Footer lang={lang} />
@@ -162,6 +194,13 @@ export const App: React.FC = () => {
         skin={modalSkin}
         lang={lang}
         onClose={() => setModalSkin(null)}
+      />
+
+      <CommunitySkinModal
+        isOpen={isImportModalOpen}
+        lang={lang}
+        onClose={() => setIsImportModalOpen(false)}
+        onSkinImported={() => refreshIndex()}
       />
     </div>
   );

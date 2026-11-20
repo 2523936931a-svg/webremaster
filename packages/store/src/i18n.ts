@@ -34,6 +34,15 @@ export interface Translations {
   verificationReport: string;
   enhancedFeatures: string;
   escapeKeyHint: string;
+  importSkin: string;
+  importSkinDesc: string;
+  architectureTitle: string;
+  architectureSubtitle: string;
+  viewModeSplit: string;
+  viewModeSideBySide: string;
+  viewModeFade: string;
+  copiedToClipboard: string;
+  customSkinBadge: string;
 }
 
 export const DICTIONARY: Record<Language, Translations> = {
@@ -72,6 +81,15 @@ export const DICTIONARY: Record<Language, Translations> = {
     verificationReport: "Playwright 验收报告",
     enhancedFeatures: "内置现代超级能力",
     escapeKeyHint: "按 Alt+Shift+R 随时在原版/新版/分屏间瞬切",
+    importSkin: "➕ 导入社区皮肤",
+    importSkinDesc: "输入 GitHub Gist、Raw URL 或粘贴皮肤清单 JSON，即刻在本地预览并安装",
+    architectureTitle: "WebRemaster 拔尖架构与硬核壁垒",
+    architectureSubtitle: "彻底超越传统油猴脚本与 Stylus CSS 的 5 项底层革命",
+    viewModeSplit: "分屏滑动",
+    viewModeSideBySide: "双栏并列",
+    viewModeFade: "透明渐变",
+    copiedToClipboard: "已复制到剪贴板",
+    customSkinBadge: "社区自制",
   },
   en: {
     heroTitle1: "Stop tolerating",
@@ -108,5 +126,15 @@ export const DICTIONARY: Record<Language, Translations> = {
     verificationReport: "Verification Report",
     enhancedFeatures: "Built-in Super Powers",
     escapeKeyHint: "Press Alt+Shift+R anytime to toggle Original / Remaster / Split",
+    importSkin: "➕ Import Custom Skin",
+    importSkinDesc: "Enter a GitHub Gist, Raw JSON URL, or manifest to preview and install",
+    architectureTitle: "WebRemaster Architecture & Superpowers",
+    architectureSubtitle: "5 Core Breakthroughs Beyond Traditional Tampermonkey & UserCSS",
+    viewModeSplit: "Split Slider",
+    viewModeSideBySide: "Side-by-Side",
+    viewModeFade: "Fade Overlay",
+    copiedToClipboard: "Copied to clipboard",
+    customSkinBadge: "Community",
   },
 };
+

@@ -1,4 +1,32 @@
-import { StoreIndexSchema, type StoreIndex } from "@webremaster/schema";
+import { StoreIndexSchema, type StoreIndex, type SkinManifest } from "@webremaster/schema";
+
+function mergeCustomSkins(baseIndex: StoreIndex): StoreIndex {
+  if (typeof window === "undefined" || !window.localStorage) return baseIndex;
+  try {
+    const raw = window.localStorage.getItem("webremaster_custom_skins");
+    if (!raw) return baseIndex;
+    const customList = JSON.parse(raw);
+    if (!Array.isArray(customList)) return baseIndex;
+
+    const existingIds = new Set(baseIndex.skins.map((s) => s.id));
+    const mergedSkins = [...baseIndex.skins];
+
+    for (const item of customList) {
+      if (!existingIds.has(item.id)) {
+        mergedSkins.unshift(item);
+        existingIds.add(item.id);
+      }
+    }
+
+    return {
+      ...baseIndex,
+      totalSkins: mergedSkins.length,
+      skins: mergedSkins,
+    };
+  } catch {
+    return baseIndex;
+  }
+}
 
 export async function loadStoreIndex(): Promise<StoreIndex> {
   try {
@@ -7,11 +35,12 @@ export async function loadStoreIndex(): Promise<StoreIndex> {
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
     const json = await res.json();
-    return StoreIndexSchema.parse(json);
+    const parsed = StoreIndexSchema.parse(json);
+    return mergeCustomSkins(parsed);
   } catch (err) {
     console.warn("Failed to load store_index.json from remote, using fallback:", err);
     // 降级兜底：至少展示 HackerNews 皮肤
-    return {
+    const fallback: StoreIndex = {
       version: "0.1.0",
       totalSkins: 1,
       totalTokensBurned: 0,
@@ -46,5 +75,6 @@ export async function loadStoreIndex(): Promise<StoreIndex> {
         },
       ],
     };
+    return mergeCustomSkins(fallback);
   }
 }

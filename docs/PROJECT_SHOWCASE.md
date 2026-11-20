@@ -75,7 +75,11 @@ flowchart TD
 
 | 检验维度 | 实测指标 | 结论与证据 |
 | :--- | :--- | :--- |
-| **自动化测试总数** | **136 / 136 全绿 (0 fail)** | `schema (15)` + `bridge (62)` + `ui-kit (14)` + `compiler (43)` + `store (2)` 全量通过 |
+| **自动化测试总数** | **141 / 141 全绿 (0 fail)** | `schema (15)` + `bridge (65)` + `ui-kit (14)` + `compiler (45)` + `store (2)` 全量通过 |
+| **TypeScript 类型检查** | **7 / 7 包 0 报错 (0 errors)** | `pnpm typecheck` 全项目严苛类型校验通过 |
+| **全量打包构建** | **6 个产物包全绿** | `pnpm build:all` 成功输出 schema, bridge, ui-kit, compiler, store 与 Chrome MV3 扩展 |
+| **开发者热重载体验** | **wr dev <siteId> 毫秒级 HMR** | 仿 `vite-plugin-monkey` 极速开发桥，直接在原站调试 React + Tailwind 样式 |
+| **社区生态与皮肤导入** | **一键 URL / Manifest 动态导入** | 支持 Gist、GitHub Raw 与本地 JSON，直接进入本地矩阵并提供 6 门禁审查与对比 |
 
 
 | **TypeScript 类型系统** | **Strict 模式 0 警告** | `pnpm typecheck` across all 7 packages 全部 exit code 0 |

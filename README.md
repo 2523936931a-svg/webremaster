@@ -5,7 +5,7 @@
 **告别 1998 年刺眼、无排版的老旧网站。零 Token 运行时 · Shadow DOM 样式隔离 · React 19 + Tailwind v4 次世代重制编译器。**
 
 [![CI Status](https://github.com/webremaster/webremaster/actions/workflows/ci.yml/badge.svg)](https://github.com/webremaster/webremaster/actions/workflows/ci.yml)
-[![Tests Passing](https://img.shields.io/badge/Tests-136%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
+[![Tests Passing](https://img.shields.io/badge/Tests-141%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -152,6 +152,7 @@ WebRemaster CLI 采用 Agent-Native 架构设计，提供高可靠的原子化�
 | `wr doctor` | 检查 Node.js / Playwright / 皮肤库依赖环境 | 终端彩色健康诊断报告 |
 | `wr list` | 查阅 Top 40 矩阵与皮肤编译上架进度 | 终端彩色矩阵进度看板 |
 | `wr scaffold <siteId>` | 自动脚手架生成合同、设计、React 19 组件与样式 | `02_contract` / `03_design` / `entry.tsx` |
+| `wr dev <siteId>` | 启动实时热重载开发服务器与联调脚本 (HMR) | `<siteId>.dev.user.js` + Vite Dev Server |
 | `wr inspect <url> --id <siteId>` | 深度测绘 DOM 结构、表单控件与视口截图 | `01_snapshot.json` + `before.png` |
 | `wr build-skin <siteId>` | TypeScript strict + Vite IIFE 单文件打包 | `<siteId>.user.js` |
 | `wr verify-skin <siteId>` | 启动真浏览器执行 6 重门禁回归校验 | `after.png` + `05_verification.json` |

@@ -35,6 +35,11 @@ import {
   saveAIConfig,
 } from "../src/powerups/AISummarizer.js";
 import { enhanceCodeBlocks } from "../src/powerups/CodeBlockEnhancer.js";
+import {
+  PluginHost,
+  definePowerUp,
+  getSharedPluginHost,
+} from "../src/powerups/pluginHost.js";
 
 
 
@@ -319,6 +324,82 @@ describe("CodeBlockEnhancer", () => {
     expect(container.querySelectorAll(".wr-code-copy-btn").length).toBe(2);
   });
 });
+
+describe("PluginHost", () => {
+  it("注册插件、触发生命周期并执行优雅清理", () => {
+    const host = new PluginHost({ url: "https://news.ycombinator.com/" });
+    let initCalled = false;
+    let cleanupCalled = false;
+    let mountRootReceived: ShadowRoot | null = null;
+    let navigatedUrl = "";
+
+    const testPlugin = definePowerUp({
+      id: "test-plugin",
+      name: "Test Plugin",
+      onInit: () => {
+        initCalled = true;
+        return () => {
+          cleanupCalled = true;
+        };
+      },
+      onMount: (root) => {
+        mountRootReceived = root;
+      },
+      onNavigate: (url) => {
+        navigatedUrl = url;
+      },
+    });
+
+    host.register(testPlugin);
+    expect(initCalled).toBe(true);
+    expect(host.getPlugin("test-plugin")).toBe(testPlugin);
+
+    // Mock ShadowRoot
+    const mockHost = document.createElement("div");
+    const shadowRoot = mockHost.attachShadow({ mode: "open" });
+    host.triggerMount(shadowRoot);
+    expect(mountRootReceived).toBe(shadowRoot);
+
+    host.triggerNavigate("https://news.ycombinator.com/item?id=123");
+    expect(navigatedUrl).toBe("https://news.ycombinator.com/item?id=123");
+
+    host.unregister("test-plugin");
+    expect(cleanupCalled).toBe(true);
+    expect(host.getPlugin("test-plugin")).toBeUndefined();
+  });
+
+  it("teardown 全量卸载清理所有已注册插件", () => {
+    const host = new PluginHost();
+    let unmountedCount = 0;
+
+    host.register({
+      id: "p1",
+      name: "P1",
+      onUnmount: () => {
+        unmountedCount++;
+      },
+    });
+    host.register({
+      id: "p2",
+      name: "P2",
+      onUnmount: () => {
+        unmountedCount++;
+      },
+    });
+
+    expect(host.listPlugins().length).toBe(2);
+    host.teardown();
+    expect(unmountedCount).toBe(2);
+    expect(host.listPlugins().length).toBe(0);
+  });
+
+  it("getSharedPluginHost 返回全局单例", () => {
+    const instance1 = getSharedPluginHost();
+    const instance2 = getSharedPluginHost();
+    expect(instance1).toBe(instance2);
+  });
+});
+
 
 
 

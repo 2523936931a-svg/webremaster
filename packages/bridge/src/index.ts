@@ -17,5 +17,6 @@ export * from "./powerups/ReaderMode.js";
 export * from "./powerups/ContentCleaner.js";
 export * from "./powerups/AISummarizer.js";
 export * from "./powerups/CodeBlockEnhancer.js";
+export * from "./powerups/pluginHost.js";
 
 

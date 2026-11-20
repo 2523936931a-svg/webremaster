@@ -1400,6 +1400,128 @@ mountShadowApp({
   return { siteId, createdFiles };
 }
 
+/* ------------------------------------------------------------------ */
+/* devHandler：热重载开发服务器与 Userscript 联调桥（HMR 模式）           */
+/* ------------------------------------------------------------------ */
+
+export interface DevHandlerOptions {
+  siteId: string;
+  port?: number;
+  skinsDir?: string;
+  dryRun?: boolean;
+}
+
+export async function devHandler(opts: DevHandlerOptions): Promise<{
+  siteId: string;
+  devUserScriptPath: string;
+  port: number;
+  devServerUrl: string;
+}> {
+  const { siteId, port = 5173, dryRun = false } = opts;
+  const skinsDir = resolveSkinsDir(opts.skinsDir);
+  const targetDir = path.join(skinsDir, siteId);
+
+  if (!existsSync(targetDir)) {
+    throw new CliExitError(
+      `未找到站点目录: ${targetDir}。请先使用 wr scaffold ${siteId} 初始化站点模板。`,
+      1,
+    );
+  }
+
+  const entryPath = path.join(targetDir, "src", "entry.tsx");
+  if (!existsSync(entryPath)) {
+    throw new CliExitError(
+      `未找到皮肤入口代码: ${entryPath}。`,
+      1,
+    );
+  }
+
+  // 读取合同以提取目标站点匹配规则
+  let matchPattern = "*://*/*";
+  const contractPath = path.join(targetDir, "02_contract.json");
+  if (existsSync(contractPath)) {
+    try {
+      const contract = JSON.parse(readFileSync(contractPath, "utf8"));
+      if (contract.targetUrl) {
+        const u = new URL(contract.targetUrl);
+        matchPattern = `${u.protocol}//${u.host}/*`;
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const devServerUrl = `http://localhost:${port}`;
+  const devUserScriptCode = `// ==UserScript==
+// @name         WebRemaster Dev: ${siteId} (HMR Live Bridge)
+// @namespace    https://webremaster.dev/
+// @version      0.1.0-dev
+// @description  WebRemaster Instant Live HMR Bridge for ${siteId}
+// @match        ${matchPattern}
+// @grant        GM_addStyle
+// @grant        GM_xmlhttpRequest
+// @run-at       document-start
+// ==/UserScript==
+
+/**
+ * WebRemaster Live HMR Dev Loader
+ * Automatically attaches Vite HMR client to the target page
+ */
+(function() {
+  'use strict';
+  if ((window as any).__WR_DEV_LOADED__) return;
+  (window as any).__WR_DEV_LOADED__ = true;
+
+  console.log('[WebRemaster Dev] Attaching live HMR client for ${siteId} -> ${devServerUrl} ...');
+
+  const viteClient = document.createElement('script');
+  viteClient.type = 'module';
+  viteClient.src = '${devServerUrl}/@vite/client';
+  document.head.appendChild(viteClient);
+
+  const skinModule = document.createElement('script');
+  skinModule.type = 'module';
+  skinModule.src = '${devServerUrl}/src/entry.tsx';
+  document.head.appendChild(skinModule);
+})();
+`;
+
+  const devUserScriptPath = path.join(targetDir, `${siteId}.dev.user.js`);
+  writeFileSync(devUserScriptPath, devUserScriptCode, "utf8");
+
+  console.log(chalk.bold(`\n🚀 WebRemaster 实时热重载开发桥已就绪: ${chalk.cyan(siteId)}\n`));
+  console.log(`  + 本地服务地址: ${chalk.green(devServerUrl)}`);
+  console.log(`  + 联调油猴脚本: ${chalk.green(path.relative(process.cwd(), devUserScriptPath))}`);
+  console.log(`  + 监听匹配规则: ${chalk.yellow(matchPattern)}`);
+  console.log(chalk.dim(`\n使用说明：`));
+  console.log(`  1. 在 Tampermonkey / ScriptCat 中安装上方生成的 .dev.user.js 脚本`);
+  console.log(`  2. 浏览器打开目标站点页面`);
+  console.log(`  3. 编辑 skins/${siteId}/src/entry.tsx，浏览器将毫秒级热重载！\n`);
+
+  if (!dryRun) {
+    try {
+      const { createServer } = await import("vite");
+      const server = await createServer({
+        root: targetDir,
+        server: {
+          port,
+          cors: true,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+          },
+        },
+      });
+      await server.listen();
+      server.printUrls();
+    } catch (err) {
+      console.warn(`启动本地 Vite 服务遇到提示（可手动启动）:`, err);
+    }
+  }
+
+  return { siteId, devUserScriptPath, port, devServerUrl };
+}
+
+
 
 /* ------------------------------------------------------------------ */
 /* buildProgram：命令装配（结构锁定）                                    */
@@ -1590,7 +1712,24 @@ export function buildProgram(): Command {
       });
     });
 
+  registerCommand(program, "dev", "启动热重载开发服务器与 Userscript 实时联调桥（HMR 模式）")
+    .argument("<siteId>", "站点 ID（kebab-case）")
+    .option("--port <port>", "本地 Vite 开发服务器端口", "5173")
+    .option("--skins-dir <dir>", "皮肤工作区根目录", "./skins")
+    .option("--dry-run", "仅生成 dev.user.js 联调脚本与校验配置，不常驻阻塞终端")
+    .action(async (siteId, opts) => {
+      await guard(async () => {
+        await devHandler({
+          siteId: optString(siteId, "siteId"),
+          port: optNumber(opts.port, "port", 5173),
+          skinsDir: optOptionalString(opts.skinsDir),
+          dryRun: Boolean(opts.dryRun),
+        });
+      });
+    });
+
   return program;
+
 
 }
 

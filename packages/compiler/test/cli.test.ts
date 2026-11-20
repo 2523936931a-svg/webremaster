@@ -27,6 +27,7 @@ import {
   doctorHandler,
   listHandler,
   scaffoldHandler,
+  devHandler,
 } from "../src/cli.js";
 
 
@@ -183,6 +184,7 @@ describe("buildProgram（结构锁定）", () => {
       "doctor",
       "list",
       "scaffold",
+      "dev",
     ]);
   });
 
@@ -374,3 +376,51 @@ describe("finalizeSkinHandler（红灯）", () => {
     expect(existsSync(path.join(skinDir, "manifest.json"))).toBe(false);
   });
 });
+
+describe("devHandler (HMR 联调桥)", () => {
+  it("dryRun 模式下正确生成 .dev.user.js 联调脚本与端口配置", async () => {
+    const rootDir = mkdtempSync(path.join(tmpdir(), "wr-dev-test-"));
+    createdDirs.push(rootDir);
+    const skinsDir = path.join(rootDir, "skins");
+
+    // 先脚手架初始化
+    await scaffoldHandler({
+      siteId: "my-dev-site",
+      url: "https://example.com/portal",
+      skinsDir,
+    });
+
+    const res = await devHandler({
+      siteId: "my-dev-site",
+      port: 5174,
+      skinsDir,
+      dryRun: true,
+    });
+
+    expect(res.siteId).toBe("my-dev-site");
+    expect(res.port).toBe(5174);
+    expect(existsSync(res.devUserScriptPath)).toBe(true);
+
+    const scriptContent = readFileSync(res.devUserScriptPath, "utf8");
+    expect(scriptContent).toContain("// ==UserScript==");
+    expect(scriptContent).toContain("WebRemaster Dev: my-dev-site");
+    expect(scriptContent).toContain("http://localhost:5174/@vite/client");
+    expect(scriptContent).toContain("http://localhost:5174/src/entry.tsx");
+  });
+
+  it("不存在站点时抛出 CliExitError", async () => {
+    const rootDir = mkdtempSync(path.join(tmpdir(), "wr-dev-test-"));
+    createdDirs.push(rootDir);
+    const skinsDir = path.join(rootDir, "skins");
+    mkdirSync(skinsDir, { recursive: true });
+
+    await expect(
+      devHandler({
+        siteId: "non-existent-site",
+        skinsDir,
+        dryRun: true,
+      }),
+    ).rejects.toThrow(CliExitError);
+  });
+});
+
