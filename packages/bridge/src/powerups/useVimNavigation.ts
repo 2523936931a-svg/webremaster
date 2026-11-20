@@ -54,13 +54,23 @@ export function useVimNavigation(options: VimNavigationOptions): {
       if (current.enabled === false) {
         return;
       }
-      if (event.key === "j") {
+      if (event.key === "j" || event.key === "ArrowDown") {
         if (current.itemCount > 0) {
           setSelectedIndexState((i) => Math.min(i + 1, current.itemCount - 1));
         }
-      } else if (event.key === "k") {
+      } else if (event.key === "k" || event.key === "ArrowUp") {
         if (current.itemCount > 0) {
           setSelectedIndexState((i) => Math.max(i - 1, 0));
+        }
+      } else if (event.key === "G" || event.key === "End") {
+        // Vim G / End：快速跳转至末尾
+        if (current.itemCount > 0) {
+          setSelectedIndexState(current.itemCount - 1);
+        }
+      } else if (event.key === "g" || event.key === "Home") {
+        // Vim g / Home：快速跳转至首项
+        if (current.itemCount > 0) {
+          setSelectedIndexState(0);
         }
       } else if (event.key === "Enter") {
         current.onActivate(selectedIndexRef.current);

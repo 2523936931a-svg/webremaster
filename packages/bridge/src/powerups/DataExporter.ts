@@ -5,29 +5,60 @@
  * 无 Blob URL 能力的环境下安全降级（downloadTextFile 直接跳过）。
  */
 
-/** CSV 单元格转义：null/undefined → 空串；含 , " \r \n 的字符串用双引号包裹并把内部 " 加倍。 */
-export function csvEscapeCell(value: unknown): string {
+/** CSV 单元格转义：null/undefined → 空串；含 , " \r \n 的字符串用双引号包裹并把内部 " 加倍。
+ * 可选开启 preventFormulaInjection 防范 Excel 宏/公式注入。
+ */
+export function csvEscapeCell(value: unknown, preventFormulaInjection?: boolean): string {
   if (value === null || value === undefined) {
     return "";
   }
-  if (typeof value === "string") {
-    if (/["\r\n,]/.test(value)) {
-      return '"' + value.replace(/"/g, '""') + '"';
-    }
-    return value;
+  let str = typeof value === "string" ? value : String(value);
+  if (preventFormulaInjection && /^[=+\-@\t\r]/.test(str)) {
+    str = "'" + str;
   }
-  return String(value);
+  if (/["\r\n,]/.test(str)) {
+    return '"' + str.replace(/"/g, '""') + '"';
+  }
+  return str;
 }
 
 /** 组装 CSV 文本（不含 BOM）：单元格逗号连接，行之间 CRLF 连接。 */
-export function buildCsvText(rows: unknown[][]): string {
-  return rows.map((row) => row.map(csvEscapeCell).join(",")).join("\r\n");
+export function buildCsvText(rows: unknown[][], preventFormulaInjection?: boolean): string {
+  return rows.map((row) => row.map((c) => csvEscapeCell(c, preventFormulaInjection)).join(",")).join("\r\n");
 }
 
 /** 导出为 CSV 文件：前置 UTF-8 BOM（\uFEFF）防止 Windows Excel 打开中文乱码；返回导出文本。 */
-export function exportToCSV(rows: unknown[][], filename?: string): string {
-  const text = "\uFEFF" + buildCsvText(rows);
+export function exportToCSV(rows: unknown[][], filename?: string, preventFormulaInjection?: boolean): string {
+  const text = "\uFEFF" + buildCsvText(rows, preventFormulaInjection);
   downloadTextFile(text, filename ?? "webremaster-export.csv", "text/csv;charset=utf-8");
+  return text;
+}
+
+/** TSV 单元格转义：制表符与换行转为空格，null/undefined 转为空串。 */
+export function tsvEscapeCell(value: unknown): string {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  const str = typeof value === "string" ? value : String(value);
+  return str.replace(/[\t\r\n]/g, " ");
+}
+
+/** 组装 TSV 文本（不含 BOM）：单元格 Tab 分隔，行之间 CRLF 连接。 */
+export function buildTsvText(rows: unknown[][]): string {
+  return rows.map((row) => row.map(tsvEscapeCell).join("\t")).join("\r\n");
+}
+
+/** 导出为 TSV 文件：前置 UTF-8 BOM，方便直接粘贴或由 Excel 打开。 */
+export function exportToTSV(rows: unknown[][], filename?: string): string {
+  const text = "\uFEFF" + buildTsvText(rows);
+  downloadTextFile(text, filename ?? "webremaster-export.tsv", "text/tab-separated-values;charset=utf-8");
+  return text;
+}
+
+/** 导出为结构化 JSON 文件；返回格式化后的 JSON 字符串。 */
+export function exportToJSON(data: unknown, filename?: string): string {
+  const text = JSON.stringify(data, null, 2);
+  downloadTextFile(text, filename ?? "webremaster-export.json", "application/json;charset=utf-8");
   return text;
 }
 

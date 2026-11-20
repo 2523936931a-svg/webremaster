@@ -17,13 +17,52 @@ function matchesPattern(pattern: string, url: string): boolean {
   }
 }
 
+/** 动态更新特定标签页的扩展徽标与气泡提示 */
+async function updateTabBadge(tabId: number, url?: string): Promise<void> {
+  if (!ext?.action) return;
+  if (!url || url.startsWith("chrome://") || url.startsWith("edge://") || url.startsWith("about:") || url.startsWith("chrome-extension://")) {
+    await ext.action.setBadgeText({ tabId, text: "" });
+    return;
+  }
+
+  const matchedSkin = SKIN_REGISTRY.find((skin) =>
+    skin.matchPatterns.some((p) => matchesPattern(p, url)),
+  );
+
+  if (!matchedSkin) {
+    await ext.action.setBadgeText({ tabId, text: "" });
+    await ext.action.setTitle({ tabId, title: "WebRemaster" });
+    return;
+  }
+
+  const storageKey = `skin_enabled_${matchedSkin.id}`;
+  const data = await ext.storage.local.get([storageKey, "master_enabled"]);
+  const isMasterEnabled = data.master_enabled !== false;
+  const isSkinEnabled = data[storageKey] !== false;
+
+  if (isMasterEnabled && isSkinEnabled) {
+    await ext.action.setBadgeText({ tabId, text: "ON" });
+    await ext.action.setBadgeBackgroundColor({ tabId, color: "#0ea5e9" }); // sky-500
+    await ext.action.setTitle({ tabId, title: `WebRemaster: ${matchedSkin.name}（已激活）` });
+  } else {
+    await ext.action.setBadgeText({ tabId, text: "OFF" });
+    await ext.action.setBadgeBackgroundColor({ tabId, color: "#71717a" }); // zinc-500
+    await ext.action.setTitle({ tabId, title: `WebRemaster: ${matchedSkin.name}（已暂停）` });
+  }
+}
+
 ext.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status !== "complete" || !tab.url) return;
-  if (tab.url.startsWith("chrome://") || tab.url.startsWith("edge://") || tab.url.startsWith("about:")) return;
+  const url = tab.url;
+  if (!url || url.startsWith("chrome://") || url.startsWith("edge://") || url.startsWith("about:")) return;
+
+  // 状态变化时刷新徽标
+  await updateTabBadge(tabId, url);
+
+  if (changeInfo.status !== "complete") return;
 
   // 寻找匹配的皮肤
   const matchedSkin = SKIN_REGISTRY.find((skin) =>
-    skin.matchPatterns.some((p) => matchesPattern(p, tab.url!)),
+    skin.matchPatterns.some((p) => matchesPattern(p, url)),
   );
 
   if (!matchedSkin) return;
@@ -45,6 +84,33 @@ ext.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     } catch (err) {
       console.error(`[WebRemaster] 注入皮肤 ${matchedSkin.id} 失败:`, err);
     }
+  }
+});
+
+// 标签页切换时更新徽标
+ext.tabs.onActivated.addListener(async (activeInfo) => {
+  try {
+    const tab = await ext.tabs.get(activeInfo.tabId);
+    if (tab?.url) {
+      await updateTabBadge(activeInfo.tabId, tab.url);
+    }
+  } catch {
+    /* 忽略已关闭标签页异常 */
+  }
+});
+
+// 开关状态变化时响应并刷新所有标签页徽标
+ext.storage.onChanged.addListener(async (_changes, area) => {
+  if (area !== "local") return;
+  try {
+    const tabs = await ext.tabs.query({});
+    for (const tab of tabs) {
+      if (tab.id && tab.url) {
+        await updateTabBadge(tab.id, tab.url);
+      }
+    }
+  } catch {
+    /* 忽略并发异常 */
   }
 });
 

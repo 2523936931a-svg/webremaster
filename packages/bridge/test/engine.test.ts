@@ -222,6 +222,34 @@ describe("reactiveStore", () => {
     store.dispose();
   });
 
+  it("性能优化：isEqual 返回 true 时跳过通知，避免无谓重渲染", async () => {
+    const rootEl = document.createElement("div");
+    document.body.appendChild(rootEl);
+    let count = 1;
+    const extractSpy = vi.fn(() => ({ count }));
+    const listener = vi.fn();
+    const store = createOriginStore({
+      originRoot: rootEl,
+      extract: extractSpy,
+      debounceMs: 20,
+      isEqual: (prev, next) => prev?.count === next.count,
+    });
+    store.subscribe(listener);
+
+    // 触发 DOM 变动但数据内容未变
+    rootEl.appendChild(document.createElement("div"));
+    await sleep(60);
+    expect(listener).not.toHaveBeenCalled();
+
+    // 数据真实变化
+    count = 2;
+    rootEl.appendChild(document.createElement("div"));
+    await sleep(60);
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(store.getSnapshot()).toEqual({ count: 2 });
+    store.dispose();
+  });
+
   it("验收③：extract 抛错时自动熔断切回 original 并弹提示", () => {
     const manager = createOriginManager({ hotkey: false });
     managers.push(manager);
@@ -294,6 +322,26 @@ describe("turboNav", () => {
     expect(nav.shouldHandle("javascript:alert(1)")).toBe(false);
     expect(nav.shouldHandle(new URL("/logout", window.location.href).href)).toBe(false);
     expect(nav.shouldHandle(new URL("#top", window.location.href).href)).toBe(false);
+    nav.dispose();
+  });
+
+  it("移动端触控优化：touchstart 触发即时静默预取", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      text: async () => "<html><head><title>Touch</title></head><body>Touch Target</body></html>",
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    const container = root();
+    const link = document.createElement("a");
+    link.href = "/touch-page";
+    container.appendChild(link);
+
+    const nav = new TurboNavigator(container, vi.fn());
+    link.dispatchEvent(new Event("touchstart", { bubbles: true }));
+    await sleep(20);
+
+    expect(fetchMock).toHaveBeenCalled();
+    expect(nav.getCached(new URL("/touch-page", window.location.href).href)).toContain("Touch Target");
     nav.dispose();
   });
 

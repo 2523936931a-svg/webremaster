@@ -11,6 +11,8 @@ import {
   Code2,
   Layers,
   FileText,
+  Copy,
+  Check,
 } from "lucide-react";
 
 export interface SkinDetailModalProps {
@@ -22,6 +24,7 @@ export interface SkinDetailModalProps {
 export const SkinDetailModal: React.FC<SkinDetailModalProps> = ({ skin, lang, onClose }) => {
   const [activeTab, setActiveTab] = useState<"slider" | "gates" | "source">("slider");
   const [sourceCode, setSourceCode] = useState<{ adapter?: string; app?: string }>({});
+  const [copied, setCopied] = useState<boolean>(false);
   const t = DICTIONARY[lang];
 
   useEffect(() => {
@@ -102,6 +105,20 @@ export const SkinDetailModal: React.FC<SkinDetailModalProps> = ({ skin, lang, on
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                const fullUrl = new URL(userscriptUrl, window.location.href).href;
+                navigator.clipboard?.writeText(fullUrl);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900 border border-white/10 hover:border-white/20 text-zinc-300 hover:text-white font-medium text-xs transition-colors"
+              title={lang === "zh" ? "复制脚本安装地址" : "Copy script URL"}
+            >
+              {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+              <span>{copied ? (lang === "zh" ? "已复制" : "Copied") : (lang === "zh" ? "复制链接" : "Copy URL")}</span>
+            </button>
+
             <a
               href={userscriptUrl}
               download

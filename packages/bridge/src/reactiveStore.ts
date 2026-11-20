@@ -15,6 +15,8 @@ export interface CreateOriginStoreOptions<T> {
   validate?: (snapshot: T) => boolean;
   debounceMs?: number;
   onTripCircuit?: (reason: string, error?: unknown) => void;
+  /** 可选的自定义相等性比较器；返回 true 时代表数据无实质变化，跳过 emit() 避免上层无谓重渲染 */
+  isEqual?: (prev: T | null, next: T) => boolean;
 }
 
 export interface OriginStore<T> {
@@ -81,8 +83,13 @@ export function createOriginStore<T>(opts: CreateOriginStoreOptions<T>): OriginS
     const result = runExtract();
     if (result.ok && result.value !== undefined) {
       breaker.recordSuccess();
-      snapshot = result.value;
-      emit();
+      const prev = snapshot;
+      const nextValue = result.value;
+      snapshot = nextValue;
+      const hasChanged = opts.isEqual ? !opts.isEqual(prev, nextValue) : true;
+      if (hasChanged) {
+        emit();
+      }
     } else {
       breaker.recordFailure(result.reason ?? "unknown");
     }

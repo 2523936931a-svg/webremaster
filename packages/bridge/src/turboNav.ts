@@ -41,6 +41,7 @@ export class TurboNavigator {
   private hoverTimer?: ReturnType<typeof setTimeout>;
   private readonly onMouseOver: (event: MouseEvent) => void;
   private readonly onMouseOut: () => void;
+  private readonly onTouchStart: (event: Event) => void;
   private readonly onPopstate: () => void;
 
   constructor(
@@ -83,12 +84,31 @@ export class TurboNavigator {
         this.hoverTimer = undefined;
       }
     };
+    this.onTouchStart = (event: Event): void => {
+      const target = event.target instanceof Element ? event.target : null;
+      const anchor = target?.closest("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if (anchor.target && anchor.target !== "_self") return;
+      if (anchor.hasAttribute("download")) return;
+      const href = anchor.getAttribute("href") ?? "";
+      if (!href || href.startsWith("#")) return;
+      let absolute: string;
+      try {
+        absolute = new URL(href, window.location.href).href;
+      } catch {
+        return;
+      }
+      if (!this.shouldHandle(absolute)) return;
+      // 触屏设备（移动端/平板）：手指触摸瞬间即触发静默预取，消除点击延迟
+      void this.prefetch(absolute);
+    };
     this.onPopstate = (): void => {
       void this.applyUrl(window.location.href, false);
     };
 
     this.originRoot.addEventListener("mouseover", this.onMouseOver);
     this.originRoot.addEventListener("mouseout", this.onMouseOut);
+    this.originRoot.addEventListener("touchstart", this.onTouchStart, { passive: true });
     if (typeof window !== "undefined") {
       window.addEventListener("popstate", this.onPopstate);
     }
@@ -148,6 +168,7 @@ export class TurboNavigator {
     this.hoverTimer = undefined;
     this.originRoot.removeEventListener("mouseover", this.onMouseOver);
     this.originRoot.removeEventListener("mouseout", this.onMouseOut);
+    this.originRoot.removeEventListener("touchstart", this.onTouchStart);
     if (typeof window !== "undefined") {
       window.removeEventListener("popstate", this.onPopstate);
     }

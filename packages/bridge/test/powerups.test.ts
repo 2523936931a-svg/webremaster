@@ -5,9 +5,12 @@ import { describe, expect, it } from "vitest";
 import {
   buildCsvText,
   buildMarkdownTable,
+  buildTsvText,
   csvEscapeCell,
   exportToCSV,
+  exportToJSON,
   exportToMarkdownTable,
+  exportToTSV,
 } from "../src/powerups/DataExporter.js";
 import { fuzzyMatch } from "../src/powerups/CommandPalette.js";
 
@@ -55,6 +58,32 @@ describe("DataExporter", () => {
     const text = exportToMarkdownTable([["h"], ["v"]], "out.md");
     expect(text).toBe("| h |\n| --- |\n| v |");
     expect(text.charCodeAt(0)).not.toBe(0xfeff);
+  });
+
+  it("防范公式注入（Formula Injection）：针对 = + - @ 等恶意前缀转义", () => {
+    expect(csvEscapeCell("=cmd|' /C calc'!A0", true)).toBe("'=cmd|' /C calc'!A0");
+    expect(csvEscapeCell("=1+1,eval", true)).toBe("\"'=1+1,eval\"");
+    expect(csvEscapeCell("+1234", true)).toBe("'+1234");
+    expect(csvEscapeCell("-5678", true)).toBe("'-5678");
+    expect(csvEscapeCell("@admin", true)).toBe("'@admin");
+  });
+
+  it("exportToJSON：结构化数据正确序列化为格式化 JSON 字符串", () => {
+    const data = { title: "WebRemaster", stars: 1200 };
+    const json = exportToJSON(data, "test.json");
+    expect(JSON.parse(json)).toEqual(data);
+  });
+
+  it("buildTsvText & exportToTSV：制表符分隔且带 UTF-8 BOM", () => {
+    const rows = [
+      ["标题", "分类\t含tab", "分数"],
+      ["Hacker News", "开发者", 100],
+    ];
+    const tsv = buildTsvText(rows);
+    expect(tsv).toBe("标题\t分类 含tab\t分数\r\nHacker News\t开发者\t100");
+    const exported = exportToTSV(rows, "test.tsv");
+    expect(exported.charCodeAt(0)).toBe(0xfeff);
+    expect(exported.slice(1)).toBe(tsv);
   });
 });
 

@@ -53,7 +53,13 @@ export const PopupApp: React.FC = () => {
     const next = !masterEnabled;
     setMasterEnabled(next);
     if (typeof chrome !== "undefined" && chrome.storage) {
-      chrome.storage.local.set({ master_enabled: next });
+      chrome.storage.local.set({ master_enabled: next }, () => {
+        if (matchedSkin && chrome.tabs) {
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) chrome.tabs.reload(tabs[0].id);
+          });
+        }
+      });
     }
   };
 
@@ -61,7 +67,13 @@ export const PopupApp: React.FC = () => {
     const next = !(skinStates[skinId] !== false);
     setSkinStates((prev) => ({ ...prev, [skinId]: next }));
     if (typeof chrome !== "undefined" && chrome.storage) {
-      chrome.storage.local.set({ [`skin_enabled_${skinId}`]: next });
+      chrome.storage.local.set({ [`skin_enabled_${skinId}`]: next }, () => {
+        if (matchedSkin?.id === skinId && chrome.tabs) {
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) chrome.tabs.reload(tabs[0].id);
+          });
+        }
+      });
     }
   };
 
