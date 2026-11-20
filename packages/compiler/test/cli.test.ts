@@ -18,7 +18,7 @@ import {
   type SiteSnapshot,
   type VerificationReport,
 } from "@webremaster/schema";
-import { CliExitError, buildProgram, finalizeSkinHandler } from "../src/cli.js";
+import { CliExitError, buildProgram, finalizeSkinHandler, doctorHandler } from "../src/cli.js";
 
 const SITE_ID = "example-site";
 const createdDirs: string[] = [];
@@ -170,11 +170,12 @@ describe("buildProgram（结构锁定）", () => {
       "finalize-skin",
       "compile",
       "sync-artifacts",
+      "doctor",
     ]);
   });
 
   it("前六条原子命令都带必填位置参数（Argument.required）", () => {
-    const positionalCommands = program.commands.filter((c) => c.name() !== "sync-artifacts");
+    const positionalCommands = program.commands.filter((c) => c.name() !== "sync-artifacts" && c.name() !== "doctor");
     for (const command of positionalCommands) {
       expect(command.registeredArguments.length).toBeGreaterThan(0);
       for (const argument of command.registeredArguments) {
@@ -184,13 +185,20 @@ describe("buildProgram（结构锁定）", () => {
   });
 
   it("必填参数缺失即拒绝（CommanderError，不触发 handler）", async () => {
-    const positionalCommands = program.commands.filter((c) => c.name() !== "sync-artifacts");
+    const positionalCommands = program.commands.filter((c) => c.name() !== "sync-artifacts" && c.name() !== "doctor");
     for (const command of positionalCommands) {
       // commander 对缺失位置参数报 "missing required argument"，对缺失必填选项报 "required option ... not specified"
       await expect(command.parseAsync([], { from: "user" })).rejects.toThrow(
         /missing required argument|required option .+ not specified/,
       );
     }
+  });
+
+  it("doctorHandler 执行系统诊断并返回至少 3 项检查结果", async () => {
+    const checks = await doctorHandler();
+    expect(checks.length).toBeGreaterThanOrEqual(3);
+    const nodeCheck = checks.find((c) => c.name.includes("Node.js"));
+    expect(nodeCheck?.passed).toBe(true);
   });
 
   it("finalize-skin 四个必填选项（mandatory）与行为验证", async () => {

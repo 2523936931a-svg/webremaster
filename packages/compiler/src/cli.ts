@@ -23,6 +23,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  readdirSync,
   realpathSync,
   renameSync,
   statSync,
@@ -1023,6 +1024,64 @@ export async function compileHandler(options: CompileOptions): Promise<CompileOu
   }
 }
 
+export interface DoctorCheck {
+  name: string;
+  passed: boolean;
+  message: string;
+}
+
+export async function doctorHandler(): Promise<DoctorCheck[]> {
+  const checks: DoctorCheck[] = [];
+
+  // 1. Node.js 版本 (>= 22)
+  const nodeVersion = process.version;
+  const major = parseInt(nodeVersion.replace(/^v/, "").split(".")[0] || "0", 10);
+  checks.push({
+    name: "Node.js 运行时",
+    passed: major >= 22,
+    message: major >= 22 ? `${nodeVersion} (符合 >= 22 要求)` : `${nodeVersion} (建议升级至 Node 22+)`,
+  });
+
+  // 2. Playwright Chromium 浏览器可用性
+  let playwrightOk = false;
+  try {
+    const { chromium } = await import("playwright");
+    const browser = await chromium.launch({ headless: true });
+    await browser.close();
+    playwrightOk = true;
+  } catch {
+    playwrightOk = false;
+  }
+  checks.push({
+    name: "Playwright Chromium 测绘环境",
+    passed: playwrightOk,
+    message: playwrightOk ? "Chromium headless 可正常拉起" : "未就绪，可运行 pnpm exec playwright install chromium",
+  });
+
+  // 3. 皮肤工作区清单
+  const skinsDir = path.resolve("./skins");
+  let skinCount = 0;
+  if (existsSync(skinsDir)) {
+    skinCount = readdirSync(skinsDir).filter((d: string) => {
+      const p = path.join(skinsDir, d);
+      return statSync(p).isDirectory() && existsSync(path.join(p, "manifest.json"));
+    }).length;
+  }
+  checks.push({
+    name: "已上架皮肤产物",
+    passed: skinCount > 0,
+    message: `检测到 ${skinCount} 个合格皮肤`,
+  });
+
+  console.log(chalk.bold("\n🩺 WebRemaster 系统环境诊断报告 (wr doctor)\n"));
+  for (const c of checks) {
+    const icon = c.passed ? chalk.green("✔") : chalk.red("✖");
+    console.log(`  ${icon} ${chalk.bold(c.name)}: ${c.message}`);
+  }
+  console.log("");
+  return checks;
+}
+
 /* ------------------------------------------------------------------ */
 /* buildProgram：命令装配（结构锁定）                                    */
 /* ------------------------------------------------------------------ */
@@ -1172,6 +1231,13 @@ export function buildProgram(): Command {
           storeDir: optString(opts.store, "store"),
           minVlmScore: optNumber(opts.minVlmScore, "min-vlm-score", 8.5),
         });
+      });
+    });
+
+  registerCommand(program, "doctor", "系统环境与依赖就绪体检诊断（Node / Playwright / 皮肤库）")
+    .action(async () => {
+      await guard(async () => {
+        await doctorHandler();
       });
     });
 
