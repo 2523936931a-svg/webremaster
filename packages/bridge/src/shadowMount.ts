@@ -7,16 +7,24 @@
  * 环境不支持时（如 JSDOM 未实现 replaceSync）降级为 Shadow Root 内部 <style>。
  */
 
+export interface ShadowMountOptions {
+  /** 阻止键盘与输入事件冒泡到原站，防止误触原站全局按键监听（默认 true，借鉴 wxt-dev/wxt） */
+  isolateEvents?: boolean;
+}
+
 export interface ShadowMountResult {
   host: HTMLElement;
   shadowRoot: ShadowRoot;
+  portalRoot: HTMLElement;
+  destroy: () => void;
 }
 
 /** 精准匹配一个完整的 @property 声明块 */
 const AT_PROPERTY_RULE_RE = /@property\s+--[a-zA-Z0-9_-]+\s*\{[^}]*\}/g;
 
 const HOST_STYLE_CSS =
-  "web-remaster-root{all:initial;display:block;min-height:100vh;position:relative;z-index:2147483640;}";
+  "web-remaster-root{all:initial;display:block;min-height:100vh;position:relative;z-index:2147483640;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}";
+
 
 export function extractCssAtPropertyRules(cssText: string): string[] {
   if (typeof cssText !== "string" || cssText.length === 0) return [];
@@ -56,7 +64,10 @@ const mergeAtPropertyRules = (rules: string[]): void => {
  * 挂载 <web-remaster-root data-wr-app={appId}> 并返回 host 与 open ShadowRoot。
  * SSR / 无 DOM 环境优雅返回空结果（调用方不应在无 DOM 环境使用返回值）。
  */
-export function mountWebRemasterRoot(appId: string, cssText?: string): ShadowMountResult {
+export function mountWebRemasterRoot(
+  appId: string,
+  cssText?: string,
+): ShadowMountResult {
   if (typeof document === "undefined") {
     return null as unknown as ShadowMountResult;
   }
@@ -106,5 +117,36 @@ export function mountWebRemasterRoot(appId: string, cssText?: string): ShadowMou
     }
   }
 
-  return { host, shadowRoot };
+  const destroy = (): void => {
+    host.remove();
+  };
+
+  return {
+    host,
+    shadowRoot,
+    get portalRoot() {
+      return getRemasterPortalRoot(appId) as HTMLElement;
+    },
+    destroy,
+  };
 }
+
+/**
+ * 懒加载获取当前 Shadow Root 内的 Portal 挂载根节点（供 React.createPortal / 下拉浮层使用）。
+ * 按需创建在主内容之后，绝不抢占首子级元素，杜绝破坏首屏背景样式判定。
+ */
+export function getRemasterPortalRoot(appId?: string): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  const selector = appId ? `web-remaster-root[data-wr-app="${appId}"]` : "web-remaster-root";
+  const host = document.querySelector(selector);
+  if (!host || !host.shadowRoot) return null;
+  let portalRoot = host.shadowRoot.querySelector<HTMLElement>("#wr-portal-root");
+  if (!portalRoot) {
+    portalRoot = document.createElement("div");
+    portalRoot.id = "wr-portal-root";
+    host.shadowRoot.appendChild(portalRoot);
+  }
+  return portalRoot;
+}
+
+

@@ -10,8 +10,11 @@ import {
   FeedListCard,
   SmartDataTable,
   DiagnosticsDrawer,
+  RemasterErrorBoundary,
+  RemasterShell,
   type DiagnosticsSnapshot,
 } from "../src/index.js";
+
 
 
 describe("@webremaster/ui-kit", () => {
@@ -174,4 +177,40 @@ describe("@webremaster/ui-kit", () => {
       expect(html).toContain("98%");
     });
   });
+
+  describe("RemasterErrorBoundary", () => {
+    it("无异常时正常渲染子组件内容", () => {
+      const html = renderToString(
+        <RemasterErrorBoundary>
+          <div data-testid="normal-content">正常渲染的重制页面</div>
+        </RemasterErrorBoundary>
+      );
+      expect(html).toContain("正常渲染的重制页面");
+      expect(html).not.toContain("Safe Mode");
+    });
+
+    it("静态捕获异常并提取错误实例，提供容灾降级模式", () => {
+      const err = new Error("原站 DOM 选择器被重构，节点缺失");
+      const derived = RemasterErrorBoundary.getDerivedStateFromError(err);
+      expect(derived.hasError).toBe(true);
+      expect(derived.error).toBe(err);
+
+      // 验证降级 UI 结构
+      const boundary = new RemasterErrorBoundary({ children: <div>child</div> });
+      boundary.state = {
+        hasError: true,
+        error: err,
+        errorInfo: { componentStack: "at FlakyComponent" },
+        copied: false,
+      };
+
+      const fallbackHtml = renderToString(boundary.render() as React.ReactElement);
+      expect(fallbackHtml).toContain("Safe Mode");
+      expect(fallbackHtml).toContain("切回原版网页");
+      expect(fallbackHtml).toContain("重试渲染");
+      expect(fallbackHtml).toContain("复制错误诊断");
+      expect(fallbackHtml).toContain("原站 DOM 选择器被重构");
+    });
+  });
 });
+

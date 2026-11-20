@@ -6,7 +6,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { installZeroFlashCurtain } from "../src/curtain.js";
 import { createOriginManager, getSharedOriginManager, type OriginManager } from "../src/originManager.js";
-import { extractCssAtPropertyRules, mountWebRemasterRoot } from "../src/shadowMount.js";
+import { extractCssAtPropertyRules, mountWebRemasterRoot, getRemasterPortalRoot } from "../src/shadowMount.js";
+
 import { nativeSetInputValue, nativeSubmitForm, nativeTriggerClick } from "../src/nativeDispatch.js";
 import { createPortalSlotController } from "../src/portalSlot.js";
 
@@ -236,7 +237,18 @@ describe("shadowMount", () => {
     expect(document.querySelectorAll('web-remaster-root[data-wr-app="duplicate-app"]').length).toBe(1);
     expect(res2.host).not.toBe(res1.host);
   });
+
+  it("Shadow DOM 专属 Portal 节点与 destroy() 生命周期清理", () => {
+    const { host, portalRoot, destroy } = mountWebRemasterRoot("portal-app", "");
+    expect(portalRoot.id).toBe("wr-portal-root");
+    expect(getRemasterPortalRoot("portal-app")).toBe(portalRoot);
+
+    destroy();
+    expect(document.querySelector('web-remaster-root[data-wr-app="portal-app"]')).toBeNull();
+  });
 });
+
+
 
 describe("nativeDispatch", () => {
   afterEach(() => {

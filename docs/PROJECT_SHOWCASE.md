@@ -75,7 +75,8 @@ flowchart TD
 
 | 检验维度 | 实测指标 | 结论与证据 |
 | :--- | :--- | :--- |
-| **自动化测试总数** | **128 / 128 全绿 (0 fail)** | `schema (15)` + `bridge (58)` + `ui-kit (10)` + `compiler (43)` + `store (2)` 全量通过 |
+| **自动化测试总数** | **131 / 131 全绿 (0 fail)** | `schema (15)` + `bridge (59)` + `ui-kit (12)` + `compiler (43)` + `store (2)` 全量通过 |
+
 | **TypeScript 类型系统** | **Strict 模式 0 警告** | `pnpm typecheck` across all 7 packages 全部 exit code 0 |
 | **Playwright 真机活体检验** | **6 重门禁全绿** | 数据对齐率 100%、无任何控制台报错、DOM 零白屏平滑揭幕、VLM 评审得分 9.2 |
 | **生产打包流水线** | **`pnpm build:all` 一键完成** | 核心库全部生成 `dist/`，扩展产物与商店同步完成 |

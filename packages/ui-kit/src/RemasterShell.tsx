@@ -20,6 +20,8 @@ import {
 } from "@webremaster/bridge";
 import { THEME_CSS, ThemeProvider, useThemeVars, type ThemeMode } from "./theme.js";
 import { DiagnosticsDrawer, type DiagnosticsSnapshot } from "./DiagnosticsDrawer.js";
+import { RemasterErrorBoundary } from "./RemasterErrorBoundary.js";
+
 
 export interface RemasterShellProps {
   title: string;
@@ -210,7 +212,9 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
             </button>
           </div>
         </header>
-        <main className="flex flex-1 flex-col">{props.children}</main>
+        <main className="flex flex-1 flex-col">
+          <RemasterErrorBoundary manager={manager}>{props.children}</RemasterErrorBoundary>
+        </main>
         <EscapePill
           theme={mode}
           onToggleTheme={toggleTheme}

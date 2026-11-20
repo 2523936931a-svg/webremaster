@@ -5,7 +5,8 @@
 **告别 1998 年刺眼、无排版的老旧网站。零 Token 运行时 · Shadow DOM 样式隔离 · React 19 + Tailwind v4 次世代重制编译器。**
 
 [![CI Status](https://github.com/webremaster/webremaster/actions/workflows/ci.yml/badge.svg)](https://github.com/webremaster/webremaster/actions/workflows/ci.yml)
-[![Tests Passing](https://img.shields.io/badge/Tests-128%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
+[![Tests Passing](https://img.shields.io/badge/Tests-131%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![React 19](https://img.shields.io/badge/React-19.0-61dafb.svg)](https://react.dev/)
@@ -89,9 +90,10 @@ flowchart TD
 WebRemaster/
 ├── packages/
 │   ├── schema/        # @webremaster/schema: Zod 共享类型契约 (15 tests)
-│   ├── bridge/        # @webremaster/bridge: 零依赖浏览器运行时 SDK + PowerUps (58 tests)
-│   ├── ui-kit/        # @webremaster/ui-kit: Linear 级现代组件库 + 社区多主题 (10 tests)
+│   ├── bridge/        # @webremaster/bridge: 零依赖浏览器运行时 SDK + PowerUps (59 tests)
+│   ├── ui-kit/        # @webremaster/ui-kit: Linear 级现代组件库 + 容灾保护边界 + 社区主题 (12 tests)
 │   ├── compiler/      # @webremaster/compiler: Playwright X-Ray + Vite 打包 + 6 门禁 CLI (43 tests)
+
 │   ├── extension/     # @webremaster/extension: Chrome & Firefox MV3 扩展 (徽标联动 / 右键菜单)
 │   └── store/         # @webremaster/store: GitHub Pages 演示大厅 (Before/After 拖拽对比) (2 tests)
 ├── skins/             # 编译产物库 (包含 hackernews 等站点的完整编译产物)

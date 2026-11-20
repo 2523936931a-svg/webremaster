@@ -386,6 +386,8 @@ describe("liveVerifier", () => {
 
     // 报告结构与总体判定
     expect(report.siteId).toBe(snapshot.siteId);
+
+
     expect(report.passed).toBe(true);
     expect(report.repairRoundsUsed).toBe(0);
     expect(report.gates).toHaveLength(6);
