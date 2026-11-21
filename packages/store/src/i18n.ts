@@ -43,6 +43,8 @@ export interface Translations {
   viewModeFade: string;
   copiedToClipboard: string;
   customSkinBadge: string;
+  liveSandbox: string;
+  interactiveDemo: string;
 }
 
 export const DICTIONARY: Record<Language, Translations> = {
@@ -90,6 +92,8 @@ export const DICTIONARY: Record<Language, Translations> = {
     viewModeFade: "透明渐变",
     copiedToClipboard: "已复制到剪贴板",
     customSkinBadge: "社区自制",
+    liveSandbox: "⚡ 交互沙箱试玩",
+    interactiveDemo: "零安装免配，直接在浏览器内交互体验重制版 60fps 动效与组件",
   },
   en: {
     heroTitle1: "Stop tolerating",
@@ -135,6 +139,8 @@ export const DICTIONARY: Record<Language, Translations> = {
     viewModeFade: "Fade Overlay",
     copiedToClipboard: "Copied to clipboard",
     customSkinBadge: "Community",
+    liveSandbox: "⚡ Live Interactive Sandbox",
+    interactiveDemo: "Zero install required. Test-drive the 60fps remastered UI and animations directly in your browser.",
   },
 };
 

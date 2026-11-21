@@ -1521,6 +1521,129 @@ export async function devHandler(opts: DevHandlerOptions): Promise<{
   return { siteId, devUserScriptPath, port, devServerUrl };
 }
 
+export interface ExportHandlerOptions {
+  siteId: string;
+  skinsDir?: string;
+  outDir?: string;
+}
+
+export async function exportHandler(opts: ExportHandlerOptions): Promise<{
+  siteId: string;
+  exportDir: string;
+  exportedFiles: string[];
+}> {
+  const { siteId } = opts;
+  const skinsDir = resolveSkinsDir(opts.skinsDir);
+  const targetDir = path.join(skinsDir, siteId);
+
+  if (!existsSync(targetDir)) {
+    throw new CliExitError(
+      `未找到站点目录: ${targetDir}。请先使用 wr scaffold ${siteId} 或 wr compile 初始化并打包站点。`,
+      1,
+    );
+  }
+
+  // 检查是否已有编译好的 <siteId>.user.js，如果缺失则自动尝试打包
+  let userScriptPath = path.join(targetDir, `${siteId}.user.js`);
+  if (!existsSync(userScriptPath)) {
+    const buildOutcome = await buildSkinHandler({
+      siteId,
+      skinsDir,
+      minify: true,
+    });
+    userScriptPath = buildOutcome.result.outFile;
+  }
+
+  const userScriptContent = readFileSync(userScriptPath, "utf8");
+
+  // 读取合同与 manifest 获取元数据
+  let siteName = siteId.toUpperCase();
+  let targetUrl = `https://${siteId}.com/`;
+  let matchPattern = "*://*/*";
+  const contractPath = path.join(targetDir, "02_contract.json");
+  if (existsSync(contractPath)) {
+    try {
+      const contract = JSON.parse(readFileSync(contractPath, "utf8"));
+      if (contract.siteName) siteName = contract.siteName;
+      if (contract.targetUrl) {
+        targetUrl = contract.targetUrl;
+        const u = new URL(targetUrl);
+        matchPattern = `${u.protocol}//${u.host}/*`;
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const baseOutDir = opts.outDir ? path.resolve(process.cwd(), opts.outDir) : path.join(process.cwd(), "dist", "export");
+  const exportDir = path.join(baseOutDir, siteId);
+  const chromeDir = path.join(exportDir, "chrome-unpacked");
+  mkdirSync(chromeDir, { recursive: true });
+
+  const exportedFiles: string[] = [];
+
+  // 1. 导出油猴安装脚本
+  const destScriptPath = path.join(exportDir, `${siteId}.user.js`);
+  writeFileSync(destScriptPath, userScriptContent, "utf8");
+  exportedFiles.push(destScriptPath);
+
+  // 2. 导出 Chrome MV3 扩展独立解压包
+  const chromeManifest = {
+    manifest_version: 3,
+    name: `WebRemaster - ${siteName}`,
+    version: "0.1.0",
+    description: `Next-generation remastered UI for ${siteName} powered by WebRemaster`,
+    content_scripts: [
+      {
+        matches: [matchPattern],
+        js: ["content.js"],
+        run_at: "document_start",
+      },
+    ],
+  };
+  const chromeManifestPath = path.join(chromeDir, "manifest.json");
+  writeFileSync(chromeManifestPath, `${JSON.stringify(chromeManifest, null, 2)}\n`, "utf8");
+  exportedFiles.push(chromeManifestPath);
+
+  const chromeContentPath = path.join(chromeDir, "content.js");
+  writeFileSync(chromeContentPath, userScriptContent, "utf8");
+  exportedFiles.push(chromeContentPath);
+
+  // 3. 导出分发自述 README.md
+  const readmeContent = `# WebRemaster: ${siteName} 重制版
+
+> 本皮肤由 [WebRemaster](https://github.com/webremaster/webremaster) 零 Key 自动化编译器驱动，为 **${siteName}** (${targetUrl}) 提供 60fps 响应式现代界面与原生 Cookie/状态双向桥接。
+
+## 📦 安装与使用方式
+
+### 途径一：Tampermonkey / 脚本猫 (推荐)
+1. 安装浏览器扩展 [Tampermonkey](https://www.tampermonkey.net/) 或 ScriptCat；
+2. 打开并安装当前目录下的 \`${siteId}.user.js\`；
+3. 访问 [${targetUrl}](${targetUrl})，页面将自动升级为现代重制版！
+
+### 途径二：Chrome 开发者模式加载独立扩展
+1. 打开 Chrome 浏览器并访问 \`chrome://extensions/\`；
+2. 开启右上角的 **「开发者模式 (Developer mode)」**；
+3. 点击 **「加载已解压的扩展程序 (Load unpacked)」**，选择当前目录下的 \`chrome-unpacked\` 文件夹即可！
+
+## ⚡ 核心能力
+- **Alt + Shift + R**：在 原版 / 现代化重制版 / 实时分屏对比 之间无缝瞬切；
+- **0 Token 纯本地运行**：100% 离线，完全保护隐私与账单；
+- **原生状态桥接**：原站登录态、Cookie、CSRF Token 100% 保留。
+`;
+  const readmePath = path.join(exportDir, "README.md");
+  writeFileSync(readmePath, readmeContent, "utf8");
+  exportedFiles.push(readmePath);
+
+  console.log(chalk.bold(`\n📦 皮肤分发包已成功导出: ${chalk.cyan(siteId)}\n`));
+  console.log(`  + 目标目录:     ${chalk.green(exportDir)}`);
+  console.log(`  + 油猴直装脚本: ${chalk.green(path.relative(process.cwd(), destScriptPath))}`);
+  console.log(`  + Chrome解压包: ${chalk.green(path.relative(process.cwd(), chromeDir))}`);
+  console.log(`  + 分发说明文档: ${chalk.green(path.relative(process.cwd(), readmePath))}\n`);
+
+  return { siteId, exportDir, exportedFiles };
+}
+
 
 
 /* ------------------------------------------------------------------ */
@@ -1724,6 +1847,20 @@ export function buildProgram(): Command {
           port: optNumber(opts.port, "port", 5173),
           skinsDir: optOptionalString(opts.skinsDir),
           dryRun: Boolean(opts.dryRun),
+        });
+      });
+    });
+
+  registerCommand(program, "export", "一键导出皮肤全量分发包（油猴脚本、Chrome 独立解压包与 README 说明）")
+    .argument("<siteId>", "站点 ID（kebab-case）")
+    .option("--skins-dir <dir>", "皮肤工作区根目录", "./skins")
+    .option("--out-dir <dir>", "导出分发包根目录", "./dist/export")
+    .action(async (siteId, opts) => {
+      await guard(async () => {
+        await exportHandler({
+          siteId: optString(siteId, "siteId"),
+          skinsDir: optOptionalString(opts.skinsDir),
+          outDir: optOptionalString(opts.outDir),
         });
       });
     });

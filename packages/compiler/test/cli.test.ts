@@ -28,6 +28,7 @@ import {
   listHandler,
   scaffoldHandler,
   devHandler,
+  exportHandler,
 } from "../src/cli.js";
 
 
@@ -185,6 +186,7 @@ describe("buildProgram（结构锁定）", () => {
       "list",
       "scaffold",
       "dev",
+      "export",
     ]);
   });
 
@@ -419,6 +421,72 @@ describe("devHandler (HMR 联调桥)", () => {
         siteId: "non-existent-site",
         skinsDir,
         dryRun: true,
+      }),
+    ).rejects.toThrow(CliExitError);
+  });
+});
+
+describe("exportHandler (皮肤全量分发包导出)", () => {
+  it("导出油猴脚本、Chrome MV3 扩展解压包与 README", async () => {
+    const rootDir = mkdtempSync(path.join(tmpdir(), "wr-export-test-"));
+    createdDirs.push(rootDir);
+    const skinsDir = path.join(rootDir, "skins");
+    const outDir = path.join(rootDir, "dist", "export");
+
+    // 脚手架生成皮肤结构
+    await scaffoldHandler({
+      siteId: "my-export-site",
+      url: "https://news.ycombinator.com/",
+      skinsDir,
+    });
+
+    // 模拟编译产物已就绪
+    const userScriptFile = path.join(skinsDir, "my-export-site", "my-export-site.user.js");
+    writeFileSync(userScriptFile, "// ==UserScript==\n// @name WebRemaster\n// ==/UserScript==\nconsole.log('ready');\n", "utf8");
+
+    const result = await exportHandler({
+      siteId: "my-export-site",
+      skinsDir,
+      outDir,
+    });
+
+    expect(result.siteId).toBe("my-export-site");
+    expect(existsSync(result.exportDir)).toBe(true);
+
+    // 1. 验证油猴脚本
+    const userScriptDest = path.join(result.exportDir, "my-export-site.user.js");
+    expect(existsSync(userScriptDest)).toBe(true);
+    expect(readFileSync(userScriptDest, "utf8")).toContain("// ==UserScript==");
+
+    // 2. 验证 Chrome 解压包
+    const chromeManifest = path.join(result.exportDir, "chrome-unpacked", "manifest.json");
+    expect(existsSync(chromeManifest)).toBe(true);
+    const parsedManifest = JSON.parse(readFileSync(chromeManifest, "utf8"));
+    expect(parsedManifest.manifest_version).toBe(3);
+    expect(parsedManifest.content_scripts.length).toBeGreaterThan(0);
+
+    const chromeContent = path.join(result.exportDir, "chrome-unpacked", "content.js");
+    expect(existsSync(chromeContent)).toBe(true);
+
+    // 3. 验证自述 README
+    const readmeFile = path.join(result.exportDir, "README.md");
+    expect(existsSync(readmeFile)).toBe(true);
+    const readmeText = readFileSync(readmeFile, "utf8");
+    expect(readmeText).toContain("Tampermonkey");
+    expect(readmeText).toContain("Chrome");
+    expect(readmeText).toContain("Alt + Shift + R");
+  });
+
+  it("站点不存在时拒绝导出并抛出 CliExitError", async () => {
+    const rootDir = mkdtempSync(path.join(tmpdir(), "wr-export-test-"));
+    createdDirs.push(rootDir);
+    const skinsDir = path.join(rootDir, "skins");
+    mkdirSync(skinsDir, { recursive: true });
+
+    await expect(
+      exportHandler({
+        siteId: "not-found-site",
+        skinsDir,
       }),
     ).rejects.toThrow(CliExitError);
   });

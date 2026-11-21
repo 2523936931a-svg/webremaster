@@ -9,6 +9,7 @@ import {
   THEME_PALETTES,
   FeedListCard,
   SmartDataTable,
+  ReaderProseLayout,
   DiagnosticsDrawer,
   RemasterErrorBoundary,
   RemasterShell,
@@ -145,6 +146,63 @@ describe("@webremaster/ui-kit", () => {
       );
 
       expect(html).toContain("暂无匹配数据");
+    });
+
+    it("支持 TanStack 式客户端分页控制与行数切片", () => {
+      const columns = [
+        { key: "id", header: "ID", value: (r: { id: number; name: string }) => r.id },
+        { key: "name", header: "名称", value: (r: { id: number; name: string }) => r.name },
+      ];
+      const rows = [
+        { id: 1, name: "Alpha" },
+        { id: 2, name: "Beta" },
+        { id: 3, name: "Gamma" },
+        { id: 4, name: "Delta" },
+      ];
+
+      // 每页 2 条，第 1 页展示 Alpha、Beta，不展示 Gamma、Delta
+      const html = renderToString(
+        <SmartDataTable
+          columns={columns}
+          rows={rows}
+          rowKey={(r) => String(r.id)}
+          pageSize={2}
+          pageSizeOptions={[2, 5, 10]}
+        />
+      );
+
+      expect(html).toContain("Alpha");
+      expect(html).toContain("Beta");
+      expect(html).not.toContain("Gamma");
+      expect(html).not.toContain("Delta");
+      expect(html).toContain("1 / 2");
+      expect(html).toContain("每页");
+      expect(html).toContain("JSON");
+    });
+  });
+
+  describe("ReaderProseLayout", () => {
+    it("渲染文章标题、元信息、Markdown 复制按钮与目录", () => {
+      const html = renderToString(
+        <ReaderProseLayout
+          title="SQLite 原理深潜"
+          meta="作者：Dr. Hipp · 2026-03"
+          readingMinutes={5}
+          toc={[
+            { id: "sec-1", title: "第一章：存储引擎", level: 1 },
+            { id: "sec-2", title: "第二章：B-Tree 实现", level: 2 },
+          ]}
+        >
+          <p>正文内容...</p>
+        </ReaderProseLayout>
+      );
+
+      expect(html).toContain("SQLite 原理深潜");
+      expect(html).toContain("作者：Dr. Hipp");
+      expect(html).toContain("约 5 分钟读完");
+      expect(html).toContain("复制 Markdown");
+      expect(html).toContain("第一章：存储引擎");
+      expect(html).toContain("第二章：B-Tree 实现");
     });
   });
 

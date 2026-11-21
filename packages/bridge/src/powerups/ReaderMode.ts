@@ -7,6 +7,12 @@
  * 3. 管理阅读器个性化排版配置（字号缩放、衬线/无衬线切换、护眼羊皮纸模式）。
  */
 
+export interface ArticleHeading {
+  id: string;
+  title: string;
+  level: 1 | 2 | 3;
+}
+
 export interface ExtractedArticle {
   title: string;
   byline?: string;
@@ -14,6 +20,7 @@ export interface ExtractedArticle {
   wordCount: number;
   readingTimeMinutes: number;
   paragraphs: string[];
+  headings: ArticleHeading[];
   excerpt: string;
 }
 
@@ -71,6 +78,7 @@ export function extractArticle(container?: HTMLElement | null): ExtractedArticle
       wordCount: 0,
       readingTimeMinutes: 0,
       paragraphs: [],
+      headings: [],
       excerpt: "",
     };
   }
@@ -99,6 +107,26 @@ export function extractArticle(container?: HTMLElement | null): ExtractedArticle
     }
   }
 
+  // 4. 提取各级标题 (h2, h3, h4)，生成自动目录锚点
+  const headingNodes = Array.from(root.querySelectorAll("h2, h3, h4"));
+  const headings: ArticleHeading[] = [];
+  headingNodes.forEach((node, idx) => {
+    if (node.closest("nav, header, footer, .sidebar, [aria-hidden='true']")) {
+      return;
+    }
+    const text = node.textContent?.trim();
+    if (!text) return;
+    const tag = node.tagName.toLowerCase();
+    const level: 1 | 2 | 3 = tag === "h2" ? 1 : tag === "h3" ? 2 : 3;
+    let id = node.getAttribute("id");
+    if (!id) {
+      const slug = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-").replace(/^-+|-+$/g, "");
+      id = slug ? `section-${slug}` : `heading-${idx + 1}`;
+      node.setAttribute("id", id);
+    }
+    headings.push({ id, title: text, level });
+  });
+
   const fullText = paragraphs.join("\n\n");
   const stats = calculateReadingStats(fullText);
   const excerpt = paragraphs.length > 0 ? paragraphs[0].slice(0, 160) + (paragraphs[0].length > 160 ? "..." : "") : "";
@@ -109,6 +137,7 @@ export function extractArticle(container?: HTMLElement | null): ExtractedArticle
     wordCount: stats.wordCount,
     readingTimeMinutes: stats.readingTimeMinutes,
     paragraphs,
+    headings,
     excerpt,
   };
 }

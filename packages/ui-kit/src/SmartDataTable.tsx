@@ -5,9 +5,9 @@
  * （复用 bridge PowerUps：UTF-8 BOM CSV，Excel 中文不乱码）。泛型行模型，
  * 排序 / 筛选 / 导出统一走 column.value 提供的原始值；render 仅负责展示。
  */
-import { useMemo, useState, type ReactElement, type ReactNode } from "react";
-import { ArrowDown, ArrowUp, ArrowUpDown, Download, FileText, Search } from "lucide-react";
-import { exportToCSV, exportToMarkdownTable } from "@webremaster/bridge";
+import { useEffect, useMemo, useState, type ReactElement, type ReactNode } from "react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Code2, Download, FileText, Search } from "lucide-react";
+import { exportToCSV, exportToJSON, exportToMarkdownTable } from "@webremaster/bridge";
 import { useThemeVars } from "./theme.js";
 
 /** 单元格原始值类型（value 函数的返回值，排序 / 筛选 / 导出共用）。 */
@@ -35,11 +35,15 @@ export interface SmartDataTableProps<T> {
   filterable?: boolean;
   filterPlaceholder?: string;
   exportable?: boolean;
-  /** 导出文件名主干，缺省 webremaster-export（自动补 .csv / .md 后缀）。 */
+  /** 导出文件名主干，缺省 webremaster-export（自动补 .csv / .md / .json 后缀）。 */
   exportBaseName?: string;
   initialSort?: { key: string; direction: SortDirection };
   onRowClick?: (row: T, index: number) => void;
   emptyMessage?: string;
+  /** 单页显示最大行数，设定则开启客户端分页（如 10, 25, 50）；缺省展示全量行。 */
+  pageSize?: number;
+  /** 可供用户切换的单页行数候选列表，缺省 [10, 25, 50, 100]。 */
+  pageSizeOptions?: ReadonlyArray<number>;
 }
 
 interface SortState {
@@ -112,6 +116,12 @@ export function SmartDataTable<T>(props: SmartDataTableProps<T>): ReactElement {
       ? { key: props.initialSort.key, direction: props.initialSort.direction }
       : { key: null, direction: "asc" },
   );
+  const [pageSize, setPageSize] = useState<number | undefined>(props.pageSize);
+  const [pageIndex, setPageIndex] = useState<number>(0);
+
+  useEffect(() => {
+    setPageIndex(0);
+  }, [filterText, sort]);
 
   const isSortable = (column: SmartDataTableColumn<T>): boolean =>
     column.sortable === true || (column.sortable !== false && typeof column.value === "function");
@@ -135,6 +145,13 @@ export function SmartDataTable<T>(props: SmartDataTableProps<T>): ReactElement {
     }
     return result;
   }, [rows, columns, filterText, sort]);
+
+  const isPaginated = pageSize !== undefined && pageSize > 0;
+  const totalPages = isPaginated ? Math.max(1, Math.ceil(visibleRows.length / pageSize)) : 1;
+  const safePageIndex = Math.min(pageIndex, totalPages - 1);
+  const displayedRows = isPaginated
+    ? visibleRows.slice(safePageIndex * pageSize, (safePageIndex + 1) * pageSize)
+    : visibleRows;
 
   const toggleSort = (column: SmartDataTableColumn<T>): void => {
     if (!isSortable(column)) {
@@ -204,6 +221,24 @@ export function SmartDataTable<T>(props: SmartDataTableProps<T>): ReactElement {
               <FileText size={13} aria-hidden />
               MD
             </button>
+            <button
+              type="button"
+              className="wr-btn wr-interactive"
+              onClick={() => {
+                const jsonExportData = visibleRows.map((row) => {
+                  const record: Record<string, CellValue> = {};
+                  columns.forEach((col) => {
+                    record[col.header] = col.value?.(row) ?? null;
+                  });
+                  return record;
+                });
+                exportToJSON(jsonExportData, `${exportBaseName}.json`);
+              }}
+              title="导出结构化 JSON 数据"
+            >
+              <Code2 size={13} aria-hidden />
+              JSON
+            </button>
           </>
         ) : null}
       </div>
@@ -262,42 +297,98 @@ export function SmartDataTable<T>(props: SmartDataTableProps<T>): ReactElement {
               </tr>
             </thead>
             <tbody>
-              {visibleRows.map((row, index) => (
-                <tr
-                  key={rowKey(row, index)}
-                  className={onRowClick !== undefined ? "wr-row wr-interactive cursor-pointer" : "wr-row"}
-                  onClick={
-                    onRowClick !== undefined
-                      ? () => {
-                          onRowClick(row, index);
-                        }
-                      : undefined
-                  }
-                  style={{ color: vars.text }}
-                >
-                  {columns.map((column) => (
-                    <td key={column.key} className={ALIGN_CLASS[column.align ?? "left"]}>
-                      {column.render !== undefined ? column.render(row, index) : displayCell(column.value?.(row) ?? null)}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {displayedRows.map((row, index) => {
+                const rowIndex = isPaginated ? safePageIndex * pageSize + index : index;
+                return (
+                  <tr
+                    key={rowKey(row, rowIndex)}
+                    className={onRowClick !== undefined ? "wr-row wr-interactive cursor-pointer" : "wr-row"}
+                    onClick={
+                      onRowClick !== undefined
+                        ? () => {
+                            onRowClick(row, rowIndex);
+                          }
+                        : undefined
+                    }
+                    style={{ color: vars.text }}
+                  >
+                    {columns.map((column) => (
+                      <td key={column.key} className={ALIGN_CLASS[column.align ?? "left"]}>
+                        {column.render !== undefined ? column.render(row, rowIndex) : displayCell(column.value?.(row) ?? null)}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
       </div>
 
       <div
-        className="flex items-center justify-between gap-3 px-3 py-2 text-[11px]"
+        className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 text-[11px]"
         style={{ color: vars.textMuted, borderTopWidth: 1, borderTopStyle: "solid", borderColor: vars.border }}
       >
-        <span>
-          {visibleRows.length === rows.length ? `共 ${rows.length} 行` : `显示 ${visibleRows.length} / 共 ${rows.length} 行`}
-        </span>
-        {sortedColumn !== undefined ? (
+        <div className="flex items-center gap-2">
           <span>
-            按「{sortedColumn.header}」{sort.direction === "asc" ? "升序" : "降序"}
+            {visibleRows.length === rows.length ? `共 ${rows.length} 行` : `显示 ${visibleRows.length} / 共 ${rows.length} 行`}
           </span>
+          {sortedColumn !== undefined ? (
+            <span>
+              · 按「{sortedColumn.header}」{sort.direction === "asc" ? "升序" : "降序"}
+            </span>
+          ) : null}
+        </div>
+
+        {isPaginated && visibleRows.length > 0 ? (
+          <div className="flex items-center gap-1.5" role="navigation" aria-label="分页导航">
+            <button
+              type="button"
+              disabled={safePageIndex === 0}
+              onClick={() => setPageIndex((p) => Math.max(0, p - 1))}
+              className="wr-btn wr-interactive p-1 disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="上一页"
+              title="上一页"
+            >
+              <ChevronLeft size={13} aria-hidden />
+            </button>
+            <span className="font-mono text-[11px] px-1.5">
+              {`${safePageIndex + 1} / ${totalPages}`}
+            </span>
+            <button
+              type="button"
+              disabled={safePageIndex >= totalPages - 1}
+              onClick={() => setPageIndex((p) => Math.min(totalPages - 1, p + 1))}
+              className="wr-btn wr-interactive p-1 disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="下一页"
+              title="下一页"
+            >
+              <ChevronRight size={13} aria-hidden />
+            </button>
+          </div>
+        ) : null}
+
+        {props.pageSize !== undefined || props.pageSizeOptions !== undefined ? (
+          <div className="flex items-center gap-1.5">
+            <span>每页</span>
+            <select
+              value={pageSize ?? 0}
+              onChange={(event) => {
+                const val = Number(event.target.value);
+                setPageSize(val === 0 ? undefined : val);
+                setPageIndex(0);
+              }}
+              aria-label="每页显示行数"
+              className="wr-input text-[11px] py-0.5 px-1.5 cursor-pointer"
+            >
+              {(props.pageSizeOptions ?? [10, 25, 50, 100]).map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt} 行
+                </option>
+              ))}
+              <option value={0}>全部</option>
+            </select>
+          </div>
         ) : null}
       </div>
     </div>

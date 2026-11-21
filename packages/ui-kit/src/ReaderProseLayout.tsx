@@ -7,7 +7,7 @@
  * 正文排版由 THEME_CSS 的 .wr-prose 提供（零 HTML 注入，children 为 React 节点）。
  */
 import { useCallback, useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
-import { Clock } from "lucide-react";
+import { Check, Clock, Copy } from "lucide-react";
 import { useThemeVars } from "./theme.js";
 
 export interface ReaderTocItem {
@@ -66,6 +66,37 @@ export function ReaderProseLayout(props: ReaderProseLayoutProps): ReactElement {
   const [progress, setProgress] = useState(0);
   const [activeTocId, setActiveTocId] = useState<string | null>(null);
   const [estimatedMinutes, setEstimatedMinutes] = useState<number | null>(null);
+  const [autoToc, setAutoToc] = useState<Array<ReaderTocItem>>([]);
+  const [copiedMd, setCopiedMd] = useState(false);
+
+  // 自动从正文标题构建目录（当未显式传入 toc 时）
+  useEffect(() => {
+    if (toc !== undefined && toc.length > 0) {
+      return;
+    }
+    const article = articleRef.current;
+    if (article === null) {
+      return;
+    }
+    const headingEls = Array.from(article.querySelectorAll("h2, h3, h4"));
+    const items: Array<ReaderTocItem> = [];
+    headingEls.forEach((el, idx) => {
+      const text = el.textContent?.trim();
+      if (!text) return;
+      const tag = el.tagName.toLowerCase();
+      const level: 1 | 2 | 3 = tag === "h2" ? 1 : tag === "h3" ? 2 : 3;
+      let id = el.getAttribute("id");
+      if (!id) {
+        const slug = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-").replace(/^-+|-+$/g, "");
+        id = slug ? `wr-sec-${slug}` : `wr-h-${idx + 1}`;
+        el.setAttribute("id", id);
+      }
+      items.push({ id, title: text, level });
+    });
+    setAutoToc(items);
+  }, [children, toc]);
+
+  const effectiveToc = toc !== undefined && toc.length > 0 ? toc : autoToc;
 
   const updateReadingProgress = useCallback(() => {
     const article = articleRef.current;
@@ -77,9 +108,9 @@ export function ReaderProseLayout(props: ReaderProseLayoutProps): ReactElement {
     const viewportHeight = typeof window === "undefined" ? 800 : window.innerHeight;
     const travel = rect.height - viewportHeight;
     setProgress(travel > 0 ? clamp01(-rect.top / travel) : 1);
-    if (toc !== undefined && toc.length > 0) {
-      let current: string | null = toc[0]?.id ?? null;
-      for (const item of toc) {
+    if (effectiveToc.length > 0) {
+      let current: string | null = effectiveToc[0]?.id ?? null;
+      for (const item of effectiveToc) {
         const heading = queryHeading(article, item.id);
         if (heading !== null && heading.getBoundingClientRect().top <= 120) {
           current = item.id;
@@ -87,7 +118,7 @@ export function ReaderProseLayout(props: ReaderProseLayoutProps): ReactElement {
       }
       setActiveTocId(current);
     }
-  }, [toc]);
+  }, [effectiveToc]);
 
   // capture:true 使内部任意滚动容器的 scroll 事件也会到达 window
   useEffect(() => {
@@ -131,6 +162,36 @@ export function ReaderProseLayout(props: ReaderProseLayoutProps): ReactElement {
     }
   };
 
+  const handleCopyMarkdown = async (): Promise<void> => {
+    const article = articleRef.current;
+    if (article === null) return;
+    const mdParts: string[] = [`# ${title}\n`];
+    if (meta) mdParts.push(`> ${meta}\n`);
+    const nodes = Array.from(article.querySelectorAll("h2, h3, h4, p, pre, blockquote, li"));
+    nodes.forEach((node) => {
+      const tag = node.tagName.toLowerCase();
+      const text = node.textContent?.trim() ?? "";
+      if (!text) return;
+      if (tag === "h2") mdParts.push(`\n## ${text}\n`);
+      else if (tag === "h3") mdParts.push(`\n### ${text}\n`);
+      else if (tag === "h4") mdParts.push(`\n#### ${text}\n`);
+      else if (tag === "pre") mdParts.push(`\n\`\`\`\n${text}\n\`\`\`\n`);
+      else if (tag === "blockquote") mdParts.push(`\n> ${text}\n`);
+      else if (tag === "li") mdParts.push(`- ${text}`);
+      else if (tag === "p") mdParts.push(`\n${text}\n`);
+    });
+    const fullMarkdown = mdParts.join("\n").replace(/\n{3,}/g, "\n\n");
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(fullMarkdown);
+        setCopiedMd(true);
+        setTimeout(() => setCopiedMd(false), 2000);
+      }
+    } catch {
+      /* 降级忽略 */
+    }
+  };
+
   const minutes = readingMinutes ?? estimatedMinutes;
   const showMetaRow = meta !== undefined || minutes !== null;
 
@@ -146,25 +207,44 @@ export function ReaderProseLayout(props: ReaderProseLayoutProps): ReactElement {
         <article ref={articleRef} className="wr-prose min-w-0 flex-1">
           <h1>{title}</h1>
           {showMetaRow ? (
-            <div className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px]" style={{ color: vars.textMuted }}>
-              {meta !== undefined ? <span>{meta}</span> : null}
-              {minutes !== null ? (
-                <span className="inline-flex items-center gap-1">
-                  <Clock size={11} aria-hidden />
-                  约 {minutes} 分钟读完
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-[12px]" style={{ color: vars.textMuted }}>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                {meta !== undefined ? <span>{meta}</span> : null}
+                {minutes !== null ? (
+                  <span className="inline-flex items-center gap-1">
+                    <Clock size={11} aria-hidden />
+                    {`约 ${minutes} 分钟读完`}
+                  </span>
+                ) : null}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[11px]" title="当前阅读进度">
+                  {Math.round(progress * 100)}%
                 </span>
-              ) : null}
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleCopyMarkdown();
+                  }}
+                  className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border wr-interactive transition-colors"
+                  style={{ borderColor: vars.border, color: copiedMd ? vars.accent : vars.textMuted }}
+                  title="复制整篇文档为 Markdown 格式"
+                >
+                  {copiedMd ? <Check size={11} aria-hidden /> : <Copy size={11} aria-hidden />}
+                  <span>{copiedMd ? "已复制 MD" : "复制 Markdown"}</span>
+                </button>
+              </div>
             </div>
           ) : null}
           {children}
         </article>
-        {toc !== undefined && toc.length > 0 ? (
+        {effectiveToc.length > 0 ? (
           <aside className="sticky top-8 hidden w-56 shrink-0 lg:block">
             <div className="text-[11px] font-medium uppercase tracking-wide" style={{ color: vars.textMuted }}>
               目录
             </div>
             <nav className="mt-2 flex flex-col">
-              {toc.map((item) => {
+              {effectiveToc.map((item) => {
                 const level = item.level ?? 1;
                 const active = item.id === activeTocId;
                 return (

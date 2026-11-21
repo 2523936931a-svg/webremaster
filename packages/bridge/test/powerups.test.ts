@@ -215,7 +215,7 @@ describe("ReaderMode", () => {
     expect(calculateReadingStats(longText).readingTimeMinutes).toBe(2);
   });
 
-  it("extractArticle：从混乱 DOM 中提取结构化文章、排除导航噪点", () => {
+  it("extractArticle：从混乱 DOM 中提取结构化文章、排除导航噪点与提取目录大纲", () => {
     const container = document.createElement("div");
     container.innerHTML = `
       <header><nav>Home About Contact</nav></header>
@@ -223,17 +223,26 @@ describe("ReaderMode", () => {
       <div class="byline">Dr. Richard Hipp</div>
       <div class="sidebar">Ads and promotions</div>
       <p>SQLite is a C-language library that implements a small, fast, self-contained, high-reliability SQL database engine.</p>
+      <h2>Storage Engine Overview</h2>
       <p>The code for SQLite is in the public domain and is free to everyone to use for any purpose.</p>
+      <h3>B-Tree Subsystem</h3>
+      <p>The B-Tree subsystem organizes database pages into tree structures for fast lookups.</p>
       <footer>Copyright 2026</footer>
     `;
 
     const article = extractArticle(container);
     expect(article.title).toBe("SQLite Architecture Guide");
     expect(article.byline).toBe("Dr. Richard Hipp");
-    expect(article.paragraphs.length).toBe(2);
+    expect(article.paragraphs.length).toBe(3);
     expect(article.paragraphs[0]).toContain("SQLite is a C-language library");
     expect(article.wordCount).toBeGreaterThan(20);
     expect(article.excerpt).toContain("SQLite is a C-language library");
+    expect(article.headings.length).toBe(2);
+    expect(article.headings[0].title).toBe("Storage Engine Overview");
+    expect(article.headings[0].level).toBe(1);
+    expect(article.headings[0].id).toContain("storage-engine-overview");
+    expect(article.headings[1].title).toBe("B-Tree Subsystem");
+    expect(article.headings[1].level).toBe(2);
   });
 
   it("ReaderSettings：配置存取与字号行高安全限幅（12~28px / 1.2~2.5）", () => {
