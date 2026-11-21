@@ -10,6 +10,10 @@ import {
   Github,
   Zap,
   CheckCircle2,
+  Crosshair,
+  Command,
+  Columns2,
+  SunMoon,
 } from "lucide-react";
 
 export const PopupApp: React.FC = () => {
@@ -78,6 +82,23 @@ export const PopupApp: React.FC = () => {
             if (tabs[0]?.id) chrome.tabs.reload(tabs[0].id);
           });
         }
+      });
+    }
+  };
+
+  const sendAction = (action: string) => {
+    if (typeof chrome !== "undefined" && chrome.tabs && chrome.scripting) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tabId = tabs[0]?.id;
+        if (!tabId) return;
+        chrome.scripting.executeScript({
+          target: { tabId },
+          func: (act: string) => {
+            window.postMessage({ type: "WEBREMASTER_ACTION", action: act }, "*");
+          },
+          args: [action],
+          world: "MAIN",
+        });
       });
     }
   };
@@ -241,6 +262,111 @@ export const PopupApp: React.FC = () => {
                 快捷键: <kbd style={{ background: "#27272a", padding: "1px 4px", borderRadius: "3px" }}>Alt+Shift+R</kbd>
               </div>
             </div>
+
+            {/* 快捷遥控操作盘 */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: "6px",
+                marginTop: "10px",
+                paddingTop: "10px",
+                borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => sendAction("toggle_zapper")}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                  padding: "6px 2px",
+                  borderRadius: "8px",
+                  background: "rgba(244, 63, 94, 0.1)",
+                  border: "1px solid rgba(244, 63, 94, 0.25)",
+                  color: "#f43f5e",
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+                title="进入瞄准模式：点击页面任意令人烦躁的元素即可持久化粉碎"
+              >
+                <Crosshair size={13} />
+                <span>消除枪</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => sendAction("open_palette")}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                  padding: "6px 2px",
+                  borderRadius: "8px",
+                  background: "rgba(56, 189, 248, 0.1)",
+                  border: "1px solid rgba(56, 189, 248, 0.25)",
+                  color: "#38bdf8",
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+                title="呼出 Raycast 风格全局命令中心 (⌘K / Ctrl+K)"
+              >
+                <Command size={13} />
+                <span>指令中心</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => sendAction("cycle_view_mode")}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                  padding: "6px 2px",
+                  borderRadius: "8px",
+                  background: "rgba(168, 85, 247, 0.1)",
+                  border: "1px solid rgba(168, 85, 247, 0.25)",
+                  color: "#c084fc",
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+                title="在 原版 / 现代化重制版 / 分屏对比 之间无缝切换 (Alt+Shift+R)"
+              >
+                <Columns2 size={13} />
+                <span>瞬切视图</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => sendAction("toggle_theme")}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                  padding: "6px 2px",
+                  borderRadius: "8px",
+                  background: "rgba(245, 158, 11, 0.1)",
+                  border: "1px solid rgba(245, 158, 11, 0.25)",
+                  color: "#fbbf24",
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+                title="切换深色模式与浅色模式"
+              >
+                <SunMoon size={13} />
+                <span>深浅主题</span>
+              </button>
+            </div>
           </div>
         ) : (
           <div
@@ -250,18 +376,44 @@ export const PopupApp: React.FC = () => {
               borderRadius: "10px",
               padding: "10px 12px",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
+              flexDirection: "column",
+              gap: "8px",
             }}
           >
-            <div>
-              <div style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255, 255, 255, 0.8)" }}>
-                当前页面未收录重制皮肤
-              </div>
-              <div style={{ fontSize: "10px", color: "rgba(255, 255, 255, 0.4)", marginTop: "2px" }}>
-                已收录 {SKIN_REGISTRY.length} 个经典站点，随时在下方浏览体验
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255, 255, 255, 0.8)" }}>
+                  当前页面未收录重制皮肤
+                </div>
+                <div style={{ fontSize: "10px", color: "rgba(255, 255, 255, 0.4)", marginTop: "2px" }}>
+                  已收录 {SKIN_REGISTRY.length} 个经典站点，随时在下方浏览体验
+                </div>
               </div>
             </div>
+
+            {/* 万能全局消除枪直控 */}
+            <button
+              type="button"
+              onClick={() => sendAction("toggle_zapper")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                padding: "6px 10px",
+                borderRadius: "8px",
+                background: "rgba(244, 63, 94, 0.12)",
+                border: "1px solid rgba(244, 63, 94, 0.3)",
+                color: "#f43f5e",
+                fontSize: "11px",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+              title="在当前任意网页启动 Arc 风格元素消除枪，持久化粉碎广告"
+            >
+              <Crosshair size={13} />
+              <span>启动万能消除枪 (Zap)</span>
+            </button>
           </div>
         )}
       </div>

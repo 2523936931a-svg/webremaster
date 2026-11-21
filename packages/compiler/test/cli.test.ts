@@ -266,9 +266,20 @@ describe("buildProgram（结构锁定）", () => {
     expect(parsedDesign.siteId).toBe("my-test-site");
     expect(parsedDesign.themeIdentity.brandAccentHex).toBe("#0ea5e9");
 
-    // 验证 entry.tsx 和 skin.css 存在
-    expect(existsSync(path.join(skinsDir, "my-test-site", "src", "entry.tsx"))).toBe(true);
+    // 验证 entry.tsx 和 skin.css 存在且遵循原型布局
+    const entryFile = path.join(skinsDir, "my-test-site", "src", "entry.tsx");
+    expect(existsSync(entryFile)).toBe(true);
+    expect(readFileSync(entryFile, "utf8")).toContain("ReaderProseLayout");
     expect(existsSync(path.join(skinsDir, "my-test-site", "src", "skin.css"))).toBe(true);
+
+    // 验证 data-table 原型智能使用 SmartDataTable
+    await scaffoldHandler({
+      siteId: "my-table-site",
+      archetype: "data-table",
+      skinsDir,
+    });
+    const tableEntry = readFileSync(path.join(skinsDir, "my-table-site", "src", "entry.tsx"), "utf8");
+    expect(tableEntry).toContain("SmartDataTable");
   });
 
 

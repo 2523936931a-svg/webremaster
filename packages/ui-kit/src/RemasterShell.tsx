@@ -108,6 +108,45 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
 
   const [fontSize, setFontSize] = useState<number>(16);
 
+  // 接收来自 Chrome 扩展 Popup 或宿主脚本的直控遥控事件
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleMessage = (event: MessageEvent) => {
+      const data = event.data;
+      if (!data || typeof data !== "object") return;
+      if (data.type === "WEBREMASTER_ACTION") {
+        switch (data.action) {
+          case "open_palette":
+            setPaletteOpen(true);
+            break;
+          case "toggle_theme":
+            toggleTheme();
+            break;
+          case "cycle_view_mode":
+            cycleViewMode();
+            break;
+          case "toggle_zapper":
+            toggleElementZapper();
+            break;
+          case "open_diagnostics":
+            setDiagnosticsOpen(true);
+            break;
+          case "reset_zapped":
+            resetZappedSelectors();
+            break;
+          case "increase_font":
+            setFontSize((prev) => Math.min(24, prev + 2));
+            break;
+          case "decrease_font":
+            setFontSize((prev) => Math.max(12, prev - 2));
+            break;
+        }
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [toggleTheme, cycleViewMode]);
+
   const commands = useMemo<PaletteCommand[]>(
     () => [
       ...(props.commands ?? []),

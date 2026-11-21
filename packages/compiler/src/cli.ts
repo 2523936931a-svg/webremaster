@@ -1302,6 +1302,54 @@ export async function scaffoldHandler(options: ScaffoldOptions): Promise<{ siteI
     componentBlueprint: "RemasterShell 承载整体框架，主体根据不同 archetype 挂载 FeedListCard 或 SmartDataTable",
   });
 
+  let uiKitImports = "RemasterShell, FeedListCard";
+  let bodyJSX = `
+    <RemasterShell title="${siteId.toUpperCase()}">
+      <main className="max-w-4xl mx-auto p-6 space-y-3">
+        {items.map((item) => (
+          <FeedListCard
+            key={item.id}
+            item={{
+              id: item.id,
+              title: item.title,
+            }}
+          />
+        ))}
+      </main>
+    </RemasterShell>
+  `;
+
+  if (normalizedArchetype === "data-table-portal") {
+    uiKitImports = "RemasterShell, SmartDataTable";
+    bodyJSX = `
+    <RemasterShell title="${siteId.toUpperCase()}">
+      <main className="max-w-5xl mx-auto p-6">
+        <SmartDataTable
+          columns={[
+            { key: "id", header: "序号", value: (r: ItemData) => r.id },
+            { key: "title", header: "数据项标题", value: (r: ItemData) => r.title },
+          ]}
+          rows={items}
+          rowKey={(r: ItemData) => r.id}
+          pageSize={25}
+          exportBaseName="${siteId}-export"
+        />
+      </main>
+    </RemasterShell>
+    `;
+  } else if (normalizedArchetype === "doc-reader") {
+    uiKitImports = "ReaderProseLayout";
+    bodyJSX = `
+    <ReaderProseLayout title="${siteId.toUpperCase()}">
+      <div className="space-y-4">
+        {items.map((it) => (
+          <p key={it.id}>{it.title}</p>
+        ))}
+      </div>
+    </ReaderProseLayout>
+    `;
+  }
+
   const entryCode = `/**
  * ${siteId} 重制皮肤入口
  * Archetype: ${normalizedArchetype}
@@ -1309,7 +1357,7 @@ export async function scaffoldHandler(options: ScaffoldOptions): Promise<{ siteI
  */
 import React, { useEffect, useState } from "react";
 import { mountShadowApp, createReactiveStore } from "@webremaster/bridge";
-import { RemasterShell, FeedListCard } from "@webremaster/ui-kit";
+import { ${uiKitImports} } from "@webremaster/ui-kit";
 import "./skin.css";
 
 interface ItemData {
@@ -1341,21 +1389,7 @@ export function App() {
     };
   }, []);
 
-  return (
-    <RemasterShell siteName="${siteId.toUpperCase()}" activeArchetype="${normalizedArchetype}">
-      <main className="max-w-4xl mx-auto p-6 space-y-3">
-        {items.map((item) => (
-          <FeedListCard
-            key={item.id}
-            item={{
-              id: item.id,
-              title: item.title,
-            }}
-          />
-        ))}
-      </main>
-    </RemasterShell>
-  );
+  return (${bodyJSX});
 }
 
 mountShadowApp({
