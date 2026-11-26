@@ -3,15 +3,15 @@
 /* ui-kit 组件的 Tailwind 类名必须被扫描进产物，否则布局塌陷为裸 div */
 @source "../../../packages/ui-kit/src";
 
-:root {
-  --wr-accent: #f97316;
-}
-
 /* HackerNews 重制皮肤专属微调 */
 .wr-hn-root {
   min-height: 100vh;
   background: #0b0f17;
 }
-.wr-hn-skin {
-  min-height: 100vh;
+
+/* 品牌橙（HN 顶栏色）：必须落在 [data-wr-theme] 这一层。
+   定义在 .wr-hn-root 上会被 THEME_CSS 在更近祖先定义的 --wr-accent 覆盖，永远不生效。 */
+.wr-hn-root [data-wr-theme] {
+  --wr-accent: #f97316;
+  --wr-accent-soft: rgba(249, 115, 22, 0.16);
 }

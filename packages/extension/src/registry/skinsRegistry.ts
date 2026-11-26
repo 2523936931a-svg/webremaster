@@ -26,8 +26,9 @@ export const SKIN_REGISTRY: SkinManifest[] = [
     "beforeImage": "before.png",
     "afterImage": "after.png",
     "vlmScore": 9.2,
+    "vlmScoreSource": "human-review",
     "dataParityRatio": 1,
-    "bundleSizeKb": 287.3154296875,
+    "bundleSizeKb": 319.29,
     "tokensUsedToCompile": 0,
     "version": "0.1.0"
   }

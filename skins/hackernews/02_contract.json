@@ -100,7 +100,7 @@
         {
           "fieldName": "body",
           "fieldType": "string",
-          "selectors": ["span.commtext"],
+          "selectors": ["div.commtext", "span.commtext", ".commtext"],
           "relativeTo": "self",
           "attribute": "textContent",
           "required": false

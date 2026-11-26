@@ -86,7 +86,9 @@ const domainOf = (rawUrl: string | undefined): string | undefined => {
   }
 };
 
-const isThreadRoute = (): boolean => /\/item\?id=/.test(window.location.href);
+/** URL 命中 `/item?id=` 走详情路由；URL 结构变化（或离线快照）时用 DOM 指纹兜底。 */
+const isThreadRoute = (): boolean =>
+  /\/item\?id=/.test(window.location.href) || Boolean(document.querySelector("tr.athing.comtr"));
 
 function extractStories(originRoot: HTMLElement, tracker: HealthTracker): FeedItem[] {
   const rows = Array.from(originRoot.querySelectorAll("tr.athing")).filter((row) => !row.classList.contains("comtr"));
@@ -117,7 +119,7 @@ function extractStories(originRoot: HTMLElement, tracker: HealthTracker): FeedIt
 function extractComments(originRoot: HTMLElement, tracker: HealthTracker): ThreadComment[] {
   const rows = Array.from(originRoot.querySelectorAll("tr.athing.comtr"));
   const authorRule = fieldRule("comment-author", ["a.hnuser", "a[href^='user?id=']"], "textContent");
-  const bodyRule = fieldRule("comment-body", ["span.commtext"], "textContent");
+  const bodyRule = fieldRule("comment-body", ["div.commtext", "span.commtext", ".commtext"], "textContent");
   const ageRule = fieldRule("comment-age", ["span.age"], "textContent");
   const flat: Array<ThreadComment & { depth: number }> = rows.map((row, index) => {
     const author = extractFieldWithCascade(row, authorRule, tracker);
@@ -214,7 +216,8 @@ function SkinApp(props: SkinAppProps): ReactElement {
         id: "export-csv",
         label: "导出当前列表为 CSV（UTF-8 BOM，Excel 无乱码）",
         run: () => {
-          exportToCSV(rows, "hackernews.csv");
+          // 标题可由用户提交，开启公式注入防护，避免 Excel 打开时执行 =/+/-/@ 开头的单元格
+          exportToCSV(rows, "hackernews.csv", true);
         },
       },
       {
@@ -224,6 +227,30 @@ function SkinApp(props: SkinAppProps): ReactElement {
           exportToMarkdownTable(rows, "hackernews.md");
         },
       },
+      // 条目检索：Cmd+K 里输入标题/作者即可定位到对应卡片（这才是 tagline 里 cmd-k-search 的实际能力）
+      ...(route === "feed"
+        ? stories.map((story, index) => ({
+            id: `jump-${story.id}`,
+            label: `第 ${index + 1} 条 · ${story.title}`,
+            keywords: `跳转 定位 goto jump ${story.author ?? ""}`,
+            run: () => {
+              const host = document.querySelector("web-remaster-root");
+              const items = host instanceof HTMLElement ? host.shadowRoot?.querySelectorAll('[data-wr-item="true"]') : undefined;
+              const item = items?.[index];
+              if (!(item instanceof HTMLElement)) return;
+              // Shadow DOM 内的 scrollIntoView 在 overlay 关闭前调用不会滚动外层文档，
+              // 推迟到面板卸载后用显式 window.scrollTo 定位，并给目标卡片一次高亮。
+              window.setTimeout(() => {
+                const rect = item.getBoundingClientRect();
+                window.scrollTo({ top: Math.max(0, window.scrollY + rect.top - 260) });
+                item.animate?.(
+                  [{ boxShadow: "0 0 0 2px rgba(249,115,22,.9)" }, { boxShadow: "0 0 0 0 rgba(249,115,22,0)" }],
+                  { duration: 900, easing: "ease-out" },
+                );
+              }, 0);
+            },
+          }))
+        : []),
       ...(upvoteArrow !== null
         ? [
             {
@@ -243,7 +270,7 @@ function SkinApp(props: SkinAppProps): ReactElement {
         },
       },
     ];
-  }, [stories, selectedIndex, context.originWrapper, context.originManager]);
+  }, [stories, selectedIndex, context.originWrapper, context.originManager, context.shadowRoot, route]);
 
   return (
     <RemasterShell

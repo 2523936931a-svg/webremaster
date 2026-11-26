@@ -12,7 +12,7 @@
       "gateName": "zero-runtime-errors",
       "passed": true,
       "score": 10,
-      "details": "页面零运行时错误（pageerror 与 console.error 均为 0 条）"
+      "details": "页面零运行时错误（pageerror 与 console.error 均为 0 条）（离线 fixture 回放：主文档由本地快照响应）"
     },
     {
       "gateName": "zero-flash-curtain-lifted",
@@ -78,5 +78,5 @@
     }
   },
   "totalTokensUsed": 0,
-  "verifiedAt": "2026-11-19T06:32:06.050Z"
+  "verifiedAt": "2026-11-25T17:51:01.290Z"
 }
