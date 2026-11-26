@@ -124,6 +124,31 @@ export const SKIN_REGISTRY: SkinManifest[] = ${JSON.stringify(acceptedSkins, nul
 `;
   writeFileSync(registryPath, registryContent, "utf-8");
 
+  // 1.1 同步 host_permissions：扩展只需要已注册皮肤站点的权限。
+  // 声明 <all_urls> 会让用户在安装时看到"读取和更改您在所有网站上的数据"，
+  // 而实际注入只发生在 SKIN_REGISTRY 命中的站点上。
+  const extManifestPath = path.join(extDir, "public", "manifest.json");
+  if (existsSync(extManifestPath)) {
+    const raw = JSON.parse(readFileSync(extManifestPath, "utf-8")) as {
+      host_permissions?: string[];
+      [key: string]: unknown;
+    };
+    const derivedHosts = Array.from(
+      new Set(acceptedSkins.flatMap((skin) => skin.matchPatterns)),
+    ).sort();
+    if (derivedHosts.length > 0) {
+      const changed =
+        !raw.host_permissions ||
+        raw.host_permissions.length !== derivedHosts.length ||
+        raw.host_permissions.some((value, index) => value !== derivedHosts[index]);
+      if (changed) {
+        raw.host_permissions = derivedHosts;
+        writeFileSync(extManifestPath, `${JSON.stringify(raw, null, 2)}\n`, "utf-8");
+        console.log(chalk.dim(`  → 扩展主机权限: ${derivedHosts.join(", ")}`));
+      }
+    }
+  }
+
   // 2. 同步到 Store
   const storeDataDir = path.join(storeDir, "public", "data");
   mkdirSync(storeDataDir, { recursive: true });

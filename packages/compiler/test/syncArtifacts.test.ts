@@ -126,6 +126,26 @@ describe("syncArtifacts", () => {
       }),
     );
 
+    // 扩展 manifest 初始声明了全站权限；同步后应收窄为已上架皮肤的 matchPatterns
+    const extManifestPath = path.join(extDir, "public", "manifest.json");
+    mkdirSync(path.join(extDir, "public"), { recursive: true });
+    writeFileSync(
+      extManifestPath,
+      JSON.stringify(
+        {
+          manifest_version: 3,
+          name: "WebRemaster Test",
+          version: "0.1.0",
+          permissions: ["storage", "scripting"],
+          host_permissions: ["<all_urls>"],
+          action: { default_popup: "popup.html" },
+        },
+        null,
+        2,
+      ),
+      "utf-8",
+    );
+
     const result = await syncArtifactsHandler({
       skinsDir,
       extDir,
@@ -146,6 +166,12 @@ describe("syncArtifacts", () => {
     const regContent = readFileSync(registry, "utf-8");
     expect(regContent).toContain("SKIN_REGISTRY");
     expect(regContent).toContain("good-site");
+
+    // 主机权限被收窄到上架站点，其余字段保持原样
+    const extManifest = JSON.parse(readFileSync(extManifestPath, "utf-8"));
+    expect(extManifest.host_permissions).toEqual(["https://good.example.com/*"]);
+    expect(extManifest.name).toBe("WebRemaster Test");
+    expect(extManifest.action.default_popup).toBe("popup.html");
 
     // 验证 Store 输出
     const storeIndex = path.join(storeDir, "public", "data", "store_index.json");

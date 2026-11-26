@@ -98,6 +98,10 @@ pnpm wr finalize-skin <siteId> --vlm-score 9.2
 pnpm sync:artifacts
 ```
 
+`sync:artifacts` 除了写扩展注册表与商店索引，还会把 `packages/extension/public/manifest.json` 的 `host_permissions` 重新派生成"所有上架皮肤的 `matchPatterns`"。**不要手改它加 `<all_urls>`**：扩展的安装权限提示应当恰好等于已上架站点，这也是 SECURITY.md 里承诺的边界。
+
+> 想验证编译器对新站点的可用性，`examples/local-1998/` 有一条不用写代码的完整链路（inspect → scaffold → build → verify）。
+
 ---
 
 ## 🧪 提交前验证 (Check All)

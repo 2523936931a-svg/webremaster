@@ -97,6 +97,21 @@ docs/          # Whitepaper, launch checklist, demo assets
 
 ---
 
+## Deploy it to your own GitHub (one command)
+
+Badges, the live demo, Releases, Pages and the `repository` field all point at the placeholder org `webremaster`. Switching to a real account:
+
+```bash
+pnpm set-owner <your-github-username>      # idempotent
+git remote add origin git@github.com:<you>/webremaster.git
+git push -u origin master
+git tag v0.1.0 && git push --tags          # release.yml builds the extension zip
+```
+
+Then fill in four fields under **Settings**: Description, Topics (`userscript` / `chrome-extension` / `shadow-dom` / `react`), Social preview (`packages/store/public/og.png`), and Pages source = **GitHub Actions**.
+
+---
+
 ## Quick start
 
 ```bash

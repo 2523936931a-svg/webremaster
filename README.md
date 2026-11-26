@@ -138,6 +138,21 @@ WebRemaster/
 
 ---
 
+## 🚀 部署到你自己的 GitHub（一条命令）
+
+仓库里的 badge、在线试用、Release、Pages 与 `repository` 字段都指向占位组织 `webremaster`。换成一个真实账号只要：
+
+```bash
+pnpm set-owner <你的 GitHub 用户名>        # 幂等：改完再跑一次也只是再换一次
+git remote add origin git@github.com:<你>/webremaster.git
+git push -u origin master
+git tag v0.1.0 && git push --tags          # 触发 release.yml，产出扩展 zip
+```
+
+推送后在仓库 **Settings** 里补四项，仓库卡片才算完整：Description（用 `package.json` 里那句）、Topics（`userscript` / `chrome-extension` / `shadow-dom` / `react`）、Social preview（传 `packages/store/public/og.png`）、Pages 源选 **GitHub Actions**。
+
+---
+
 ## ⚡ 快速开始
 
 ### 1. 安装与诊断

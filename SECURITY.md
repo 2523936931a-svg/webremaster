@@ -23,6 +23,7 @@ WebRemaster 目前处于 `0.1.x` 阶段，仅对最新发布版本提供安全�
 3. **编译期抓取会发起真实网络请求。** `wr inspect` 使用 Playwright 访问目标 URL，请只对你拥有授权或公开可访问的站点运行。
 4. **LLM 网关使用你自己的 Key。** `compiler` 的 BYOK 配置只从本地环境变量 / `.env` 读取，不会上传到本项目任何服务器。
 5. **运行时零上报。** 浏览器 SDK 不包含遥测端点；`storageState.json`、`.wr-cache/` 属于本地缓存，已在 `.gitignore` 中排除。
+6. **扩展只申请已上架站点的权限。** `packages/extension/public/manifest.json` 的 `host_permissions` 由 `wr sync-artifacts` 从上架皮肤的 `matchPatterns` 派生（当前只有一个域名），不使用 `<all_urls>`。新增皮肤会重新打包并显式写入对应域名——安装时能看到权限范围变化，不存在"装上后静默扩权"。
 
 ## 不在范围内的内容
 

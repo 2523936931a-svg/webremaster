@@ -36,6 +36,7 @@
 - **在线试用 Playground（免安装）**：`packages/store` 新增 `#live-demo`：iframe 加载 `configs/hn-recon` 的离线快照（列表页 + 详情页各一份），把打包好的 userscript 文本注入进去真实跑一遍；工具栏可切「重制版 / 左右分屏 / 1998 原版」，分屏下分割线仍可拖动。配图 `docs/playground.png`，README 新增对应章节。
 - **Cmd+K 条目检索**：命令面板现在合并每条列表项（标题 + 作者），输入关键词即可过滤定位，回车滚动到目标卡片并高亮——补齐 tagline 中 `cmd-k-search` 的实际能力
 - **主题预设可从 UI 切换**：`THEME_PALETTES` 里的 Catppuccin Mocha / Tokyo Night / Nord / Sepia Book 此前只有 CSS 规则、没有任何入口；命令面板新增「切换配色预设」，循环切换并写入 `localStorage`；深浅切换会回到标准色板，避免被 palette 变量覆盖而看起来没反应
+- **`pnpm set-owner <用户名>`**：仓库里 30+ 处指向占位组织 `webremaster`（badge、在线试用、Release、Pages、`repository` 字段、og:image 绝对地址）本来只能手工搜索替换。新增脚本扫描 `.md / .json / .html / .yml / .ts`，把 `owner/repo` 与 `owner.github.io/repo` 一次性替换，幂等、可带仓库名参数；README 中英双语补「部署到你自己的 GitHub」三步。
 - **`examples/local-1998` 端到端示例**：一个 1998 风格的本地静态页，`inspect → scaffold → build-skin → verify-skin` 全链路不写一行业务代码即产出皮肤，六重门禁 6/6 全绿、数据对齐 100%（`title` / `url` 各 `tier=1 hits=40 misses=0`）。报告 `05_verification.json` 与「3 分钟复现」说明一并入库，用来证明编译器对新站点可用，而不只是能跑仓库里那个手作皮肤
 
 ### Fixed
@@ -61,6 +62,7 @@
 
 ### Changed
 
+- **扩展不再申请全站权限**：`host_permissions` 从 `<all_urls>` 收窄为已上架皮肤的 `matchPatterns`（当前仅 `https://news.ycombinator.com/*`）。注入本来只发生在 `SKIN_REGISTRY` 命中的页面上，全站声明会让 Chrome / Firefox 安装页显示"读取和更改您在所有网站上的数据"，也过不了认真的安全审查。现在由 `wr sync-artifacts` 在写注册表时一并派生并回写，新增皮肤自动带上对应域名；`syncArtifacts.test.ts` 断言 `<all_urls>` 会被替换、其它 manifest 字段保持原样。
 - CI 增加 `concurrency`（同分支新推送取消旧运行）；Release 在打包前先跑 `pnpm test`。
 - Pages 部署加 `paths` 过滤，只在 `skins/`、`packages/`、`configs/`、lockfile 变化时触发，README 改动不再触发重建。
 - `configs/top40_sites.yaml` 移除无代码引用的 `budget_tokens: 55000000`；`zhengfang-edu` 标注为本地 Mock 靶场，避免被当成公开可访问站点。

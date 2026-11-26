@@ -41,6 +41,7 @@
     "doctor": "node packages/compiler/dist/cli.js doctor",
     "list": "node packages/compiler/dist/cli.js list",
     "bootstrap": "pnpm build",
+    "set-owner": "node scripts/set-owner.mjs",
     "check:all": "pnpm build && pnpm typecheck && pnpm test && pnpm build:all",
     "test:all": "pnpm build && pnpm typecheck && pnpm test && pnpm build:all"
   }
