@@ -21,6 +21,8 @@ export const SkinManifestSchema = z.object({
   beforeImage: z.string(),
   afterImage: z.string(),
   vlmScore: z.number().min(0).max(10),
+  /** 评分来源：自动 VLM 通道，或人工终审。两者不可混为一谈。 */
+  vlmScoreSource: z.enum(["auto-vlm", "human-review"]).default("auto-vlm"),
   dataParityRatio: z.number().min(0).max(1),
   bundleSizeKb: z.number().nonnegative(),
   tokensUsedToCompile: z.number().int().nonnegative(),
