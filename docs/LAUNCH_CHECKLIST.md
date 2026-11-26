@@ -7,7 +7,7 @@
 
 ## 1. 十秒硬替换：把占位组织换成你的账号
 
-仓库里所有链接目前指向占位的 `webremaster/webremaster`。上传前必须一次性替换，否则首屏 CI badge 会显示 **not found**，Release 链接会 404。
+仓库里所有链接目前指向占位的 `2523936931a-svg/webremaster`。上传前必须一次性替换，否则首屏 CI badge 会显示 **not found**，Release 链接会 404。
 
 ```powershell
 # 在仓库根目录执行；把 owner 换成你的 GitHub 用户名
@@ -18,7 +18,7 @@ Get-ChildItem -Recurse -File -Include *.md,*.json,*.yml,*.yaml |
   ForEach-Object {
     $p = $_.FullName
     (Get-Content -Raw -Encoding UTF8 -LiteralPath $p) `
-      -replace 'webremaster/webremaster', "$owner/WebRemaster" `
+      -replace '2523936931a-svg/webremaster', "$owner/WebRemaster" `
       -replace 'webremaster\.github\.io/webremaster', "$owner.github.io/WebRemaster" |
       Set-Content -Encoding UTF8 -NoNewline -LiteralPath $p
   }
@@ -27,7 +27,7 @@ Get-ChildItem -Recurse -File -Include *.md,*.json,*.yml,*.yaml |
 注意两点：
 
 - GitHub Pages 的项目页路径**区分大小写**，仓库叫 `WebRemaster` 就必须写 `/WebRemaster/`。
-- 只替换 `webremaster/webremaster` 这种"组织/仓库"形式，不要动 npm 包名 `@webremaster/*`。
+- 只替换 `2523936931a-svg/webremaster` 这种"组织/仓库"形式，不要动 npm 包名 `@webremaster/*`。
 
 ---
 

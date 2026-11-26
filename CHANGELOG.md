@@ -80,5 +80,5 @@
 - Pages 部署加 `paths` 过滤，只在 `skins/`、`packages/`、`configs/`、lockfile 变化时触发，README 改动不再触发重建。
 - `configs/top40_sites.yaml` 移除无代码引用的 `budget_tokens: 55000000`；`zhengfang-edu` 标注为本地 Mock 靶场，避免被当成公开可访问站点。
 
-[Unreleased]: https://github.com/webremaster/webremaster/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/webremaster/webremaster/releases/tag/v0.1.0
+[Unreleased]: https://github.com/2523936931a-svg/webremaster/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/2523936931a-svg/webremaster/releases/tag/v0.1.0

@@ -28,7 +28,7 @@ skins/             # 各站点重制皮肤源码与打包产物 (entry.tsx, .use
 
 ### 1. 克隆与安装依赖
 ```bash
-git clone https://github.com/webremaster/webremaster.git
+git clone https://github.com/2523936931a-svg/webremaster.git
 cd webremaster
 pnpm install
 ```

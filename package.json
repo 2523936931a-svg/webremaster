@@ -8,11 +8,11 @@
   "author": "WebRemaster Contributors",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webremaster/webremaster.git"
+    "url": "git+https://github.com/2523936931a-svg/webremaster.git"
   },
-  "homepage": "https://webremaster.github.io/webremaster/",
+  "homepage": "https://2523936931a-svg.github.io/webremaster/",
   "bugs": {
-    "url": "https://github.com/webremaster/webremaster/issues"
+    "url": "https://github.com/2523936931a-svg/webremaster/issues"
   },
   "keywords": [
     "userscript",

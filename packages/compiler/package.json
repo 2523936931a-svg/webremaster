@@ -4,7 +4,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webremaster/webremaster.git",
+    "url": "git+https://github.com/2523936931a-svg/webremaster.git",
     "directory": "packages/compiler"
   },
   "description": "WebRemaster 编译器：Playwright DOM X-Ray 深度测绘、零闪烁单文件油猴打包引擎、SQLite LLM 缓存与三档熔断网关",

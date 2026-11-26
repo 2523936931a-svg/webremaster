@@ -4,13 +4,13 @@
 
 Compile-time inspection · Shadow DOM isolation · Zero-flash boot · Chrome MV3 extension
 
-[![CI](https://github.com/webremaster/webremaster/actions/workflows/ci.yml/badge.svg)](https://github.com/webremaster/webremaster/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/Tests-154%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
+[![CI](https://github.com/2523936931a-svg/webremaster/actions/workflows/ci.yml/badge.svg)](https://github.com/2523936931a-svg/webremaster/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/Tests-154%20passing-brightgreen.svg)](https://github.com/2523936931a-svg/webremaster)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![React 19](https://img.shields.io/badge/React-19.0-61dafb.svg)](https://react.dev/)
 
-[Try it live, no install](https://webremaster.github.io/webremaster/#live-demo) · [Online skin gallery](https://webremaster.github.io/webremaster/) · [Architecture whitepaper](docs/PROJECT_SHOWCASE.md) · [Download extension](https://github.com/webremaster/webremaster/releases)
+[Try it live, no install](https://2523936931a-svg.github.io/webremaster/#live-demo) · [Online skin gallery](https://2523936931a-svg.github.io/webremaster/) · [Architecture whitepaper](docs/PROJECT_SHOWCASE.md) · [Download extension](https://github.com/2523936931a-svg/webremaster/releases)
 
 ![WebRemaster — Hacker News, before and after](docs/demo.gif)
 
@@ -63,7 +63,7 @@ At 390px it is still a complete first screen — two-line headline, both CTAs, t
 
 <img src="docs/mobile.png" width="320" alt="390px first screen: headline, CTAs, before/after image and state switcher all visible" />
 
-[🔗 Open the store →](https://webremaster.github.io/webremaster/#live-demo)
+[🔗 Open the store →](https://2523936931a-svg.github.io/webremaster/#live-demo)
 
 ---
 
@@ -131,7 +131,7 @@ Then fill in four fields under **Settings**: Description, Topics (`userscript` /
 ## Quick start
 
 ```bash
-git clone https://github.com/webremaster/webremaster.git
+git clone https://github.com/2523936931a-svg/webremaster.git
 cd webremaster
 pnpm install
 pnpm wr doctor          # checks Node 22, Playwright browsers, skin readiness

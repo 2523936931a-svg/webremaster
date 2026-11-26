@@ -4,7 +4,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webremaster/webremaster.git",
+    "url": "git+https://github.com/2523936931a-svg/webremaster.git",
     "directory": "packages/bridge"
   },
   "description": "WebRemaster 零依赖浏览器运行时 SDK：零闪烁幕帘 / 隐身原站管理 / Shadow DOM 隔离挂载 / Frameset 穿透 / 4 级抗改版提取 / 跨框架事件桥 / 活体传送门 / TurboNav / 熔断器 / PowerUps",

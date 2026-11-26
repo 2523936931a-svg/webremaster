@@ -1767,7 +1767,7 @@ export async function exportHandler(opts: ExportHandlerOptions): Promise<{
   // 3. 导出分发自述 README.md
   const readmeContent = `# WebRemaster: ${siteName} 重制版
 
-> 本皮肤由 [WebRemaster](https://github.com/webremaster/webremaster) 零 Key 自动化编译器驱动，为 **${siteName}** (${targetUrl}) 提供 60fps 响应式现代界面与原生 Cookie/状态双向桥接。
+> 本皮肤由 [WebRemaster](https://github.com/2523936931a-svg/webremaster) 零 Key 自动化编译器驱动，为 **${siteName}** (${targetUrl}) 提供 60fps 响应式现代界面与原生 Cookie/状态双向桥接。
 
 ## 📦 安装与使用方式
 

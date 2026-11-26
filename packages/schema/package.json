@@ -4,7 +4,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webremaster/webremaster.git",
+    "url": "git+https://github.com/2523936931a-svg/webremaster.git",
     "directory": "packages/schema"
   },
   "description": "WebRemaster 唯一数据契约：站点快照 / 站点合同 / 设计规格 / 验证报告 / 皮肤商店的 Zod 强类型 Schema 集",

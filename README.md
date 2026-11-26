@@ -6,8 +6,8 @@
 
 **告别 1998 年刺眼、无排版的老旧网站。零 Token 运行时 · Shadow DOM 样式隔离 · React 19 + Tailwind v4 次世代重制编译器。**
 
-[![CI Status](https://github.com/webremaster/webremaster/actions/workflows/ci.yml/badge.svg)](https://github.com/webremaster/webremaster/actions/workflows/ci.yml)
-[![Tests Passing](https://img.shields.io/badge/Tests-154%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
+[![CI Status](https://github.com/2523936931a-svg/webremaster/actions/workflows/ci.yml/badge.svg)](https://github.com/2523936931a-svg/webremaster/actions/workflows/ci.yml)
+[![Tests Passing](https://img.shields.io/badge/Tests-154%20passing-brightgreen.svg)](https://github.com/2523936931a-svg/webremaster)
 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -17,7 +17,7 @@
 [![Playwright](https://img.shields.io/badge/Verified%20with-Playwright-2EAD33.svg)](https://playwright.dev/)
 [![Chrome MV3](https://img.shields.io/badge/Extension-Chrome%20MV3-orange.svg)](https://developer.chrome.com/docs/extensions/mv3/)
 
-[**🕹️ 在线试用（免安装）**](https://webremaster.github.io/webremaster/#live-demo) · [**🌐 皮肤商店 & Before/After**](https://webremaster.github.io/webremaster/) · [**📑 项目介绍书与白皮书**](docs/PROJECT_SHOWCASE.md) · [**📦 下载 Chrome 扩展 (.zip)**](https://github.com/webremaster/webremaster/releases) · [**🎯 皮肤路线图（1 / 40 已上架）**](configs/top40_sites.yaml)
+[**🕹️ 在线试用（免安装）**](https://2523936931a-svg.github.io/webremaster/#live-demo) · [**🌐 皮肤商店 & Before/After**](https://2523936931a-svg.github.io/webremaster/) · [**📑 项目介绍书与白皮书**](docs/PROJECT_SHOWCASE.md) · [**📦 下载 Chrome 扩展 (.zip)**](https://github.com/2523936931a-svg/webremaster/releases) · [**🎯 皮肤路线图（1 / 40 已上架）**](configs/top40_sites.yaml)
 
 
 ---
@@ -77,7 +77,7 @@
 
 <img src="docs/mobile.png" width="320" alt="390px 首屏：标题、CTA、对比图与模式开关都在第一屏内" />
 
-[🔗 打开商店页 →](https://webremaster.github.io/webremaster/#live-demo)
+[🔗 打开商店页 →](https://2523936931a-svg.github.io/webremaster/#live-demo)
 
 ---
 
@@ -175,7 +175,7 @@ git tag v0.1.0 && git push --tags          # 触发 release.yml，产出扩展 z
 
 ```bash
 # 克隆仓库
-git clone https://github.com/webremaster/webremaster.git
+git clone https://github.com/2523936931a-svg/webremaster.git
 cd webremaster
 
 # 安装依赖
