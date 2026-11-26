@@ -86,7 +86,7 @@ flowchart TD
 | **Playwright 真机活体检验** | **6 重门禁全绿** | 数据对齐率 100%、无任何控制台报错、DOM 零白屏平滑揭幕；VLM 终审通道已实现，当前皮肤的分数以 `05_verification.json` 为准 |
 | **生产打包流水线** | **`pnpm build:all` 一键完成** | 核心库全部生成 `dist/`，扩展产物与商店同步完成 |
 | **开箱冷启动体验** | **`pnpm dev` 255ms 极速启动** | 根目录直接输入 `pnpm dev` 即可在 `http://localhost:5173/` 探索全功能商店 |
-| **离线扩展安装包** | **即拷即用 Zip 包** | [webremaster-chrome-ext.zip](file:///D:/黑科技/WebRemaster/release/webremaster-chrome-ext.zip) 自动打好，支持拖拽离线安装 |
+| **离线扩展安装包** | **即拷即用 Zip 包** | 由 `pnpm build:ext` 生成 `release/webremaster-chrome-ext.zip`（该目录不入库，每个 tag 的 [GitHub Release](https://github.com/webremaster/webremaster/releases) 都会附带），支持拖拽离线安装 |
 
 **结论**：**整个项目结构严密、依赖解耦、逻辑闭环，不存在任何悬挂引用、环境阻断或隐藏崩溃！**
 
@@ -190,22 +190,20 @@ graph LR
 ### 方式 1：普通冲浪用户 —— 3 步安装 Chrome / Edge 扩展（最推荐）
 1. 打开浏览器扩展管理页（Chrome: `chrome://extensions/`，Edge: `edge://extensions/`）；
 2. 开启右上角 **「开发者模式」**；
-3. 点击 **「加载已解压的扩展程序」**，选择本地目录：
-   ```
-   D:\黑科技\WebRemaster\packages\extension\dist
-   ```
-   *(或者解压 [release/webremaster-chrome-ext.zip](file:///D:/黑科技/WebRemaster/release/webremaster-chrome-ext.zip) 后载入)*
+3. 点击 **「加载已解压的扩展程序」**，选择本地目录 `packages/extension/dist`（先跑 `pnpm build:ext` 生成）；
+   *(或者使用每个 tag 在 [GitHub Release](https://github.com/webremaster/webremaster/releases) 附带的 `webremaster-chrome-ext.zip`)*
 4. **见证奇迹**：直接打开 [Hacker News (https://news.ycombinator.com/)](https://news.ycombinator.com/)，老旧橙色页面将在 0.1 秒内自动进化为现代高科技暗黑 UI！点击右上角插件图标，可随时切换回原版或开启分屏对比。
 
 ### 方式 2：资深极客玩家 —— 单文件油猴脚本一键运行
 如果你习惯使用 Tampermonkey 或 Violentmonkey：
-- 直接在油猴插件中新建脚本，将 [skins/hackernews/hackernews.user.js](file:///D:/黑科技/WebRemaster/skins/hackernews/hackernews.user.js) 内容复制贴入；
+- 直接在油猴插件中新建脚本，将 [skins/hackernews/hackernews.user.js](../skins/hackernews/hackernews.user.js) 内容复制贴入；
 - 它是独立打包的 IIFE 单文件，**零外部网络依赖、零 CDN 延迟、零安全隐私隐患**。
 
 ### 方式 3：体验与评审者 —— 本地交互式皮肤演示大厅
 在终端运行：
 ```bash
-cd D:\黑科技\WebRemaster
+# 在克隆后的仓库根目录
+pnpm install && pnpm build
 pnpm dev
 ```
 立即在浏览器打开 `http://localhost:5173/`：
@@ -250,7 +248,7 @@ node packages/compiler/dist/cli.js verify-skin sqlite-docs
 
 ## 7. Top 40 经典高频老旧网站重制战略矩阵
 
-项目内置了详尽的 [configs/top40_sites.yaml](file:///D:/黑科技/WebRemaster/configs/top40_sites.yaml)，覆盖全球最迫切需要重制的 40 大经典古老网站：
+项目内置了详尽的 [configs/top40_sites.yaml](../configs/top40_sites.yaml)，覆盖全球最迫切需要重制的 40 大经典古老网站：
 
 ```
 1. 开发者生态 (10 站)  : HackerNews (已上架) | Lobsters | PyPI | Go Docs | GNU | Kernel Lore | SQLite | curl | man7 | GCC

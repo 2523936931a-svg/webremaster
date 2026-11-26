@@ -386,7 +386,12 @@ export async function inspectHandler(options: InspectOptions): Promise<InspectOu
   const snapshotPath = path.join(outDir, SNAPSHOT_FILE);
   // mapSite 只落盘 before.png；快照 JSON 由 CLI 兜底补写（幂等：已存在不覆盖）。
   if (!existsSync(snapshotPath)) {
-    writeFileSync(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
+    // 仓库会被公开：快照里只留文件名，别把本机绝对路径（D:\…）一起提交。
+    const snapshotForDisk = {
+      ...snapshot,
+      beforeScreenshotPath: path.basename(snapshot.beforeScreenshotPath),
+    };
+    writeFileSync(snapshotPath, `${JSON.stringify(snapshotForDisk, null, 2)}\n`, "utf8");
   }
   const beforePngPath = snapshot.beforeScreenshotPath;
   spinner.succeed(

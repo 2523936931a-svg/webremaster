@@ -797,7 +797,9 @@ export async function verifyRemasteredSkin(options: VerifyRemasteredSkinOptions)
     let vlmFeedback = AGENT_NATIVE_FEEDBACK;
     let totalTokensUsed = 0;
     if (options.enableVlm && options.vlmCritic !== undefined) {
-      const verdict = await options.vlmCritic(options.snapshot.beforeScreenshotPath, afterPath);
+      // 快照落盘时 beforeScreenshotPath 只存文件名（避免把本机绝对路径写进仓库）；
+      // resolve 对绝对路径原样返回，两种形式都能工作。
+      const verdict = await options.vlmCritic(resolve(options.outDir, options.snapshot.beforeScreenshotPath), afterPath);
       vlmScore = verdict.score;
       vlmFeedback = verdict.feedback;
       totalTokensUsed = verdict.tokensUsed ?? 0;

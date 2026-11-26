@@ -117,6 +117,7 @@ pnpm check:all
 2. `pnpm typecheck`（6 个包严苛类型检查）
 3. `pnpm test`（154 项单元测试）
 4. `pnpm build:all`（全栈各端完整打包编译）
+5. `pnpm check:docs`（README / docs 里 21 处相对链接与图片必须真实存在，`file:///D:/…` 这类本机路径直接判错）
 
 ---
 
