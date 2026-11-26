@@ -59,6 +59,10 @@ The store ships a `#live-demo` section: it loads an offline 1998 Hacker News sna
 
 ![Try it live: 1998 original on the left, remastered on the right](docs/playground.png)
 
+At 390px it is still a complete first screen — two-line headline, both CTAs, the before/after image and the state switcher — and the skin inside the iframe drops its subtitle and wraps item titles to two lines instead of cramming the desktop layout into a phone.
+
+<img src="docs/mobile.png" width="320" alt="390px first screen: headline, CTAs, before/after image and state switcher all visible" />
+
 [🔗 Open the store →](https://webremaster.github.io/webremaster/#live-demo)
 
 ---
@@ -137,6 +141,10 @@ pnpm build:all
 ```
 
 Load the extension: open `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, choose `packages/extension/dist/`, then visit `https://news.ycombinator.com/`.
+
+<img src="docs/popup.png" width="320" alt="Extension popup: three-step onboarding on first install, with a primary CTA to a covered site" />
+
+A fresh install opens with a three-step onboarding card (open a covered site → the icon flips to ON → `Alt+Shift+R` to compare with the original / `Ctrl+K` for the command palette). When the current tab isn't covered, the primary button takes you straight to Hacker News instead of dead-ending on "not supported". On a covered site it shows the active skin, where the score came from (human review vs. automatic VLM), a per-site toggle and four remote controls.
 
 Try the gallery locally:
 

@@ -73,6 +73,10 @@
 
 ![在线试用：左侧 1998 原版、右侧重制版](docs/playground.png)
 
+窄屏（390px）也是完整首屏：标题两行、两个 CTA、对比图与「100% 原版 / 50% 对比 / 100% 重制」都在第一屏内；iframe 里的皮肤自己会收起副标题、把条目标题折成两行，而不是把桌面版硬塞进 390px。
+
+<img src="docs/mobile.png" width="320" alt="390px 首屏：标题、CTA、对比图与模式开关都在第一屏内" />
+
 [🔗 打开商店页 →](https://webremaster.github.io/webremaster/#live-demo)
 
 ---
@@ -205,6 +209,10 @@ pnpm build:all
 2. 开启右上角 **「开发者模式」**；
 3. 点击 **「加载已解压的扩展程序」**，选择目录 `packages/extension/dist/`；
 4. 访问 [Hacker News](https://news.ycombinator.com/)，即可见证秒级现代化重制蜕变！
+
+<img src="docs/popup.png" width="320" alt="Chrome 扩展 popup：首次安装的三步引导与空态 CTA" />
+
+装完后点图标看到的就是这张：**首次安装给「三步开始」**（打开已收录站点 → 图标变 ON → `Alt+Shift+R` 对照原版 / `Ctrl+K` 命令面板），未命中站点时主按钮直接把你送去 Hacker News，而不是只留一句"未收录"。命中站点则显示当前皮肤、评分来源（人工终审 / 自动 VLM）、单站开关与四个遥控按钮。
 
 ---
 
