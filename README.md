@@ -93,6 +93,18 @@ pnpm wr verify-skin demo1998 --no-vlm --skins-dir ./skins-tmp
 
 ---
 
+## 🤖 Agent-Native：把"做一个皮肤"写成 agent 能照做的规程
+
+仓库自带 [`skills/webremaster/SKILL.md`](skills/webremaster/SKILL.md)——不是泛泛的提示词，而是六步可执行规程：DOM 测绘 → 契约与设计 → `entry.tsx` → 打包 → 六门禁 → 终审上架。
+
+- **只写真实 API**：规程逐个点名 `bridge` 里存在的导出（`extractFieldWithCascade`、`createOriginStore`、`HealthTracker`、`TurboNavigator`、`nativeSetInputValue`…），并明确禁止 `queryWithFallback` 这类不存在的导出——这份文档曾经就教错过，现在由人肉 review 与 `scaffold` 断言双重盯着。
+- **命令都是真的**：规程里的 `pnpm wr …` 与 CLI `--help` 完全一致；`inspect` / `scaffold` 不需要任何模型 Key。
+- **可以先生成再改**：`wr scaffold` 产出的骨架已经能打包、能过门禁，agent 从可运行的代码起步，而不是从空白文件起步。
+
+支持 Skills 的客户端（Claude Code / Cursor / 豆包工作模式等）把 `skills/webremaster/` 作为 Skill 目录加载即可。
+
+---
+
 ## 🏗️ 核心架构
 
 ```mermaid

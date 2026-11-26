@@ -12,7 +12,8 @@ When asked to remaster a legacy website `<url>` with ID `<siteId>`:
    Read `skins/<siteId>/01_snapshot.json` and view `skins/<siteId>/before.png`.
 
 2. **Analyze & Design**:
-   Write `skins/<siteId>/02_contract.json` (conforming to `SiteContractSchema`) and `skins/<siteId>/03_design.json` (conforming to `UXDesignSpecSchema`).
+   Fastest path: run `pnpm wr scaffold <siteId> --url <url> --archetype <news-feed|doc-reader|data-table-portal|academic-archive|package-registry|classifieds-grid|forum-thread|auth-portal>` — it derives the primary list selector from the snapshot's largest repeated group, strips `html > body` prefixes, and emits contract/design/`entry.tsx`/`skin.css` that already build and pass the six gates (see `examples/local-1998/`). Edit from there instead of writing everything from scratch.
+   Otherwise write `skins/<siteId>/02_contract.json` (conforming to `SiteContractSchema`) and `skins/<siteId>/03_design.json` (conforming to `UXDesignSpecSchema`).
    Ensure all CSS selectors exist verbatim in `01_snapshot.json` with 2-3 fallbacks.
 
 3. **Generate Skin Code**:

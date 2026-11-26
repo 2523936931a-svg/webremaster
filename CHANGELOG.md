@@ -37,6 +37,7 @@
 - **Cmd+K 条目检索**：命令面板现在合并每条列表项（标题 + 作者），输入关键词即可过滤定位，回车滚动到目标卡片并高亮——补齐 tagline 中 `cmd-k-search` 的实际能力
 - **主题预设可从 UI 切换**：`THEME_PALETTES` 里的 Catppuccin Mocha / Tokyo Night / Nord / Sepia Book 此前只有 CSS 规则、没有任何入口；命令面板新增「切换配色预设」，循环切换并写入 `localStorage`；深浅切换会回到标准色板，避免被 palette 变量覆盖而看起来没反应
 - **`pnpm set-owner <用户名>`**：仓库里 30+ 处指向占位组织 `webremaster`（badge、在线试用、Release、Pages、`repository` 字段、og:image 绝对地址）本来只能手工搜索替换。新增脚本扫描 `.md / .json / .html / .yml / .ts`，把 `owner/repo` 与 `owner.github.io/repo` 一次性替换，幂等、可带仓库名参数；README 中英双语补「部署到你自己的 GitHub」三步。
+- **README 补「Agent-Native」章节**：`skills/webremaster/SKILL.md` 一直躺在仓库里却没有任何入口，访客只能偶然翻到。新章节说明它是六步可执行规程、只列 `bridge` 里真实存在的导出、命令与 `wr --help` 一致；`SKILL.md` 自身补上「先 `wr scaffold` 再改」的起点建议，并把 archetype 写成 schema 真值（`data-table-portal` / `doc-reader`，原文里的 `data-table` / `article-reader` 只是别名）
 - **`examples/local-1998` 端到端示例**：一个 1998 风格的本地静态页，`inspect → scaffold → build-skin → verify-skin` 全链路不写一行业务代码即产出皮肤，六重门禁 6/6 全绿、数据对齐 100%（`title` / `url` 各 `tier=1 hits=40 misses=0`）。报告 `05_verification.json` 与「3 分钟复现」说明一并入库，用来证明编译器对新站点可用，而不只是能跑仓库里那个手作皮肤
 
 ### Fixed

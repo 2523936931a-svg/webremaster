@@ -79,6 +79,18 @@ The measured result lives in [`examples/local-1998/05_verification.json`](exampl
 
 ---
 
+## Agent-native: the whole job is a procedure an agent can follow
+
+The repo ships [`skills/webremaster/SKILL.md`](skills/webremaster/SKILL.md): not a vague prompt, but a six-step procedure — inspect the DOM, write contract + design, generate `entry.tsx`, bundle, run the six gates, finalize and sync.
+
+- **Real APIs only**: the procedure names the exports that actually exist in `bridge` (`extractFieldWithCascade`, `createOriginStore`, `HealthTracker`, `TurboNavigator`, `nativeSetInputValue`, …) and explicitly forbids `queryWithFallback`, which does not. This document once taught that non-existent export; today both review and the `scaffold` assertions watch it.
+- **Real commands**: every `pnpm wr …` matches `--help`; `inspect` and `scaffold` need no model key at all.
+- **Start from runnable code**: `wr scaffold` emits a skeleton that already builds and passes the gates, so an agent edits working code instead of an empty file.
+
+Clients that support Skills (Claude Code, Cursor, Doubao work mode, …) can load `skills/webremaster/` as a skill directory.
+
+---
+
 ## Repository layout
 
 ```text
