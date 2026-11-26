@@ -2,6 +2,7 @@
   "name": "webremaster",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@12.21.0",
   "description": "WebRemaster — 全网老旧丑网站 Shadow-DOM React 重制编译器 + 零 Token 皮肤商店 + Chrome 扩展",
   "license": "MIT",
   "author": "WebRemaster Contributors",

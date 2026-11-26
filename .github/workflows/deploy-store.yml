@@ -46,8 +46,7 @@ jobs:
       - name: Build All & Sync
         run: |
           pnpm build
-          pnpm sync:artifacts
-          pnpm build:store
+          pnpm build:store   # 内含 sync:artifacts，无需再单独跑一次
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
