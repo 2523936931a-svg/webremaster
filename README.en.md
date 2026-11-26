@@ -63,6 +63,22 @@ The store ships a `#live-demo` section: it loads an offline 1998 Hacker News sna
 
 ---
 
+## Proof it isn't just one hand-polished screenshot: a second skin in 3 minutes
+
+`skins/hackernews` is hand-crafted, which invites the fair question "is the compiler doing anything?" `examples/local-1998/` is a 1998-style local page, and the whole chain below runs **without writing a single line of skin code**:
+
+```bash
+node examples/local-1998/server.cjs                                   # serve a 1998-era site
+pnpm wr inspect http://127.0.0.1:4190/ --id demo1998 --out-dir ./skins-tmp
+pnpm wr scaffold demo1998 --url http://127.0.0.1:4190/ --skins-dir ./skins-tmp --archetype news-feed
+pnpm wr build-skin demo1998 --skins-dir ./skins-tmp
+pnpm wr verify-skin demo1998 --no-vlm --skins-dir ./skins-tmp
+```
+
+The measured result lives in [`examples/local-1998/05_verification.json`](examples/local-1998/05_verification.json): **6/6 gates green, 100% data parity (20 → 20), `title` and `url` both at `tier=1 hits=40 misses=0`**. It also pins the four defects that `scaffold` templates used to have (imaginary APIs, missing default export, `html > body` selector prefixes, CSS not scanning ui-kit), so any regression turns this example red immediately.
+
+---
+
 ## Repository layout
 
 ```text
@@ -74,6 +90,7 @@ packages/
   extension/   # Chrome MV3 extension (badge state, context menu, popup controls)
   store/       # Before/After gallery, deployed to GitHub Pages
 skins/         # Compiled skins: source, contract, design, screenshots, gate report, .user.js
+examples/      # End-to-end regression site (local-1998: generate a second skin, pass six gates)
 configs/       # Site roadmap (top40_sites.yaml)
 docs/          # Whitepaper, launch checklist, demo assets
 ```

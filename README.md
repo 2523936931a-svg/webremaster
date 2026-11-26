@@ -77,6 +77,22 @@
 
 ---
 
+## 🔬 证明它不是"只有一张精修图"：3 分钟生成第二个皮肤
+
+仓库里 `skins/hackernews` 是手工精作的成品，容易被怀疑"编译器只是摆设"。`examples/local-1998/` 是一个 1998 风格的本地静态页，整条链路**不写一行业务代码**：
+
+```bash
+node examples/local-1998/server.cjs                                   # 起一个 1998 老站
+pnpm wr inspect http://127.0.0.1:4190/ --id demo1998 --out-dir ./skins-tmp
+pnpm wr scaffold demo1998 --url http://127.0.0.1:4190/ --skins-dir ./skins-tmp --archetype news-feed
+pnpm wr build-skin demo1998 --skins-dir ./skins-tmp
+pnpm wr verify-skin demo1998 --no-vlm --skins-dir ./skins-tmp
+```
+
+实测结果写在 [`examples/local-1998/05_verification.json`](examples/local-1998/05_verification.json)：**六重门禁 6/6 全绿、数据对齐 100%（20 → 20）、`title` / `url` 两个字段 `tier=1 hits=40 misses=0`**。这份示例同时钉住了 `scaffold` 模板曾经的四个坑（虚构 API、缺 default 导出、选择器带 `html > body` 前缀、CSS 漏扫 ui-kit），任何一处回归都会让这个示例直接红。
+
+---
+
 ## 🏗️ 核心架构
 
 ```mermaid
@@ -115,6 +131,7 @@ WebRemaster/
 │   ├── extension/     # @webremaster/extension: Chrome & Firefox MV3 扩展（徽标联动 / 右键菜单）
 │   └── store/         # @webremaster/store: 演示大厅（Before/After 拖拽 + 在线试用 Playground）（2 tests）
 ├── skins/             # 编译产物库（hackernews 等站点的完整产物与验证报告）
+├── examples/          # 端到端回归现场（local-1998：从零生成第二个皮肤并过 6 门禁）
 ├── configs/           # Top 40 待重制高频老旧网站清单（configs/top40_sites.yaml）
 └── release/           # 扩展离线安装包（CI 打 zip 后随 GitHub Release 发布，不入库）
 ```
@@ -191,9 +208,9 @@ WebRemaster CLI 采用 Agent-Native 架构设计，提供高可靠的原子化�
 - 🛡️ **OriginDefuser & ContentCleaner（借鉴 uBlock Origin / Privacy Badger）**：隐匿原站后自动静音背景音视频并停止跑马灯；移除 Cookie 弹窗并自动解除页面滚动锁死。
 - ⚡ **TurboNav（借鉴 Hotwire Turbo / Google Quicklink）**：链接预检与无刷新 DOM 局部替换，结合弱网环境智能节流与平滑进度条。
 - ⌨️ **Vim 键盘导航与 CommandPalette**：支持 `j` / `k` 条目移动、`o` 打开、`g` / `G` 顶底跳转，以及 `Cmd+K` 跨功能指令中心；输入标题或作者即可定位到对应卡片（回车跳转 + 高亮）。
+- 🎨 **社区顶流主题预设（借鉴 Catppuccin / Tokyo Night / Nord）**：内置 `catppuccin-mocha`、`tokyo-night`、`nord`、`sepia-book` 四套调色盘，`Cmd+K` →「切换配色预设」即可循环切换（localStorage 记住选择），经 CSS 变量与 Shadow DOM 无缝穿透。
 
 ![Cmd+K 条目检索与跳转](docs/palette.gif)
-- 🎨 **社区顶流主题预设（借鉴 Catppuccin / Tokyo Night / Nord）**：内置 `catppuccin-mocha`、`tokyo-night`、`nord`、`sepia-book` 四套调色盘，`Cmd+K` →「切换配色预设」即可循环切换（localStorage 记住选择），经 CSS 变量与 Shadow DOM 无缝穿透。
 
 ---
 

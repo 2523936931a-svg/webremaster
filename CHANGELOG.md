@@ -36,6 +36,7 @@
 - **在线试用 Playground（免安装）**：`packages/store` 新增 `#live-demo`：iframe 加载 `configs/hn-recon` 的离线快照（列表页 + 详情页各一份），把打包好的 userscript 文本注入进去真实跑一遍；工具栏可切「重制版 / 左右分屏 / 1998 原版」，分屏下分割线仍可拖动。配图 `docs/playground.png`，README 新增对应章节。
 - **Cmd+K 条目检索**：命令面板现在合并每条列表项（标题 + 作者），输入关键词即可过滤定位，回车滚动到目标卡片并高亮——补齐 tagline 中 `cmd-k-search` 的实际能力
 - **主题预设可从 UI 切换**：`THEME_PALETTES` 里的 Catppuccin Mocha / Tokyo Night / Nord / Sepia Book 此前只有 CSS 规则、没有任何入口；命令面板新增「切换配色预设」，循环切换并写入 `localStorage`；深浅切换会回到标准色板，避免被 palette 变量覆盖而看起来没反应
+- **`examples/local-1998` 端到端示例**：一个 1998 风格的本地静态页，`inspect → scaffold → build-skin → verify-skin` 全链路不写一行业务代码即产出皮肤，六重门禁 6/6 全绿、数据对齐 100%（`title` / `url` 各 `tier=1 hits=40 misses=0`）。报告 `05_verification.json` 与「3 分钟复现」说明一并入库，用来证明编译器对新站点可用，而不只是能跑仓库里那个手作皮肤
 
 ### Fixed
 
@@ -55,6 +56,7 @@
 - **评论正文选择器写死**：`bodyRule` 只有 `span.commtext`，而 2006 年的 HN（以及多数存档）用 `div.commtext`，折叠树只剩作者没有正文。改为 `div.commtext → span.commtext → .commtext` 级联，`02_contract.json` 同步。
 - **皮肤的品牌橙从未生效**：`skin.css` 把 `--wr-accent: #f97316` 定义在 `.wr-hn-root`，而 `THEME_CSS` 在更近的祖先 `[data-wr-theme]` 上定义了同名变量，子元素继承时永远拿到主题蓝。改为 `.wr-hn-root [data-wr-theme]` 这一层覆盖（同时覆盖 `--wr-accent-soft`）；顺带删掉两条死规则：`:root` 在 Shadow DOM 里不匹配任何节点、`.wr-hn-skin` 无任何使用者。`after.png`、`split.png`、`docs/demo.gif`、`og.png` 已按品牌橙重新生成。
 - **README 模块表的测试数过期**：模块树写 `bridge (62) / ui-kit (14) / compiler (43)`，实际是 72 / 17 / 48，和顶部 badge 的 154 也对不上。已按真实数字重写，并澄清 `release/*.zip` 不随仓库提交、只经 GitHub Release 发布。
+- **`wr scaffold` 生成的模板根本打不出包**：四个缺陷叠加——`--skins-dir` 传绝对路径时被拼成 `./C:/…`（TS2307）；`entry.tsx` import 了 `bridge` 里不存在的 `mountShadowApp` / `createReactiveStore`（TS2305）；模板没有 `export default mountSkin`，wrapper 的产物自检必失败（TS1192）；提取选择器带 `html > body` 前缀，而 `body` 会被 `OriginManager` 搬进 `#wr-origin-wrapper`，必然匹配 0 项（渲染 0×0、对齐率 0.00）。另外 `skin.css` 漏了 `@source` 扫描 ui-kit，Tailwind 类不生成、布局塌陷。契约改为取快照里 `totalCount` 最大的重合组作主列表并剥离根前缀，模板重写为真实协议（`mountSkin` + `createOriginStore` + `TurboNavigator` + `HealthTracker` 挂 `diagnostics`），`cssCode` 补两条 `@source` 与容器底色。新增断言防回归：必须含 `export default function mountSkin` / `createOriginStore` / `TurboNavigator`，不得含两个虚构 API，`skin.css` 必须含 `packages/ui-kit/src`。`skins-tmp/` 加入 `.gitignore`。
 - `better-sqlite3` 在 Node 22.23 / Windows 下的 ABI 不匹配（NODE_MODULE_VERSION 137 vs 127），`pnpm rebuild better-sqlite3` 后 154 项测试全绿。
 
 ### Changed

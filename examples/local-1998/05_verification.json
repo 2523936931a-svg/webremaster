@@ -1,0 +1,62 @@
+{
+  "siteId": "demo1998",
+  "passed": true,
+  "repairRoundsUsed": 0,
+  "originalItemCount": 20,
+  "remasteredItemCount": 20,
+  "dataParityRatio": 1,
+  "vlmScore": 0,
+  "vlmFeedback": "待终审（Agent-Native 模式）",
+  "gates": [
+    {
+      "gateName": "zero-runtime-errors",
+      "passed": true,
+      "score": 10,
+      "details": "页面零运行时错误（pageerror 与 console.error 均为 0 条）"
+    },
+    {
+      "gateName": "zero-flash-curtain-lifted",
+      "passed": true,
+      "score": 10,
+      "details": "幕帘已揭起：data-wr-ready=true，幕帘样式已移除，host 渲染区 1440×1340，原站处于 remastered 隐身模式"
+    },
+    {
+      "gateName": "data-parity-and-health",
+      "passed": true,
+      "score": 10,
+      "details": "列表原型 news-feed：remastered 20 项 / 原站 hint 20 → ratio 1.00；必填字段健康度：全部 ≥90%；健康遥测：title(t1 h40/m0), url(t1 h40/m0)"
+    },
+    {
+      "gateName": "no-broken-render",
+      "passed": true,
+      "score": 10,
+      "details": "渲染健康：无 undefined/NaN 文本，scrollWidth 1440 ≤ innerWidth 1440+4，首个元素子级 background=rgb(11, 15, 23) / color=rgb(232, 234, 237)"
+    },
+    {
+      "gateName": "bridge-and-split-smoke",
+      "passed": true,
+      "score": 10,
+      "details": "Alt+Shift+R 三态切换：remastered→original→split→remastered；commandPalette 未声明：探测到可用面板，已完成打开/Escape 关闭验证；diagnosticsDrawer 未声明：探测到可用抽屉，已完成打开/Escape 关闭验证"
+    },
+    {
+      "gateName": "portal-and-turbonav-integrity",
+      "passed": true,
+      "score": 10,
+      "details": "route.portalSlots 未声明：跳过传送门投影/归还断言；TurboNav：悬停首个同源链接 http://127.0.0.1:4190/new 900ms，__WR_FETCH_LOG__ 共 1 条，预取命中"
+    }
+  ],
+  "extractorHealthSummary": {
+    "title": {
+      "tier": 1,
+      "hits": 40,
+      "misses": 0
+    },
+    "url": {
+      "tier": 1,
+      "hits": 40,
+      "misses": 0
+    }
+  },
+  "totalTokensUsed": 0,
+  "verifiedAt": "2026-11-26T00:45:11.987Z"
+}
