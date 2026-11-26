@@ -122,20 +122,37 @@ describe("originManager", () => {
     expect(seen).toEqual(["original"]);
   });
 
-  it("split 模式：clip-path 双向切割 + 分割手柄 + setSplitPercent 实时生效", () => {
+  it("split 模式：两侧各自重排（原站收窄 + 重制占右半）+ 分割手柄 + setSplitPercent 实时生效", () => {
+    const hostElement = document.createElement("web-remaster-root");
+    document.body.appendChild(hostElement);
     const manager = createOriginManager({ hotkey: false, splitPercent: 50 });
     managers.push(manager);
     const wrapper = manager.captureAndHideOrigin();
     manager.setViewMode("split");
-    expect(wrapper.style.clipPath).toBe("inset(0 50% 0 0)");
+    // 左半是收窄后的原站（不是 clip）：窄屏下流式布局会重排，右对齐的分数/评论数不被切掉
+    expect(wrapper.style.width).toBe("50vw");
+    expect(wrapper.style.clipPath).toBe("");
     expect(wrapper.style.pointerEvents).toBe("auto");
+    expect(wrapper.style.overflow).toBe("auto");
+    // 右半是重制界面，整体定位而不是裁右半
+    const host = document.querySelector("web-remaster-root") as HTMLElement | null;
+    expect(host).not.toBeNull();
+    expect(host!.style.left).toBe("50%");
+    expect(host!.style.width).toBe("50vw");
+    expect(host!.style.position).toBe("fixed");
+    expect(host!.style.clipPath).toBe("none");
     expect(document.getElementById("wr-split-handle")).not.toBeNull();
     manager.setSplitPercent(30);
-    expect(wrapper.style.clipPath).toBe("inset(0 70% 0 0)");
+    expect(wrapper.style.width).toBe("30vw");
+    expect(host!.style.left).toBe("30%");
+    expect(host!.style.width).toBe("70vw");
     const handle = document.getElementById("wr-split-handle");
     expect(handle?.style.left).toBe("calc(30% - 4px)");
     manager.setViewMode("original");
-    expect(wrapper.style.clipPath).toBe("");
+    expect(wrapper.style.cssText).toBe("");
+    expect(host!.style.position).toBe("");
+    expect(host!.style.left).toBe("");
+    expect(host!.style.width).toBe("");
     expect(document.getElementById("wr-split-handle")).toBeNull();
   });
 

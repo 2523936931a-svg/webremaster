@@ -163,15 +163,29 @@ class DefaultOriginManager implements OriginManager {
     if (wrapper) {
       wrapper.setAttribute("data-wr-mode", mode);
       if (mode === "split") {
-        wrapper.style.cssText =
-          "position:fixed;left:0;top:0;width:100vw;height:100vh;opacity:1;pointer-events:auto;overflow:auto;z-index:2147483635;";
+        // 左半屏的原站不做裁剪，而是收窄到 p vw 并独立滚动：裁剪会把右对齐的分数/评论数
+        // 直接切掉，收窄后流式布局会重新排版，对比两侧都是完整内容。
+        wrapper.style.cssText = `position:fixed;left:0;top:0;width:${this.split}vw;height:100vh;opacity:1;pointer-events:auto;overflow:auto;z-index:2147483635;`;
         this.applySplit();
         this.ensureSplitHandle();
       } else {
         // 离开 split：清掉全部 inline 覆盖，回到样式表控制的隐身/文档流状态
         wrapper.style.cssText = "";
         const host = document.querySelector("web-remaster-root");
-        if (host instanceof HTMLElement) host.style.removeProperty("clip-path");
+        if (host instanceof HTMLElement) {
+          for (const prop of [
+            "position",
+            "left",
+            "top",
+            "width",
+            "height",
+            "overflow",
+            "clip-path",
+            "z-index",
+          ]) {
+            host.style.removeProperty(prop);
+          }
+        }
         this.removeSplitHandle();
       }
     }
@@ -249,9 +263,22 @@ class DefaultOriginManager implements OriginManager {
     const wrapper = this.currentWrapper;
     if (!wrapper || this.mode !== "split") return;
     const p = this.split;
-    wrapper.style.clipPath = `inset(0 ${100 - p}% 0 0)`;
+    // 原站随分割条收窄（不是 clip），让 85% 宽度的表格类布局重新流式排版
+    wrapper.style.width = `${p}vw`;
     const host = document.querySelector("web-remaster-root");
-    if (host instanceof HTMLElement) host.style.clipPath = `inset(0 0 0 ${p}%)`;
+    if (host instanceof HTMLElement) {
+      // 重制界面本身是左对齐排版：若只是 clip 右半，卡片文字（位于左侧）会被裁掉，
+      // 右侧只剩背景色横条。这里改为把 host 整体挪到右半屏并独立滚动，
+      // 让 UI 在自己的左边缘重新开始排版，宽度随分割条实时变化。
+      host.style.position = "fixed";
+      host.style.left = `${p}%`;
+      host.style.top = "0";
+      host.style.width = `${100 - p}vw`;
+      host.style.height = "100vh";
+      host.style.overflow = "auto";
+      host.style.clipPath = "none";
+      host.style.zIndex = "2147483635";
+    }
     const handle = document.getElementById("wr-split-handle");
     if (handle) handle.style.left = `calc(${p}% - 4px)`;
   }

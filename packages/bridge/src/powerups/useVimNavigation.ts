@@ -14,6 +14,33 @@ export interface VimNavigationOptions {
   enabled?: boolean;
 }
 
+/**
+ * 判断这次按键是否发生在「正在输入」的上下文里。
+ *
+ * Shadow DOM 会把 event.target 重定向成宿主元素（web-remaster-root），
+ * 只看 target.tagName 会漏掉 shadow 里的 input —— 命令面板里按 Enter 会被
+ * 误当成「激活当前列表项」，同时触发 TurboNav 导航并把页面滚动复位。
+ * 因此优先读 composedPath()[0]（事件真实起点），再用可见的 role=dialog 兜底。
+ */
+export function isTypingContext(event: KeyboardEvent): boolean {
+  const path = typeof event.composedPath === "function" ? event.composedPath() : [];
+  const origin = path[0];
+  const candidate = origin instanceof HTMLElement ? origin : event.target;
+  if (candidate instanceof HTMLElement) {
+    const tag = candidate.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || candidate.isContentEditable) {
+      return true;
+    }
+  }
+  const host = document.querySelector("web-remaster-root");
+  const dialog = host?.shadowRoot?.querySelector('[role="dialog"]');
+  if (dialog instanceof HTMLElement) {
+    const style = getComputedStyle(dialog);
+    if (style.display !== "none" && style.visibility !== "hidden") return true;
+  }
+  return false;
+}
+
 export function useVimNavigation(options: VimNavigationOptions): {
   selectedIndex: number;
   setSelectedIndex: (index: number) => void;
@@ -43,12 +70,8 @@ export function useVimNavigation(options: VimNavigationOptions): {
       if (event.metaKey || event.ctrlKey || event.altKey) {
         return;
       }
-      const target = event.target;
-      if (target instanceof HTMLElement) {
-        const tag = target.tagName;
-        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable) {
-          return;
-        }
+      if (isTypingContext(event)) {
+        return;
       }
       const current = optionsRef.current;
       if (current.enabled === false) {
