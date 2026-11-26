@@ -75,8 +75,15 @@ pnpm wr build-skin <siteId>
 
 ### 步骤 4：运行 Playwright 六重硬性门禁与 VLM 视觉评审
 ```bash
-pnpm wr verify-skin <siteId> --headed
+pnpm wr verify-skin <siteId> --no-vlm        # 只跑六门禁，不需要 OPENAI_API_KEY
+pnpm wr verify-skin <siteId>                # 六门禁 + VLM 视觉评审（需要 Key）
 ```
+站点不可达（地域封锁、原站改版、CI 无外网）时，用本地快照回放：
+```bash
+pnpm wr verify-skin <siteId> --no-vlm --fixture configs/<siteId>-recon/front.html
+```
+回放只响应主文档与同目录同名静态资源，报告里会标注「离线 fixture 回放」，不会覆盖真机截图。
+验收器固定 headless 运行（保证 CI 可复现），没有 `--headed` 开关；要看过程请用 `wr dev`。
 门禁将严格检验：
 1. `zero-runtime-errors`: 0 页面报错
 2. `zero-flash-curtain-lifted`: 0 闪烁幕帘平滑揭起
@@ -102,9 +109,10 @@ pnpm check:all
 ```
 
 此命令将按顺序执行：
-1. `pnpm typecheck`（7 个包严苛类型检查）
-2. `pnpm test`（141+ 项单测全绿）
-3. `pnpm build:all`（全栈各端完整打包编译）
+1. `pnpm build`（先产出各 workspace 包的 `dist`，后续类型检查与测试都依赖它）
+2. `pnpm typecheck`（6 个包严苛类型检查）
+3. `pnpm test`（154 项单元测试）
+4. `pnpm build:all`（全栈各端完整打包编译）
 
 ---
 

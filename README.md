@@ -2,10 +2,12 @@
 
 # 🏛️ WebRemaster
 
+[English](README.en.md) · **简体中文**
+
 **告别 1998 年刺眼、无排版的老旧网站。零 Token 运行时 · Shadow DOM 样式隔离 · React 19 + Tailwind v4 次世代重制编译器。**
 
 [![CI Status](https://github.com/webremaster/webremaster/actions/workflows/ci.yml/badge.svg)](https://github.com/webremaster/webremaster/actions/workflows/ci.yml)
-[![Tests Passing](https://img.shields.io/badge/Tests-141%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
+[![Tests Passing](https://img.shields.io/badge/Tests-154%20passing-brightgreen.svg)](https://github.com/webremaster/webremaster)
 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -15,10 +17,12 @@
 [![Playwright](https://img.shields.io/badge/Verified%20with-Playwright-2EAD33.svg)](https://playwright.dev/)
 [![Chrome MV3](https://img.shields.io/badge/Extension-Chrome%20MV3-orange.svg)](https://developer.chrome.com/docs/extensions/mv3/)
 
-[**🌐 在线皮肤商店 & Before/After 演示**](https://webremaster.github.io/webremaster/) · [**📑 项目介绍书与白皮书**](docs/PROJECT_SHOWCASE.md) · [**📦 下载 Chrome 扩展 (.zip)**](https://github.com/webremaster/webremaster/releases) · [**🎯 Top 40 站点清单**](#-top-40-待重制网站矩阵)
+[**🕹️ 在线试用（免安装）**](https://webremaster.github.io/webremaster/#live-demo) · [**🌐 皮肤商店 & Before/After**](https://webremaster.github.io/webremaster/) · [**📑 项目介绍书与白皮书**](docs/PROJECT_SHOWCASE.md) · [**📦 下载 Chrome 扩展 (.zip)**](https://github.com/webremaster/webremaster/releases) · [**🎯 皮肤路线图（1 / 40 已上架）**](configs/top40_sites.yaml)
 
 
 ---
+
+![WebRemaster — Hacker News：1998 原版 → 2026 重制版](docs/demo.gif)
 
 </div>
 
@@ -59,6 +63,20 @@
 
 ---
 
+## 🕹️ 在线试用：30 秒，不用装插件
+
+商店页内置 `#live-demo` 区块：把 1998 年 HN 的离线快照放进 iframe，再把编译好的 `hackernews.user.js` 文本注入进去——访客看到的是真实运行时，不是录屏。
+
+- **双路由**：「列表页 /front」「详情页 /item」两份快照，分别命中 feed 与 thread
+- **三态切换**：「重制版 / 左右分屏 / 1998 原版」，分屏模式的分割线可以直接拖动
+- **零安装**：纯前端，不需要油猴、扩展或任何 API Key
+
+![在线试用：左侧 1998 原版、右侧重制版](docs/playground.png)
+
+[🔗 打开商店页 →](https://webremaster.github.io/webremaster/#live-demo)
+
+---
+
 ## 🏗️ 核心架构
 
 ```mermaid
@@ -68,7 +86,7 @@ flowchart TD
         B --> C[01_snapshot.json 骨架/截图/重合组]
         C --> D[Multi-Agent 契约/设计/代码生成]
         D --> E[Vite IIFE 单文件打包引擎]
-        E --> F[6 重硬门禁回归测试: 白屏/控制台/数据/功能/尺寸/VLM]
+        E --> F[6 重门禁回归测试: 运行时/幕帘/数据/渲染/桥接/传送门]
         F --> G[manifest.json + 编译完成的 .user.js]
     end
 
@@ -91,16 +109,14 @@ flowchart TD
 WebRemaster/
 ├── packages/
 │   ├── schema/        # @webremaster/schema: Zod 共享类型契约 (15 tests)
-│   ├── bridge/        # @webremaster/bridge: 零依赖浏览器运行时 SDK + 7 大 PowerUps (62 tests)
-│   ├── ui-kit/        # @webremaster/ui-kit: Linear 级现代组件库 + 容灾保护 + 4 大主题 + Toast (14 tests)
-│   ├── compiler/      # @webremaster/compiler: Playwright X-Ray + Vite 打包 + 6 门禁 CLI (43 tests)
-
-
-│   ├── extension/     # @webremaster/extension: Chrome & Firefox MV3 扩展 (徽标联动 / 右键菜单)
-│   └── store/         # @webremaster/store: GitHub Pages 演示大厅 (Before/After 拖拽对比) (2 tests)
-├── skins/             # 编译产物库 (包含 hackernews 等站点的完整编译产物)
-├── configs/           # Top 40 待重制高频老旧网站清单 (configs/top40_sites.yaml)
-└── release/           # 开箱即用的 Chrome 扩展离线安装包 (webremaster-chrome-ext.zip)
+│   ├── bridge/        # @webremaster/bridge: 零依赖运行时 SDK + 7 大 PowerUps（72 tests）
+│   ├── ui-kit/        # @webremaster/ui-kit: 现代组件库 + 容灾保护 + 4 套调色盘（17 tests）
+│   ├── compiler/      # @webremaster/compiler: Playwright X-Ray + Vite 打包 + 6 门禁 CLI（48 tests）
+│   ├── extension/     # @webremaster/extension: Chrome & Firefox MV3 扩展（徽标联动 / 右键菜单）
+│   └── store/         # @webremaster/store: 演示大厅（Before/After 拖拽 + 在线试用 Playground）（2 tests）
+├── skins/             # 编译产物库（hackernews 等站点的完整产物与验证报告）
+├── configs/           # Top 40 待重制高频老旧网站清单（configs/top40_sites.yaml）
+└── release/           # 扩展离线安装包（CI 打 zip 后随 GitHub Release 发布，不入库）
 ```
 
 ---
@@ -121,16 +137,21 @@ pnpm install
 pnpm wr doctor
 ```
 
-### 2. 运行全量测试与构建
+### 2. 首次构建、测试与全量打包
+
+> 首次克隆后必须先执行 `pnpm build`：各 workspace 包通过 `dist/` 互相引用类型与代码，跳过后 `typecheck` / `test` 会报找不到 `@webremaster/schema`。
 
 ```bash
+# 产出 workspace 包的 dist（schema → bridge → ui-kit → compiler）
+pnpm build
+
 # 全仓严格类型检查
 pnpm typecheck
 
-# 运行 117 项全量单元测试与门禁自检（100% 绿灯）
+# 运行 154 项单元测试与门禁自检（6 个包）
 pnpm test
 
-# 全栈一键构建
+# 全栈一键构建（含扩展与皮肤大厅）
 pnpm build:all
 ```
 
@@ -155,7 +176,7 @@ WebRemaster CLI 采用 Agent-Native 架构设计，提供高可靠的原子化�
 | `wr dev <siteId>` | 启动实时热重载开发服务器与联调脚本 (HMR) | `<siteId>.dev.user.js` + Vite Dev Server |
 | `wr inspect <url> --id <siteId>` | 深度测绘 DOM 结构、表单控件与视口截图 | `01_snapshot.json` + `before.png` |
 | `wr build-skin <siteId>` | TypeScript strict + Vite IIFE 单文件打包 | `<siteId>.user.js` |
-| `wr verify-skin <siteId>` | 启动真浏览器执行 6 重门禁回归校验 | `after.png` + `05_verification.json` |
+| `wr verify-skin <siteId>` | 启动真浏览器执行 6 重门禁回归校验（`--fixture` 可离线回放本地快照） | `after.png` + `05_verification.json` |
 | `wr finalize-skin <siteId>` | 上架终审（门禁全绿 + VLM ≥ 8.5） | `manifest.json` |
 | `wr sync-artifacts` | 将合格皮肤同步至 Chrome 扩展与皮肤大厅 | `skinsRegistry.ts` + `store_index.json` |
 
@@ -169,12 +190,18 @@ WebRemaster CLI 采用 Agent-Native 架构设计，提供高可靠的原子化�
 - 🔖 **BookmarkManager（借鉴 Pocket / Readwise）**：客户端本地高隐私稍后阅读书签系统，支持一键导出为标准 Markdown 清单。
 - 🛡️ **OriginDefuser & ContentCleaner（借鉴 uBlock Origin / Privacy Badger）**：隐匿原站后自动静音背景音视频并停止跑马灯；移除 Cookie 弹窗并自动解除页面滚动锁死。
 - ⚡ **TurboNav（借鉴 Hotwire Turbo / Google Quicklink）**：链接预检与无刷新 DOM 局部替换，结合弱网环境智能节流与平滑进度条。
-- ⌨️ **Vim 键盘导航与 CommandPalette**：支持 `j` / `k` 条目移动、`o` 打开、`g` / `G` 顶底跳转，以及 `Cmd+K` 跨功能指令中心。
-- 🎨 **社区顶流主题预设（借鉴 Catppuccin / Tokyo Night / Nord）**：内置 `catppuccin-mocha`、`tokyo-night`、`nord`、`sepia-book` 等经典调色盘，经 CSS 变量与 Shadow DOM 无缝穿透。
+- ⌨️ **Vim 键盘导航与 CommandPalette**：支持 `j` / `k` 条目移动、`o` 打开、`g` / `G` 顶底跳转，以及 `Cmd+K` 跨功能指令中心；输入标题或作者即可定位到对应卡片（回车跳转 + 高亮）。
+
+![Cmd+K 条目检索与跳转](docs/palette.gif)
+- 🎨 **社区顶流主题预设（借鉴 Catppuccin / Tokyo Night / Nord）**：内置 `catppuccin-mocha`、`tokyo-night`、`nord`、`sepia-book` 四套调色盘，`Cmd+K` →「切换配色预设」即可循环切换（localStorage 记住选择），经 CSS 变量与 Shadow DOM 无缝穿透。
 
 ---
 
-## 🎯 Top 40 待重制网站矩阵 (`configs/top40_sites.yaml`)
+## 🎯 皮肤路线图：1 / 40 已上架 (`configs/top40_sites.yaml`)
+
+**已上架（含完整门禁报告与 before/after 截图）**：Hacker News → `skins/hackernews/`
+
+其余 39 个站点为规划项（`status: pending`）。想优先看到哪个，欢迎开一个 [`Site remaster request`](.github/ISSUE_TEMPLATE/site_remaster_request.yml) Issue，我们按 👍 数排序。
 
 - **全球开发者生态**：HackerNews（已上架）, Lobsters, PyPI, Go Dev Docs, GNU, Kernel Lore, SQLite, curl, man7, GCC.
 - **学术科研与论文**：arXiv CS.AI, arXiv Abs, DBLP, PubMed, OEIS, Wolfram MathWorld, Stanford Plato, Project Gutenberg.

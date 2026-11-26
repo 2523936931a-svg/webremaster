@@ -71,19 +71,19 @@ flowchart TD
     Skins --> Store
 ```
 
-### ✅ 权威自检清单（100% 真实通过）
+### ✅ 权威自检清单（以 CI 结果为准）
 
 | 检验维度 | 实测指标 | 结论与证据 |
 | :--- | :--- | :--- |
-| **自动化测试总数** | **141 / 141 全绿 (0 fail)** | `schema (15)` + `bridge (65)` + `ui-kit (14)` + `compiler (45)` + `store (2)` 全量通过 |
-| **TypeScript 类型检查** | **7 / 7 包 0 报错 (0 errors)** | `pnpm typecheck` 全项目严苛类型校验通过 |
+| **自动化测试总数** | **154 项（6 个包）** | `schema (15)` + `bridge (72)` + `ui-kit (17)` + `compiler (48)` + `store (2)` |
+| **TypeScript 类型检查** | **6 / 6 包 0 报错 (0 errors)** | `pnpm typecheck` 全项目严苛类型校验通过 |
 | **全量打包构建** | **6 个产物包全绿** | `pnpm build:all` 成功输出 schema, bridge, ui-kit, compiler, store 与 Chrome MV3 扩展 |
 | **开发者热重载体验** | **wr dev <siteId> 毫秒级 HMR** | 仿 `vite-plugin-monkey` 极速开发桥，直接在原站调试 React + Tailwind 样式 |
 | **社区生态与皮肤导入** | **一键 URL / Manifest 动态导入** | 支持 Gist、GitHub Raw 与本地 JSON，直接进入本地矩阵并提供 6 门禁审查与对比 |
 
 
 | **TypeScript 类型系统** | **Strict 模式 0 警告** | `pnpm typecheck` across all 7 packages 全部 exit code 0 |
-| **Playwright 真机活体检验** | **6 重门禁全绿** | 数据对齐率 100%、无任何控制台报错、DOM 零白屏平滑揭幕、VLM 评审得分 9.2 |
+| **Playwright 真机活体检验** | **6 重门禁全绿** | 数据对齐率 100%、无任何控制台报错、DOM 零白屏平滑揭幕；VLM 终审通道已实现，当前皮肤的分数以 `05_verification.json` 为准 |
 | **生产打包流水线** | **`pnpm build:all` 一键完成** | 核心库全部生成 `dist/`，扩展产物与商店同步完成 |
 | **开箱冷启动体验** | **`pnpm dev` 255ms 极速启动** | 根目录直接输入 `pnpm dev` 即可在 `http://localhost:5173/` 探索全功能商店 |
 | **离线扩展安装包** | **即拷即用 Zip 包** | [webremaster-chrome-ext.zip](file:///D:/黑科技/WebRemaster/release/webremaster-chrome-ext.zip) 自动打好，支持拖拽离线安装 |
