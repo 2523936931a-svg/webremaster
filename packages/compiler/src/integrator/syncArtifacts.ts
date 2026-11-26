@@ -188,9 +188,11 @@ export const SKIN_REGISTRY: SkinManifest[] = ${JSON.stringify(acceptedSkins, nul
   }
 
   console.log(chalk.green(`\n✓ 皮肤产物同步完成！`));
+  const autoCount = acceptedSkins.filter((s) => s.vlmScoreSource === "auto-vlm").length;
+  const manualCount = acceptedSkins.length - autoCount;
   console.log(
     chalk.cyan(
-      `  已上架: ${acceptedSkins.length} 站 | 淘汰/跳过: ${rejectedCount} 站 | 平均 VLM: ${avgVlmScore}分`,
+      `  已上架: ${acceptedSkins.length} 站 | 淘汰/跳过: ${rejectedCount} 站 | 平均评分: ${avgVlmScore}分（评分来源：自动 VLM ${autoCount} 站 / 人工终审 ${manualCount} 站）`,
     ),
   );
   console.log(chalk.dim(`  → Chrome 扩展注册表: ${registryPath}`));

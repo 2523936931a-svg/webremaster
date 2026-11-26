@@ -38,10 +38,13 @@
  *   locator.hover()，断言完恢复 remastered。
  * - extractFieldWithCascade 等纯提取逻辑属于皮肤侧实现，验收器只看运行结果（items 数量 /
  *   遥测命中率），不重复实现提取算法。
+ * - fixtureHtmlPath 为离线回放通道：主文档由本地 HTML 响应，站点不可达（地域封锁、CI 无
+ *   外网、原站改版）时仍可复核门禁；报告的 Gate 1 details 会标注「离线 fixture 回放」，
+ *   避免把回放结果误读成真站实测。
  */
 
-import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import type { Browser, Page } from "playwright";
 import {
   VerificationReportSchema,
@@ -75,6 +78,10 @@ export interface VerifyRemasteredSkinOptions {
   storageStatePath?: string;
   proxy?: string;
   settleMs?: number;
+  /** 离线回放：用该本地 HTML 响应 snapshot.url 的主文档（站点不可达时复核门禁）。 */
+  fixtureHtmlPath?: string;
+  /** 是否落盘 after.png / split.png（默认 true；离线回放建议关闭，避免用回放截图覆盖真机图）。 */
+  captureScreenshots?: boolean;
   browser?: Browser;
 }
 
@@ -438,6 +445,32 @@ function isSameUrl(logged: string, expected: string): boolean {
   }
 }
 
+/** fixture 同目录同名资源的 Content-Type（未知扩展名按二进制流处理，浏览器不会误解析）。 */
+function fixtureContentType(fileName: string): string {
+  const ext = fileName.toLowerCase().split(".").pop() ?? "";
+  switch (ext) {
+    case "css":
+      return "text/css; charset=utf-8";
+    case "js":
+      return "text/javascript; charset=utf-8";
+    case "html":
+      return "text/html; charset=utf-8";
+    case "svg":
+      return "image/svg+xml";
+    case "png":
+      return "image/png";
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "gif":
+      return "image/gif";
+    case "json":
+      return "application/json; charset=utf-8";
+    default:
+      return "application/octet-stream";
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* 主流程                                                               */
 /* ------------------------------------------------------------------ */
@@ -449,6 +482,10 @@ function isSameUrl(logged: string, expected: string): boolean {
  */
 export async function verifyRemasteredSkin(options: VerifyRemasteredSkinOptions): Promise<VerificationReport> {
   const settleMs = options.settleMs ?? DEFAULT_SETTLE_MS;
+  const captureScreenshots = options.captureScreenshots ?? true;
+  if (!captureScreenshots && options.enableVlm) {
+    throw new Error("captureScreenshots=false 时不产出 after.png，无法进行 VLM 评审；请关闭 VLM 或保留截图。");
+  }
   mkdirSync(options.outDir, { recursive: true });
 
   // options.browser 注入优先（调用方负责关闭）；自建浏览器在 finally 关闭
@@ -459,6 +496,37 @@ export async function verifyRemasteredSkin(options: VerifyRemasteredSkinOptions)
     ...(options.storageStatePath !== undefined ? { storageState: options.storageStatePath } : {}),
   });
   try {
+    // 离线回放：主文档由本地快照响应；同源静态资源（CSS/SVG/JS）优先取 fixture 同目录同名文件，
+    // 缺失时返回 200 空响应 —— 既不触发 net::ERR_FAILED（那会污染 Gate 1 的错误采集），
+    // 也不让 load 事件卡在不可达的网络上。
+    const fixtureNote = options.fixtureHtmlPath !== undefined ? "（离线 fixture 回放：主文档由本地快照响应）" : "";
+    if (options.fixtureHtmlPath !== undefined) {
+      const fixturePath = resolve(options.fixtureHtmlPath);
+      if (!existsSync(fixturePath)) {
+        throw new Error(`fixture HTML 不存在：${fixturePath}`);
+      }
+      const fixtureDir = dirname(fixturePath);
+      const fixtureHtml = readFileSync(fixturePath);
+      await context.route("**/*", async (route) => {
+        const request = route.request();
+        if (request.url() === options.snapshot.url) {
+          await route.fulfill({ status: 200, contentType: "text/html; charset=utf-8", body: fixtureHtml });
+          return;
+        }
+        if (request.resourceType() === "document") {
+          await route.fulfill({ status: 200, contentType: "text/html; charset=utf-8", body: "" });
+          return;
+        }
+        const fileName = basename(new URL(request.url()).pathname);
+        const localPath = join(fixtureDir, fileName);
+        if (fileName.length > 0 && existsSync(localPath)) {
+          await route.fulfill({ status: 200, contentType: fixtureContentType(fileName), body: readFileSync(localPath) });
+          return;
+        }
+        await route.fulfill({ status: 200, contentType: fixtureContentType(fileName), body: "" });
+      });
+    }
+
     const page = await context.newPage();
 
     // 错误采集从导航开始：pageerror + console(type===error)
@@ -487,8 +555,8 @@ export async function verifyRemasteredSkin(options: VerifyRemasteredSkinOptions)
       passed: gate1Passed,
       score: gate1Passed ? 10 : 0,
       details: gate1Passed
-        ? "页面零运行时错误（pageerror 与 console.error 均为 0 条）"
-        : `采集到 ${errors.length} 条运行时错误，前 3 条：${errors.slice(0, 3).join("；")}`,
+        ? `页面零运行时错误（pageerror 与 console.error 均为 0 条）${fixtureNote}`
+        : `采集到 ${errors.length} 条运行时错误，前 3 条：${errors.slice(0, 3).join("；")}${fixtureNote}`,
     });
 
     /* ---- Gate 2 zero-flash-curtain-lifted ---- */
@@ -610,7 +678,7 @@ export async function verifyRemasteredSkin(options: VerifyRemasteredSkinOptions)
     await page.waitForTimeout(SMOKE_SETTLE_MS);
     const mode2 = await readViewMode(page);
     if (mode2 !== "split") modeCycleOk = false;
-    await page.screenshot({ path: join(options.outDir, "split.png") });
+    if (captureScreenshots) await page.screenshot({ path: join(options.outDir, "split.png") });
     await page.keyboard.press("Alt+Shift+R");
     await page.waitForTimeout(SMOKE_SETTLE_MS);
     const mode3 = await readViewMode(page);
@@ -724,7 +792,7 @@ export async function verifyRemasteredSkin(options: VerifyRemasteredSkinOptions)
 
     /* ---- Gate 7（不入 gates 数组）：VLM 终审 ---- */
     const afterPath = join(options.outDir, "after.png");
-    await page.screenshot({ path: afterPath });
+    if (captureScreenshots) await page.screenshot({ path: afterPath });
     let vlmScore = 0;
     let vlmFeedback = AGENT_NATIVE_FEEDBACK;
     let totalTokensUsed = 0;

@@ -490,6 +490,20 @@ export async function buildSkinHandler(options: BuildSkinOptions): Promise<Build
   if (!gateOk) {
     throw new SkinBuildGateError(`打包三门禁未全部通过（${options.siteId}）`, formatBundleErrorDetails(result.gate));
   }
+
+  // 产物体积是 manifest 对外披露的字段，重新打包后必须跟着走，否则商店卡片/README 会长期显示旧体积。
+  const manifestPath = path.join(skinDir, "manifest.json");
+  if (existsSync(manifestPath)) {
+    const manifest = parseJsonFile(manifestPath, SkinManifestSchema, "皮肤清单");
+    const nextSizeKb = Number(sizeKb.toFixed(2));
+    if (manifest.bundleSizeKb !== nextSizeKb) {
+      const next = SkinManifestSchema.parse({ ...manifest, bundleSizeKb: nextSizeKb });
+      writeFileSync(manifestPath, `${JSON.stringify(next, null, 2)}\n`, "utf8");
+      console.log(
+        chalk.dim(`  manifest 同步　：bundleSizeKb ${manifest.bundleSizeKb.toFixed(2)} → ${nextSizeKb.toFixed(2)} KB`),
+      );
+    }
+  }
   return { result, sizeKb, artifactPath: result.outFile, entryPath };
 }
 
@@ -504,6 +518,8 @@ export interface VerifySkinOptions {
   auth?: string;
   proxy?: string;
   settleMs?: number;
+  /** 离线回放：用本地 HTML 响应站点主文档（站点不可达时仍可跑六门禁）。 */
+  fixture?: string;
 }
 
 /** 六重门禁表格 + VLM 反馈 + 数据对齐率 + 提取器健康摘要（chalk 表格）。 */
@@ -539,6 +555,11 @@ export async function verifySkinHandler(options: VerifySkinOptions): Promise<Ver
   const skinDir = path.resolve(options.skinsDir, options.siteId);
   const snapshot = parseJsonFile(path.join(skinDir, SNAPSHOT_FILE), SiteSnapshotSchema, "站点快照");
   const contract = parseJsonFile(path.join(skinDir, CONTRACT_FILE), SiteContractSchema, "站点合同");
+  if (options.fixture !== undefined && options.enableVlm) {
+    throw new CliExitError(
+      "--fixture 离线回放不落盘截图（避免用回放截图覆盖真机图），因此不能与 VLM 评审同时使用；请加 --no-vlm 或去掉 --fixture",
+    );
+  }
   const vlmCritic = options.enableVlm ? createGatewayVlmCritic() : undefined;
   if (options.enableVlm) {
     console.log(chalk.cyan(`VLM 视觉评审已启用（模型 ${resolveModel()}，经 OpenAI 兼容网关）`));
@@ -557,6 +578,8 @@ export async function verifySkinHandler(options: VerifySkinOptions): Promise<Ver
       ...(options.auth !== undefined ? { storageStatePath: path.resolve(options.auth) } : {}),
       ...(options.proxy !== undefined ? { proxy: options.proxy } : {}),
       ...(options.settleMs !== undefined ? { settleMs: options.settleMs } : {}),
+      ...(options.fixture !== undefined ? { fixtureHtmlPath: path.resolve(options.fixture) } : {}),
+      ...(options.fixture !== undefined ? { captureScreenshots: false } : {}),
     });
   } catch (error) {
     spinner.stop();
@@ -1753,6 +1776,7 @@ export function buildProgram(): Command {
     .option("--skins-dir <dir>", "皮肤工作区根目录", "./skins")
     .option("--proxy <server>", "代理服务器地址")
     .option("--settle-ms <n>", "页面加载后的稳定等待毫秒数")
+    .option("--fixture <path>", "离线回放：用本地 HTML 响应站点主文档（站点不可达时跑六门禁）")
     .action(async (siteId, opts) => {
       await guard(async () => {
         const options: VerifySkinOptions = {
@@ -1764,6 +1788,8 @@ export function buildProgram(): Command {
         if (auth !== undefined) options.auth = auth;
         const proxy = optOptionalString(opts.proxy);
         if (proxy !== undefined) options.proxy = proxy;
+        const fixture = optOptionalString(opts.fixture);
+        if (fixture !== undefined) options.fixture = fixture;
         if (opts.settleMs !== undefined) {
           const settleMs = optNumber(opts.settleMs, "settle-ms");
           if (!(settleMs >= 0)) throw new CliExitError(`--settle-ms 必须 ≥ 0（收到 ${settleMs}）`);

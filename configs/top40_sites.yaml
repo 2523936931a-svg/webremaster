@@ -2,7 +2,6 @@
 # 选站黄金标准：高频刚需 + 1995~2012 年古老 UI + 公开访问免登录
 
 version: "1.0.0"
-budget_tokens: 55000000
 
 sites:
   # 1. 全球开发者与开源生态 (10 站)
@@ -255,8 +254,10 @@ sites:
     url: "https://kns.cnki.net/"
     status: "pending"
 
+  # 本地演示靶场：URL 指向 8088 端口的 mock 服务，不是公开可访问站点，
+  # 仅用于演示「表格 + 表单 + 登录态」这类高校系统的重制路径。
   - id: zhengfang-edu
-    name: "高校正方教务系统靶场重制面板"
+    name: "高校正方教务系统（本地 Mock 靶场）"
     category: "高校教务"
     archetype: "data-table"
     url: "http://localhost:8088/edu-mock.html"

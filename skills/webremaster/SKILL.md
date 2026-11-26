@@ -16,7 +16,8 @@ When asked to remaster a legacy website `<url>` with ID `<siteId>`:
    Ensure all CSS selectors exist verbatim in `01_snapshot.json` with 2-3 fallbacks.
 
 3. **Generate Skin Code**:
-   Write `skins/<siteId>/src/adapter.ts` and `skins/<siteId>/src/SkinApp.tsx` using `@webremaster/bridge` (`queryWithFallback`, `nativeSetInputValue`, `nativeTriggerClick`, `nativeSubmitForm`, `CommandPalette`, `EscapePill`, `exportToCSV`, `exportToMarkdownTable`, `useVimNavigation`).
+   Write `skins/<siteId>/src/entry.tsx` exporting a **default** `mountSkin(context)` function, and import `./skin.css` from it. This single entry is the required contract; split into `adapter.ts` / `SkinApp.tsx` only when the skin exceeds ~300 lines.
+   Use APIs that actually exist in `@webremaster/bridge`: `extractFieldWithCascade`, `createOriginStore`, `HealthTracker`, `TurboNavigator`, `nativeSetInputValue`, `nativeTriggerClick`, `nativeSubmitForm`, `CommandPalette`, `EscapePill`, `exportToCSV`, `exportToMarkdownTable`, `useVimNavigation`. Do **not** import `queryWithFallback` — there is no such export.
    - Query ONLY inside `originRoot`.
    - Tag every rendered list item with `data-wr-item="true"`.
    - Support dark/light toggle + `Alt+Shift+R` escape + `Cmd+K` search.
@@ -27,9 +28,10 @@ When asked to remaster a legacy website `<url>` with ID `<siteId>`:
 5. **Live Browser Verification & Visual Audit**:
    Run `pnpm wr verify-skin <siteId> --no-vlm`.
    Inspect `skins/<siteId>/05_verification.json` AND visually compare `skins/<siteId>/before.png` vs `skins/<siteId>/after.png`.
-   - If any deterministic gate (1-5) fails OR visual quality is below 8.5/10 (overflow, contrast, missing data, broken styling), surgically repair `adapter.ts`/`SkinApp.tsx` and repeat Steps 4-5 (max 4 rounds).
+   - If any of the six gates fails OR visual quality is below 8.5/10 (overflow, contrast, missing data, broken styling), surgically repair `entry.tsx` and repeat Steps 4-5 (max 4 rounds).
+   - If the target site is unreachable from your network, replay it from a local fixture instead of skipping verification: `pnpm wr verify-skin <siteId> --no-vlm --fixture configs/<siteId>-recon/front.html` (the report will be tagged "离线 fixture 回放" and no screenshots are overwritten).
 
 6. **Finalize & Sync**:
-   Once all 5 deterministic gates pass AND visual quality >= 8.5/10, run:
+   Once all six gates pass AND visual quality >= 8.5/10, run:
    `pnpm wr finalize-skin <siteId> --vlm-score <score> --category <cat> --tagline-zh "<zh>" --tagline-en "<en>"`
    Then run `pnpm sync:artifacts` to update the Chrome Extension and Before/After Store automatically.

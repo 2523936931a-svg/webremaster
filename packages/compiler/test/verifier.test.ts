@@ -65,6 +65,23 @@ const DETAIL_PAGE = `<!doctype html>
 <body><h1>Story Detail</h1><p>detail body</p></body>
 </html>`;
 
+/**
+ * 离线回放专用页面：与 INDEX_PAGE 同构，但把图片换成 data URI，
+ * 确保 fixture 模式拦截全部请求时不会产生解码/加载报错污染 Gate 1。
+ */
+const FIXTURE_PAGE = `<!doctype html>
+<html>
+<head><title>Fixture Story List (Offline Replay)</title></head>
+<body>
+<h1>Fixture Stories</h1>
+<table id="stories"><tbody>
+${storyRows(10)}
+</tbody></table>
+<p><a href="./detail.html">Open detail</a></p>
+<img id="captcha" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="captcha challenge" width="120" height="40">
+</body>
+</html>`;
+
 /** 1×1 合法 PNG：favicon 与验证码占位图（避免 404/解码失败触发 console.error 干扰 Gate 1）。 */
 const TINY_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
@@ -474,5 +491,42 @@ describe("liveVerifier", () => {
     expect(failReport.vlmScore).toBe(4);
     expect(failReport.vlmFeedback).toBe("布局漂移，打回修复");
     expect(failReport.totalTokensUsed).toBe(0);
+  }, 180_000);
+
+  it("离线 fixture 回放：站点不可达也能跑六门禁，报告标注来源且不覆盖截图", async () => {
+    const replayDir = await mkdtemp(join(tmpdir(), "wr-verifier-fixture-"));
+    tempDirs.push(replayDir);
+    const fixtureHtmlPath = join(replayDir, "front.html");
+    await writeFile(fixtureHtmlPath, FIXTURE_PAGE, "utf8");
+
+    const report = await verifyRemasteredSkin({
+      snapshot,
+      contract: CONTRACT,
+      userscriptPath: positiveUserscript,
+      outDir: replayDir,
+      enableVlm: false,
+      settleMs: 400,
+      browser,
+      fixtureHtmlPath,
+      captureScreenshots: false,
+    });
+
+    // 主文档来自本地快照：与真站验证同等的六门禁结论
+    expect(report.passed).toBe(true);
+    expect(report.gates).toHaveLength(6);
+    expect(report.gates.every((gate) => gate.passed)).toBe(true);
+    expect(report.remasteredItemCount).toBe(10);
+    expect(report.dataParityRatio).toBeGreaterThanOrEqual(0.9);
+
+    // 来源必须可辨认，避免回放结果被读成真站实测
+    const gate1 = report.gates.find((gate) => gate.gateName === "zero-runtime-errors");
+    expect(gate1?.details).toContain("离线 fixture 回放");
+
+    // 回放不落盘截图：真机图不会被回放画面覆盖
+    await expect(readFile(join(replayDir, "after.png"))).rejects.toBeTruthy();
+    await expect(readFile(join(replayDir, "split.png"))).rejects.toBeTruthy();
+
+    const persisted = JSON.parse(await readFile(join(replayDir, "05_verification.json"), "utf8")) as object;
+    expect(persisted).toEqual(report as unknown as object);
   }, 180_000);
 });
