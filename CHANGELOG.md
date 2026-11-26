@@ -39,6 +39,8 @@
 - **`pnpm set-owner <用户名>`**：仓库里 30+ 处指向占位组织 `webremaster`（badge、在线试用、Release、Pages、`repository` 字段、og:image 绝对地址）本来只能手工搜索替换。新增脚本扫描 `.md / .json / .html / .yml / .ts`，把 `owner/repo` 与 `owner.github.io/repo` 一次性替换，幂等、可带仓库名参数；README 中英双语补「部署到你自己的 GitHub」三步。
 - **README 补「Agent-Native」章节**：`skills/webremaster/SKILL.md` 一直躺在仓库里却没有任何入口，访客只能偶然翻到。新章节说明它是六步可执行规程、只列 `bridge` 里真实存在的导出、命令与 `wr --help` 一致；`SKILL.md` 自身补上「先 `wr scaffold` 再改」的起点建议，并把 archetype 写成 schema 真值（`data-table-portal` / `doc-reader`，原文里的 `data-table` / `article-reader` 只是别名）
 - **`examples/local-1998` 端到端示例**：一个 1998 风格的本地静态页，`inspect → scaffold → build-skin → verify-skin` 全链路不写一行业务代码即产出皮肤，六重门禁 6/6 全绿、数据对齐 100%（`title` / `url` 各 `tier=1 hits=40 misses=0`）。报告 `05_verification.json` 与「3 分钟复现」说明一并入库，用来证明编译器对新站点可用，而不只是能跑仓库里那个手作皮肤
+- **扩展首次安装引导**：装完点图标原本只有一句"启动万能消除枪"，新手不知道下一步该做什么。popup 首次打开显示可关闭的「三步开始」卡片（打开已收录站点 → 图标变 ON → `Alt+Shift+R` / `Ctrl+K`），关闭状态写 `onboarding_dismissed`；未命中站点时主 CTA 直接 `chrome.tabs.create` 送去 Hacker News，消除枪降为次要按钮；搜索无结果补「清除搜索」。
+- **移动端首屏素材**：`docs/popup.png`（首次引导）、`docs/mobile.png`（390px 首屏），README 中英双语接入并补充窄屏说明
 
 ### Fixed
 
@@ -61,8 +63,17 @@
 - **`wr scaffold` 生成的模板根本打不出包**：四个缺陷叠加——`--skins-dir` 传绝对路径时被拼成 `./C:/…`（TS2307）；`entry.tsx` import 了 `bridge` 里不存在的 `mountShadowApp` / `createReactiveStore`（TS2305）；模板没有 `export default mountSkin`，wrapper 的产物自检必失败（TS1192）；提取选择器带 `html > body` 前缀，而 `body` 会被 `OriginManager` 搬进 `#wr-origin-wrapper`，必然匹配 0 项（渲染 0×0、对齐率 0.00）。另外 `skin.css` 漏了 `@source` 扫描 ui-kit，Tailwind 类不生成、布局塌陷。契约改为取快照里 `totalCount` 最大的重合组作主列表并剥离根前缀，模板重写为真实协议（`mountSkin` + `createOriginStore` + `TurboNavigator` + `HealthTracker` 挂 `diagnostics`），`cssCode` 补两条 `@source` 与容器底色。新增断言防回归：必须含 `export default function mountSkin` / `createOriginStore` / `TurboNavigator`，不得含两个虚构 API，`skin.css` 必须含 `packages/ui-kit/src`。`skins-tmp/` 加入 `.gitignore`。
 - **文档与快照里残留本机绝对路径**：`docs/PROJECT_SHOWCASE.md` 有 4 处 `file:///D:/黑科技/…` 链接，推送到 GitHub 后全是 404；`skins/hackernews/01_snapshot.json` 把 `beforeScreenshotPath` 记成 `D:\…`，换台机器 clone 后 VLM 终审直接读不到原图。前者改为仓库相对路径 / Release 页，后者改为只存文件名——`wr inspect` 落盘时自动 `basename` 化，`liveVerifier` 用 `resolve(outDir, …)` 同时兼容旧快照的绝对路径。新增 `pnpm check:docs`（21 处相对链接与图片必须存在，`file://` 直接判错），接入 `check:all` 与 CI。
 - `better-sqlite3` 在 Node 22.23 / Windows 下的 ABI 不匹配（NODE_MODULE_VERSION 137 vs 127），`pnpm rebuild better-sqlite3` 后 154 项测试全绿。
+- **商店首屏的径向蒙版把内容一起遮掉了**：`Hero` 的 `section` 同时挂着 `bg-grid-mesh` 与 `radial-top-mask`（`mask-image: radial-gradient(...)`），而 CSS mask 作用于**全部子元素**——图片位于 section 中部、正好落在渐变透明区，桌面是图片下半淡出，390px 窄屏直接整块发黑。改为把网格与蒙版挪到独立绝对定位背景层（`aria-hidden`），section 只留 `relative overflow-hidden`。
+- **商店 390 / 360 横向溢出**：实测 `scrollWidth=417` 而 `innerWidth=390`，罪魁是 Header 右侧按钮组（导入 + 语言 + Star + 安装扩展，204px 宽）。Header 改为 `px-3`、logo/标题/副标题分级收起、语言按钮窄屏只显示 EN/中、安装 CTA 窄屏文案「扩展」；Hero 的 `pt` / `gap` / 标题字号 / CTA 方向 / feature bullets 全部按断点收窄。修复后 `scrollWidth` 精确等于 390 / 360。
+- **Header 的 Star 数写死 `1.2k+`**：新仓库 0 star，纯装饰性假数据（与之前统计卡、评分口径同类问题），直接删掉。
+- **扩展与商店的两个死链**：popup 底部「皮肤商店官网」指向 `./store.html`，但 `packages/extension/dist` 里没有该文件；商店「安装扩展」按钮指 `./release/webremaster-chrome-ext.zip`，`release/` 不随仓库发布、Pages 上必 404。前者改常量 `STORE_URL`（Pages 地址），后者指向 `.../releases`。
+- **popup 底部不贴底**：`body` 固定 360×520，但 `#root` 没有高度，内容只占上半屏、footer 悬在中间，其余是纯黑。`popup.css` 补 `html, body, #root { height: 100% }`。
+- **popup 把人工终审分标成 VLM 分**：命中态写死「VLM 评分: 9.2/10」，而该分来自 `vlmScoreSource: "human-review"`（与商店卡片此前修过的是同一个口径）。改为按来源渲染「人工终审 / VLM」。
+- **皮肤顶栏在 390px 里被裁**：`RemasterShell` 的 header 是桌面布局（标题 + 副标题 + 模式文字 + 四个按钮）硬塞窄屏，iframe 内表现为 "Hack… / WebRe…" 截断、标题单行截断。header 改 `px-3 py-2.5`、标题 13px、副标题与视图模式文字 `<sm` 隐藏（只留图标），`FeedListCard` 标题改 `line-clamp-2 sm:line-clamp-1`。
 
 ### Changed
+
+- `THEME_CSS` 里的 `.wr-chip` 等规则没有 `@layer` 包装，特异性高于 Tailwind `utilities` 层，`hidden` 这类响应式规则对它们不生效。域名标签因此保持常显（窄屏靠标题两行 clamp 承载信息），原因写进代码注释，避免留下"写了却没效果"的假实现。
 
 - **扩展不再申请全站权限**：`host_permissions` 从 `<all_urls>` 收窄为已上架皮肤的 `matchPatterns`（当前仅 `https://news.ycombinator.com/*`）。注入本来只发生在 `SKIN_REGISTRY` 命中的页面上，全站声明会让 Chrome / Firefox 安装页显示"读取和更改您在所有网站上的数据"，也过不了认真的安全审查。现在由 `wr sync-artifacts` 在写注册表时一并派生并回写，新增皮肤自动带上对应域名；`syncArtifacts.test.ts` 断言 `<all_urls>` 会被替换、其它 manifest 字段保持原样。
 - CI 增加 `concurrency`（同分支新推送取消旧运行）；Release 在打包前先跑 `pnpm test`。

@@ -28,7 +28,7 @@ export const SKIN_REGISTRY: SkinManifest[] = [
     "vlmScore": 9.2,
     "vlmScoreSource": "human-review",
     "dataParityRatio": 1,
-    "bundleSizeKb": 319.29,
+    "bundleSizeKb": 319.68,
     "tokensUsedToCompile": 0,
     "version": "0.1.0"
   }

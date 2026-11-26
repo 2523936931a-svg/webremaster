@@ -284,15 +284,15 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
 
         <style>{THEME_CSS}</style>
         <header
-          className="sticky top-0 z-20 flex items-center gap-3 px-4 py-2.5"
+          className="sticky top-0 z-20 flex items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-4"
           style={{ background: vars.bg, borderBottomWidth: 1, borderBottomStyle: "solid", borderColor: vars.border }}
         >
           <div className="min-w-0">
-            <h1 className="truncate text-[15px] font-semibold leading-tight" style={{ color: vars.text }}>
+            <h1 className="truncate text-[13px] font-semibold leading-tight sm:text-[15px]" style={{ color: vars.text }}>
               {props.title}
             </h1>
             {props.subtitle !== undefined ? (
-              <p className="mt-0.5 truncate text-[11px]" style={{ color: vars.textMuted }}>
+              <p className="mt-0.5 hidden truncate text-[11px] sm:block" style={{ color: vars.textMuted }}>
                 {props.subtitle}
               </p>
             ) : null}
@@ -324,7 +324,7 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
               ) : (
                 <Columns2 size={14} aria-hidden />
               )}
-              <span>{VIEW_MODE_LABEL[viewMode]}</span>
+              <span className="hidden sm:inline">{VIEW_MODE_LABEL[viewMode]}</span>
             </button>
             <button
               type="button"

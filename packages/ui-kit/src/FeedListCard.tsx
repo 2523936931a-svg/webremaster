@@ -78,7 +78,7 @@ export function FeedListCard(props: FeedListCardProps): ReactElement {
               href={item.url}
               target="_blank"
               rel="noreferrer noopener"
-              className="wr-link wr-interactive truncate text-[14px] font-medium leading-snug"
+              className="wr-link wr-interactive line-clamp-2 sm:line-clamp-1 text-[14px] font-medium leading-snug"
               style={{ color: selected ? vars.accent : vars.text }}
               onClick={(event) => {
                 event.stopPropagation();
@@ -87,11 +87,13 @@ export function FeedListCard(props: FeedListCardProps): ReactElement {
               {item.title}
             </a>
           ) : (
-            <span className="truncate text-[14px] font-medium leading-snug" style={{ color: vars.text }}>
+            <span className="line-clamp-2 sm:line-clamp-1 text-[14px] font-medium leading-snug" style={{ color: vars.text }}>
               {item.title}
             </span>
           )}
           {item.domain !== undefined ? (
+            // 域名标签始终显示：THEME_CSS 里的 .wr-chip 自带 display，Tailwind 的 hidden 会被它盖掉，
+            // 与其写一条不生效的响应式规则，不如老实保留（窄屏靠标题两行 clamp 承载信息）
             <span className="wr-chip shrink-0">
               <ExternalLink size={11} aria-hidden />
               {item.domain}
