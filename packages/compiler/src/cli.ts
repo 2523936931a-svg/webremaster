@@ -1278,29 +1278,54 @@ export async function scaffoldHandler(options: ScaffoldOptions): Promise<{ siteI
   };
   const normalizedArchetype = (archMap[rawArch] || rawArch) as any;
 
+  // 若已跑过 inspect，用快照里条目最多的重合组作为主列表与标题选择器——
+  // 这比「h1/h2/.title」这类猜测靠谱，生成出来的皮肤首屏就有数据。
+  const snapshotPath = path.join(targetDir, SNAPSHOT_FILE);
+  const snapshot = existsSync(snapshotPath) ? parseJsonFile(snapshotPath, SiteSnapshotSchema, "站点快照") : null;
+  const topGroup = snapshot
+    ? [...snapshot.repeatedGroups].sort((a, b) => b.totalCount - a.totalCount)[0]
+    : undefined;
+  // Playwright 风格的绝对路径（html > body > …）在 OriginManager 把 body 搬进 wrapper 后必然失效，
+  // 因此落进 contract / 皮肤的选择器一律去掉 html / body 前缀，只保留容器内的相对路径。
+  const stripRootPrefix = (selector: string): string =>
+    selector
+      .replace(/^html\s*>\s*/, "")
+      .replace(/^body\s*>\s*/, "")
+      .trim();
+  const primaryItemSelector = topGroup ? stripRootPrefix(topGroup.itemSelector) : "article, .item, tr, li";
+  const primaryListContainer = topGroup ? stripRootPrefix(topGroup.containerSelector) : "body";
+
   const contractData: SiteContract = SiteContractSchema.parse({
     siteId,
     siteName: siteId.toUpperCase(),
     matchPatterns: [`${origin}/*`],
     enableTurboNav: true,
-    recommendedPowerUps: ["cmd-k-search", "csv-markdown-export"],
+    recommendedPowerUps: [],
     routes: [
       {
         routeId: "main",
         urlRegex: "^" + origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "/.*",
-        domFingerprintSelector: "body",
+        domFingerprintSelector: topGroup ? topGroup.itemSelector : "body",
         archetype: normalizedArchetype,
-        primaryListContainer: "body",
-        primaryItemSelector: "article, .item, tr, li",
+        primaryListContainer,
+        primaryItemSelector,
         pairingMode: "single",
         itemFields: [
           {
             fieldName: "title",
             fieldType: "string",
-            selectors: ["h1", "h2", ".title", "a"],
+            selectors: ["td.title a", "td.title", "a", "h1", "h2", ".title"],
             relativeTo: "self",
             attribute: "textContent",
             required: true,
+          },
+          {
+            fieldName: "url",
+            fieldType: "url",
+            selectors: ["td.title a", "a"],
+            relativeTo: "self",
+            attribute: "href",
+            required: false,
           },
         ],
       },
@@ -1327,14 +1352,16 @@ export async function scaffoldHandler(options: ScaffoldOptions): Promise<{ siteI
 
   let uiKitImports = "RemasterShell, FeedListCard";
   let bodyJSX = `
-    <RemasterShell title="${siteId.toUpperCase()}">
+    <RemasterShell title="${siteId.toUpperCase()}" subtitle={"WebRemaster 重制 · " + items.length + " 条"}>
       <main className="max-w-4xl mx-auto p-6 space-y-3">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <FeedListCard
             key={item.id}
+            index={index}
             item={{
               id: item.id,
               title: item.title,
+              ...(item.url ? { url: item.url } : {}),
             }}
           />
         ))}
@@ -1374,59 +1401,125 @@ export async function scaffoldHandler(options: ScaffoldOptions): Promise<{ siteI
   }
 
   const entryCode = `/**
- * ${siteId} 重制皮肤入口
+ * ${siteId} 重制皮肤入口（wr scaffold 生成）
  * Archetype: ${normalizedArchetype}
  * Category: ${category}
+ *
+ * 协议：默认导出 mountSkin(context)，由 userscript wrapper 在幕帘揭起后调用。
+ * context = { shadowRoot, originWrapper, originManager }。
  */
-import React, { useEffect, useState } from "react";
-import { mountShadowApp, createReactiveStore } from "@webremaster/bridge";
+import React, { useSyncExternalStore } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  HealthTracker,
+  createOriginStore,
+  extractFieldWithCascade,
+  TurboNavigator,
+  type FieldRule,
+  type OriginManager,
+  type OriginStore,
+} from "@webremaster/bridge";
 import { ${uiKitImports} } from "@webremaster/ui-kit";
 import "./skin.css";
+
+const ITEM_SELECTOR = ${JSON.stringify(primaryItemSelector)};
+
+const TITLE_RULE: FieldRule = {
+  fieldName: "title",
+  fieldType: "string",
+  selectors: ["td.title a", "td.title", "a", "h1", "h2", ".title"],
+  relativeTo: "self",
+  attribute: "textContent",
+  required: true,
+};
+
+const URL_RULE: FieldRule = {
+  fieldName: "url",
+  fieldType: "url",
+  selectors: ["td.title a", "a"],
+  relativeTo: "self",
+  attribute: "href",
+  required: false,
+};
 
 interface ItemData {
   id: string;
   title: string;
+  url?: string;
 }
 
-export function App() {
-  const [items, setItems] = useState<ItemData[]>([]);
+interface SkinSnapshot {
+  items: ItemData[];
+}
 
-  useEffect(() => {
-    const store = createReactiveStore<ItemData[]>({
-      selector: "body",
-      extractor: () => {
-        const headings = Array.from(document.querySelectorAll("h1, h2, .title, a"));
-        return headings.slice(0, 30).map((el, idx) => ({
-          id: String(idx + 1),
-          title: el.textContent?.trim() || "无标题",
-        }));
-      },
-    });
+export interface SkinMountContext {
+  shadowRoot: ShadowRoot;
+  originWrapper: HTMLElement;
+  originManager: OriginManager;
+  diagnostics?: { healthSummary?: () => unknown };
+}
 
-    const unsubscribe = store.subscribe((data) => {
-      if (data) setItems(data);
-    });
-
-    return () => {
-      unsubscribe();
+/** 从隐身原站逐行提取条目；选择器级联由 extractFieldWithCascade 负责。 */
+function extractSnapshot(originRoot: HTMLElement, tracker: HealthTracker): SkinSnapshot {
+  const rows = Array.from(originRoot.querySelectorAll(ITEM_SELECTOR));
+  const items: ItemData[] = rows.map((row, index) => {
+    const title = extractFieldWithCascade(row, TITLE_RULE, tracker) ?? \`第 \${index + 1} 条\`;
+    const href = extractFieldWithCascade(row, URL_RULE, tracker);
+    return {
+      id: row.getAttribute("id") ?? \`item-\${index + 1}\`,
+      title,
+      ...(href !== null && href.length > 0 ? { url: href } : {}),
     };
-  }, []);
-
-  return (${bodyJSX});
+  });
+  return { items };
 }
 
-mountShadowApp({
-  mountId: "webremaster-skin-${siteId}",
-  Component: App,
-  styles: "",
-});
+const SkinApp: React.FC<{ store: OriginStore<SkinSnapshot> }> = ({ store }) => {
+  const snapshot = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
+  const items = snapshot?.items ?? [];
+  return (${bodyJSX});
+};
+
+export default function mountSkin(context: SkinMountContext): void {
+  const tracker = new HealthTracker();
+  if (context.diagnostics) {
+    context.diagnostics.healthSummary = () => tracker.getAllHealth();
+  }
+  const store = createOriginStore<SkinSnapshot>({
+    originRoot: context.originWrapper,
+    extract: () => extractSnapshot(context.originWrapper, tracker),
+    validate: (snapshot) => snapshot.items.length > 0,
+    debounceMs: 150,
+  });
+  const turbo = new TurboNavigator(context.originWrapper, () => {
+    store.refresh();
+  }, {});
+  const container = document.createElement("div");
+  container.className = "wr-skin-root";
+  context.shadowRoot.appendChild(container);
+  createRoot(container).render(<SkinApp store={store} />);
+  window.addEventListener("pagehide", () => {
+    store.dispose();
+    turbo.dispose();
+  });
+}
 `;
 
   const cssCode = `@import "tailwindcss";
+/* ui-kit 组件的 Tailwind 类名必须被扫描进产物，否则布局会塌陷成裸 div（0×0） */
+@source "./";
+@source "../../../packages/ui-kit/src";
 
 :host {
   all: initial;
   display: block;
+}
+
+/* 容器自带底色：首个渲染节点的「白底黑字」检查依赖它，浅色主题下由 RemasterShell 覆盖 */
+.wr-skin-root {
+  min-height: 100vh;
+  background: #0b0f17;
+  color: #e8eaed;
 }
 `;
 

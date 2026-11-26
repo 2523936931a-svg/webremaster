@@ -10,6 +10,7 @@ release/*.zip
 
 # local verification scratch
 tmp-split-probe.png
+skins-tmp/
 
 # env & secrets
 .env

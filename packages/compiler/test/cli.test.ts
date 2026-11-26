@@ -269,8 +269,20 @@ describe("buildProgram（结构锁定）", () => {
     // 验证 entry.tsx 和 skin.css 存在且遵循原型布局
     const entryFile = path.join(skinsDir, "my-test-site", "src", "entry.tsx");
     expect(existsSync(entryFile)).toBe(true);
-    expect(readFileSync(entryFile, "utf8")).toContain("ReaderProseLayout");
-    expect(existsSync(path.join(skinsDir, "my-test-site", "src", "skin.css"))).toBe(true);
+    const entrySource = readFileSync(entryFile, "utf8");
+    expect(entrySource).toContain("ReaderProseLayout");
+    // 模板必须导出真实协议：wrapper 只认 default export mountSkin
+    expect(entrySource).toContain("export default function mountSkin");
+    expect(entrySource).toContain("createOriginStore");
+    expect(entrySource).toContain("TurboNavigator");
+    // 曾经的两个虚构 API 不许再出现
+    expect(entrySource).not.toContain("mountShadowApp");
+    expect(entrySource).not.toContain("createReactiveStore");
+
+    const cssFile = path.join(skinsDir, "my-test-site", "src", "skin.css");
+    expect(existsSync(cssFile)).toBe(true);
+    // ui-kit 的 Tailwind 类名必须被扫描，否则渲染会塌陷成 0×0
+    expect(readFileSync(cssFile, "utf8")).toContain("packages/ui-kit/src");
 
     // 验证 data-table 原型智能使用 SmartDataTable
     await scaffoldHandler({
