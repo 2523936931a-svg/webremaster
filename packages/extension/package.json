@@ -1,6 +1,12 @@
 {
   "name": "@webremaster/extension",
   "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webremaster/webremaster.git",
+    "directory": "packages/extension"
+  },
   "description": "WebRemaster 统一 Chrome MV3 换肤扩展",
   "type": "module",
   "private": true,

@@ -1,6 +1,12 @@
 {
   "name": "@webremaster/ui-kit",
   "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webremaster/webremaster.git",
+    "directory": "packages/ui-kit"
+  },
   "description": "WebRemaster 重制界面组件库：RemasterShell / FeedListCard / SmartDataTable / NestedThreadTree / ReaderProseLayout / DiagnosticsDrawer",
   "type": "module",
   "main": "./dist/index.js",

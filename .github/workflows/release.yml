@@ -1,0 +1,52 @@
+name: Release Chrome Extension
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.21.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build core packages
+        run: pnpm build
+
+      - name: Test before publishing
+        run: pnpm test
+
+      - name: Sync skins into extension and store
+        run: pnpm sync:artifacts
+
+      - name: Build Chrome extension
+        run: pnpm --filter @webremaster/extension build
+
+      - name: Package extension zip
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/release"
+          cd packages/extension/dist
+          zip -r "$GITHUB_WORKSPACE/release/webremaster-chrome-ext.zip" .
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/webremaster-chrome-ext.zip
+          generate_release_notes: true

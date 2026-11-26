@@ -5,6 +5,12 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# binary release artifacts (published via GitHub Releases, not committed)
+release/*.zip
+
+# local verification scratch
+tmp-split-probe.png
+
 # env & secrets
 .env
 .env.*
