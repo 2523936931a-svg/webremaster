@@ -3,6 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "description": "WebRemaster — 全网老旧丑网站 Shadow-DOM React 重制编译器 + 零 Token 皮肤商店 + Chrome 扩展",
+  "license": "MIT",
+  "author": "WebRemaster Contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webremaster/webremaster.git"
+  },
+  "homepage": "https://webremaster.github.io/webremaster/",
+  "bugs": {
+    "url": "https://github.com/webremaster/webremaster/issues"
+  },
+  "keywords": [
+    "userscript",
+    "chrome-extension",
+    "shadow-dom",
+    "react19",
+    "tailwindcss",
+    "playwright",
+    "web-modernization",
+    "dark-mode",
+    "legacy-website"
+  ],
   "engines": {
     "node": ">=22"
   },
@@ -19,7 +40,8 @@
     "test": "pnpm -r --if-present test",
     "doctor": "node packages/compiler/dist/cli.js doctor",
     "list": "node packages/compiler/dist/cli.js list",
-    "check:all": "pnpm typecheck && pnpm test && pnpm build:all",
-    "test:all": "pnpm typecheck && pnpm test && pnpm build:all"
+    "bootstrap": "pnpm build",
+    "check:all": "pnpm build && pnpm typecheck && pnpm test && pnpm build:all",
+    "test:all": "pnpm build && pnpm typecheck && pnpm test && pnpm build:all"
   }
 }

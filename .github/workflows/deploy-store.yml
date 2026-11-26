@@ -3,6 +3,12 @@ name: Deploy Before/After Store to GitHub Pages
 on:
   push:
     branches: [main, master]
+    paths:
+      - "skins/**"
+      - "packages/**"
+      - "configs/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/deploy-store.yml"
   workflow_dispatch:
 
 permissions:
