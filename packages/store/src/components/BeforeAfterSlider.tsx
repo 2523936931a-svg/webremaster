@@ -7,6 +7,7 @@ export interface BeforeAfterSliderProps {
   afterSrc: string;
   alt: string;
   initialPercent?: number;
+  initialViewMode?: CompareViewMode;
   lang?: Language;
   className?: string;
   showControls?: boolean;
@@ -19,12 +20,13 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   afterSrc,
   alt,
   initialPercent = 50,
+  initialViewMode = "split",
   lang = "zh",
   className = "",
   showControls = true,
 }) => {
   const [percent, setPercent] = useState<number>(initialPercent);
-  const [viewMode, setViewMode] = useState<CompareViewMode>("split");
+  const [viewMode, setViewMode] = useState<CompareViewMode>(initialViewMode);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const t = DICTIONARY[lang];
@@ -111,12 +113,12 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
             className="absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-150"
             style={{ opacity: percent / 100 }}
           />
-          <div className="absolute top-3 left-3 z-10">
+          <div className="absolute top-3 left-3 z-10 transition-opacity duration-150" style={{ opacity: (100 - percent) / 100 }}>
             <span className="px-2.5 py-1 text-[11px] font-semibold tracking-wide rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 backdrop-blur-md">
               {t.beforeBadge}
             </span>
           </div>
-          <div className="absolute top-3 right-3 z-10">
+          <div className="absolute top-3 right-3 z-10 transition-opacity duration-150" style={{ opacity: percent / 100 }}>
             <span className="px-2.5 py-1 text-[11px] font-semibold tracking-wide rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/30 backdrop-blur-md">
               {t.afterBadge}
             </span>
@@ -152,7 +154,8 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
           <div
             className="absolute inset-0 w-full h-full pointer-events-none"
             style={{
-              clipPath: `inset(0 ${100 - percent}% 0 0)`,
+              // 左旧右新：After 只显示分割线右侧，与「BEFORE 左上 / AFTER 右上」两个角标一致。
+              clipPath: `inset(0 0 0 ${percent}%)`,
             }}
           >
             <img

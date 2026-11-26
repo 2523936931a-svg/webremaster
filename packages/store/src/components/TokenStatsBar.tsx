@@ -20,6 +20,7 @@ function formatTokens(count: number): string {
 
 export const TokenStatsBar: React.FC<TokenStatsBarProps> = ({ storeIndex, lang }) => {
   const t = DICTIONARY[lang];
+  const humanReviewCount = storeIndex.skins.filter((skin) => skin.vlmScoreSource === "human-review").length;
 
   return (
     <section className="w-full py-10 bg-zinc-950/60 border-y border-white/5 relative">
@@ -54,23 +55,29 @@ export const TokenStatsBar: React.FC<TokenStatsBarProps> = ({ storeIndex, lang }
             <span className="text-[10px] text-zinc-500 mt-0.5">{t.metricRuntimeTokensDesc}</span>
           </div>
 
-          {/* Card 3: Avg VLM Score */}
+          {/* Card 3: Avg Visual Score */}
           <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-colors">
             <span className="text-3xl sm:text-4xl font-extrabold text-emerald-400 tracking-tight flex items-baseline gap-1">
-              {storeIndex.avgVlmScore > 0 ? storeIndex.avgVlmScore : "9.2"}
+              {storeIndex.avgVlmScore > 0 ? storeIndex.avgVlmScore : "—"}
               <span className="text-sm font-normal text-zinc-500">/ 10</span>
             </span>
             <span className="text-xs text-zinc-400 mt-1 font-medium">{t.metricAvgVlm}</span>
+            <span className="text-[10px] text-zinc-500 mt-0.5">
+              {lang === "zh"
+                ? `人工终审 ${humanReviewCount} 站 / 自动 VLM ${storeIndex.skins.length - humanReviewCount} 站`
+                : `Human review ${humanReviewCount} / Auto VLM ${storeIndex.skins.length - humanReviewCount}`}
+            </span>
           </div>
 
           {/* Card 4: Tokens Burned */}
           <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-colors">
             <span className="text-3xl sm:text-4xl font-extrabold text-indigo-400 tracking-tight">
-              {storeIndex.totalTokensBurned > 0
-                ? formatTokens(storeIndex.totalTokensBurned)
-                : "54.8M"}
+              {storeIndex.totalTokensBurned > 0 ? formatTokens(storeIndex.totalTokensBurned) : "—"}
             </span>
             <span className="text-xs text-zinc-400 mt-1 font-medium">{t.metricCompiledTokens}</span>
+            <span className="text-[10px] text-zinc-500 mt-0.5">
+              {lang === "zh" ? "未纳入索引统计（运行时恒为 0）" : "Not tracked in index (runtime is always 0)"}
+            </span>
           </div>
         </div>
       </div>

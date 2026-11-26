@@ -118,15 +118,16 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
                 beforeSrc={activeDemo.beforeSrc}
                 afterSrc={activeDemo.afterSrc}
                 alt={activeDemo.alt}
-                initialPercent={50}
+                initialPercent={100}
+                initialViewMode="fade"
                 lang={lang}
                 className="glow-sky"
               />
             </div>
             <span className="text-xs text-zinc-500 mt-2.5">
               {lang === "zh"
-                ? "💡 左右拖拽发光中轴、按左右方向键、或点击下方模式按钮，细致检视每一个设计细节"
-                : "💡 Drag glowing divider or use Arrow keys to inspect transformation details"}
+                ? "💡 首屏默认展示重制版成品；点「100% BEFORE」看 1998 原版，或切到分屏模式拖动中轴逐项对照"
+                : "💡 Starts on the remastered result; hit “100% BEFORE” for the 1998 original, or switch to split mode and drag the divider"}
             </span>
           </div>
         </div>

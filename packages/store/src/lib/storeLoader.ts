@@ -68,6 +68,7 @@ export async function loadStoreIndex(): Promise<StoreIndex> {
           beforeImage: "before.png",
           afterImage: "after.png",
           vlmScore: 9.2,
+          vlmScoreSource: "human-review",
           dataParityRatio: 1,
           bundleSizeKb: 287.3,
           tokensUsedToCompile: 0,

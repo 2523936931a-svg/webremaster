@@ -31,6 +31,7 @@ const SAMPLE_COMMUNITY_SKIN: SkinManifest = {
   beforeImage: "before.png",
   afterImage: "after.png",
   vlmScore: 9.4,
+  vlmScoreSource: "human-review",
   dataParityRatio: 1,
   bundleSizeKb: 142.5,
   tokensUsedToCompile: 0,

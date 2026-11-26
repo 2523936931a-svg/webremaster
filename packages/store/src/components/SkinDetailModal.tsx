@@ -280,13 +280,18 @@ export const SkinDetailModal: React.FC<SkinDetailModalProps> = ({ skin, lang, on
                     <span className="text-xs text-emerald-300/80">
                       通过自动化回归校验，功能与原生事件 100% 存活，无任何运行时破损
                     </span>
+                    <span className="mt-1 block text-[10px] text-zinc-500">
+                      hackernews 的报告由本地快照回放产出（非访问真站），见 <code>05_verification.json</code> 的 Gate 1 说明
+                    </span>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-extrabold text-emerald-400">
                     {skin.vlmScore} / 10
                   </div>
-                  <span className="text-[10px] text-zinc-400">VLM 视觉评审得分</span>
+                  <span className="text-[10px] text-zinc-400">
+                    {skin.vlmScoreSource === "human-review" ? "人工终审评分（未跑自动 VLM）" : "VLM 视觉评审得分"}
+                  </span>
                 </div>
               </div>
 

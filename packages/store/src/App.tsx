@@ -4,6 +4,7 @@ import { loadStoreIndex } from "./lib/storeLoader.js";
 import type { SkinManifest, StoreIndex } from "@webremaster/schema";
 import { Header } from "./components/Header.js";
 import { Hero } from "./components/Hero.js";
+import { LivePlayground } from "./components/LivePlayground.js";
 import { TokenStatsBar } from "./components/TokenStatsBar.js";
 import { SkinCard } from "./components/SkinCard.js";
 import { SkinDetailModal } from "./components/SkinDetailModal.js";
@@ -98,6 +99,8 @@ export const App: React.FC = () => {
 
       <main className="flex-1">
         <Hero lang={lang} />
+
+        <LivePlayground lang={lang} />
 
         {storeIndex && <TokenStatsBar storeIndex={storeIndex} lang={lang} />}
 

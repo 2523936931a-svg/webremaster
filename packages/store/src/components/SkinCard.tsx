@@ -87,7 +87,11 @@ export const SkinCard: React.FC<SkinCardProps> = ({ skin, lang, onOpenDetails })
         <div className="absolute top-2.5 right-2.5 z-10">
           <span className="px-2 py-0.5 text-[10px] font-semibold rounded-md bg-zinc-950/80 text-emerald-400 border border-emerald-500/30 backdrop-blur-md flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>VLM {skin.vlmScore}</span>
+            <span>
+              {skin.vlmScoreSource === "human-review"
+                ? `${lang === "zh" ? "人工终审" : "Review"} ${skin.vlmScore}`
+                : `VLM ${skin.vlmScore}`}
+            </span>
           </span>
         </div>
 
