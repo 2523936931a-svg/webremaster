@@ -21,7 +21,7 @@ import {
   type PaletteCommand,
   type ViewMode,
 } from "@webremaster/bridge";
-import { THEME_CSS, ThemeProvider, useThemeVars, type ThemeMode } from "./theme.js";
+import { THEME_CSS, THEME_PALETTE_LABELS, ThemeProvider, useThemeVars, type PresetPaletteName, type ThemeMode } from "./theme.js";
 import { DiagnosticsDrawer, type DiagnosticsSnapshot } from "./DiagnosticsDrawer.js";
 import { RemasterErrorBoundary } from "./RemasterErrorBoundary.js";
 import { ToastProvider } from "./Toast.js";
@@ -54,6 +54,30 @@ const VIEW_MODE_LABEL: Record<ViewMode, string> = {
 
 const DEFAULT_THEME_STORAGE_KEY = "webremaster-theme";
 
+/** 命令面板循环顺序：默认（跟随深浅）→ 四套社区预设。 */
+export type PaletteChoice = "default" | PresetPaletteName;
+const PALETTE_CYCLE: readonly PaletteChoice[] = ["default", "catppuccin-mocha", "tokyo-night", "nord", "sepia-book"];
+const PALETTE_LABEL: Record<PaletteChoice, string> = {
+  default: "默认（跟随深浅）",
+  ...THEME_PALETTE_LABELS,
+};
+
+/** 下一个配色预设（纯函数，供单测与命令面板共用）。 */
+export function nextPalette(current: PaletteChoice): PaletteChoice {
+  const index = PALETTE_CYCLE.indexOf(current);
+  return PALETTE_CYCLE[(index + 1) % PALETTE_CYCLE.length] ?? "default";
+}
+
+function readStoredPalette(key: string): PaletteChoice {
+  if (typeof window === "undefined") return "default";
+  try {
+    const raw = window.localStorage.getItem(`${key}:palette`);
+    return raw !== null && (PALETTE_CYCLE as readonly string[]).includes(raw) ? (raw as PaletteChoice) : "default";
+  } catch {
+    return "default";
+  }
+}
+
 function readStoredTheme(key: string): ThemeMode | null {
   if (typeof window === "undefined") {
     return null;
@@ -81,6 +105,7 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
   const [manager] = useState<OriginManager>(() => props.manager ?? getSharedOriginManager());
   const storageKey = props.themeStorageKey ?? DEFAULT_THEME_STORAGE_KEY;
   const [mode, setMode] = useState<ThemeMode>(() => readStoredTheme(storageKey) ?? props.initialTheme ?? "dark");
+  const [palette, setPalette] = useState<PaletteChoice>(() => readStoredPalette(storageKey));
   const [viewMode, setViewModeState] = useState<ViewMode>(() => manager.getViewMode());
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
@@ -94,10 +119,20 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
     writeStoredTheme(storageKey, mode);
   }, [storageKey, mode]);
 
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(`${storageKey}:palette`, palette);
+    } catch {
+      /* 隐私模式等场景忽略持久化失败 */
+    }
+  }, [storageKey, palette]);
+
   // 订阅视图模式变化：快捷键 / 熔断回落等外部切换同步进 React 状态
   useEffect(() => manager.onViewModeChange(setViewModeState), [manager]);
 
   const toggleTheme = useCallback((): void => {
+    // 深浅切换回到标准色板：社区预设会被 palette 规则覆盖，留在预设里会让这个按钮看起来没反应
+    setPalette("default");
     setMode((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
@@ -151,6 +186,14 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
     () => [
       ...(props.commands ?? []),
       { id: "wr-toggle-theme", label: "切换深浅主题", keywords: "theme dark light 主题 深色 浅色", run: toggleTheme },
+      {
+        id: "wr-cycle-palette",
+        label: `切换配色预设（当前 ${PALETTE_LABEL[palette]}）`,
+        keywords: "palette theme 配色 主题 预设 catppuccin tokyo nord sepia",
+        run: () => {
+          setPalette((prev) => nextPalette(prev));
+        },
+      },
       {
         id: "wr-font-increase",
         label: `增大字号 (+2px，当前 ${fontSize}px)`,
@@ -226,13 +269,18 @@ export function RemasterShell(props: RemasterShellProps): ReactElement {
         },
       },
     ],
-    [props.commands, manager, diagnosticsOpen, toggleTheme, fontSize],
+    [props.commands, manager, diagnosticsOpen, toggleTheme, fontSize, palette],
   );
 
   return (
     <ThemeProvider mode={mode}>
       <ToastProvider>
-        <div data-wr-theme={mode} className="flex min-h-screen flex-col" style={{ fontSize: `${fontSize}px` }}>
+        <div
+          data-wr-theme={mode}
+          data-wr-palette={palette === "default" ? undefined : palette}
+          className="flex min-h-screen flex-col"
+          style={{ fontSize: `${fontSize}px` }}
+        >
 
         <style>{THEME_CSS}</style>
         <header

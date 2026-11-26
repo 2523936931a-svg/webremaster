@@ -67,6 +67,17 @@ export type ThemePaletteName =
   | "nord"
   | "sepia-book";
 
+/** 可切换的社区预设（不含 default-dark / default-light 这两个由深浅模式控制的基础色板）。 */
+export type PresetPaletteName = Exclude<ThemePaletteName, "default-dark" | "default-light">;
+
+/** 预设的中文展示名，供命令面板与文档引用。 */
+export const THEME_PALETTE_LABELS: Record<PresetPaletteName, string> = {
+  "catppuccin-mocha": "Catppuccin Mocha",
+  "tokyo-night": "Tokyo Night",
+  nord: "Nord",
+  "sepia-book": "Sepia Book（护眼羊皮纸）",
+};
+
 /**
  * 社区流行高星主题预设（Catppuccin / Tokyo Night / Nord / 护眼羊皮纸）。
  */

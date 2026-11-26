@@ -13,6 +13,7 @@ import {
   DiagnosticsDrawer,
   RemasterErrorBoundary,
   RemasterShell,
+  nextPalette,
   ToastProvider,
   useToast,
   type DiagnosticsSnapshot,
@@ -61,6 +62,14 @@ describe("@webremaster/ui-kit", () => {
       expect(THEME_CSS).toContain('data-wr-palette="tokyo-night"');
       expect(THEME_CSS).toContain('data-wr-palette="nord"');
       expect(THEME_CSS).toContain('data-wr-palette="sepia-book"');
+    });
+
+    it("nextPalette 按 default → 四套预设循环，末项回到默认", () => {
+      expect(nextPalette("default")).toBe("catppuccin-mocha");
+      expect(nextPalette("catppuccin-mocha")).toBe("tokyo-night");
+      expect(nextPalette("tokyo-night")).toBe("nord");
+      expect(nextPalette("nord")).toBe("sepia-book");
+      expect(nextPalette("sepia-book")).toBe("default");
     });
   });
 
