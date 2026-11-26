@@ -14,7 +14,11 @@ import {
   Command,
   Columns2,
   SunMoon,
+  ArrowRight,
+  X,
 } from "lucide-react";
+
+const STORE_URL = "https://webremaster.github.io/webremaster/";
 
 export const PopupApp: React.FC = () => {
   const [currentTabUrl, setCurrentTabUrl] = useState<string>("");
@@ -23,6 +27,7 @@ export const PopupApp: React.FC = () => {
   const [customSkins, setCustomSkins] = useState<SkinManifest[]>([]);
   const [skinStates, setSkinStates] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
 
   useEffect(() => {
     // 探测当前标签页
@@ -30,6 +35,8 @@ export const PopupApp: React.FC = () => {
       // 读取开关存储与社区自定义皮肤
       chrome.storage.local.get(null, (items) => {
         setMasterEnabled(items.master_enabled !== false);
+        // 首次安装（或从没关过引导）时给出「三步开始」，只在未命中站点时出现
+        setShowOnboarding(items.onboarding_dismissed !== true);
         const loadedCustom: SkinManifest[] = Array.isArray(items.custom_skins) ? items.custom_skins : [];
         setCustomSkins(loadedCustom);
 
@@ -86,6 +93,21 @@ export const PopupApp: React.FC = () => {
     }
   };
 
+  const dismissOnboarding = () => {
+    setShowOnboarding(false);
+    if (typeof chrome !== "undefined" && chrome.storage) {
+      chrome.storage.local.set({ onboarding_dismissed: true });
+    }
+  };
+
+  const openUrl = (url: string) => {
+    if (typeof chrome !== "undefined" && chrome.tabs) {
+      chrome.tabs.create({ url });
+    } else {
+      window.open(url, "_blank", "noreferrer");
+    }
+  };
+
   const sendAction = (action: string) => {
     if (typeof chrome !== "undefined" && chrome.tabs && chrome.scripting) {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -104,6 +126,7 @@ export const PopupApp: React.FC = () => {
   };
 
   const allSkins = [...SKIN_REGISTRY, ...customSkins];
+  const firstSkin = allSkins[0];
   const filteredSkins = allSkins.filter((skin) => {
     const q = searchQuery.toLowerCase();
     return (
@@ -255,7 +278,7 @@ export const PopupApp: React.FC = () => {
             >
               <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                 <CheckCircle2 size={12} color="#10b981" />
-                <span>VLM 评分: </span>
+                <span>{matchedSkin.vlmScoreSource === "human-review" ? "人工终审: " : "VLM 评分: "}</span>
                 <strong style={{ color: "#10b981" }}>{matchedSkin.vlmScore}/10</strong>
               </div>
               <div style={{ color: "rgba(255, 255, 255, 0.4)" }}>
@@ -369,51 +392,125 @@ export const PopupApp: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div
-            style={{
-              background: "#111114",
-              border: "1px solid rgba(255, 255, 255, 0.06)",
-              borderRadius: "10px",
-              padding: "10px 12px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {showOnboarding && (
+              <div
+                style={{
+                  background: "linear-gradient(180deg, rgba(56, 189, 248, 0.10) 0%, rgba(56, 189, 248, 0.02) 100%)",
+                  border: "1px solid rgba(56, 189, 248, 0.22)",
+                  borderRadius: "10px",
+                  padding: "10px 12px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#fff" }}>三步开始</span>
+                  <button
+                    type="button"
+                    onClick={dismissOnboarding}
+                    title="不再显示这个引导"
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "rgba(255, 255, 255, 0.4)",
+                      cursor: "pointer",
+                      display: "flex",
+                      padding: "2px",
+                    }}
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+                <ol
+                  style={{
+                    margin: "6px 0 0",
+                    paddingLeft: "15px",
+                    fontSize: "10px",
+                    lineHeight: 1.75,
+                    color: "rgba(255, 255, 255, 0.6)",
+                  }}
+                >
+                  <li>
+                    打开一个已收录站点，图标变成 <strong style={{ color: "#38bdf8" }}>ON</strong> 就说明已经重制
+                  </li>
+                  <li>
+                    <kbd style={{ background: "#27272a", padding: "1px 4px", borderRadius: "3px" }}>Alt+Shift+R</kbd> 对照 1998
+                    原版，<kbd style={{ background: "#27272a", padding: "1px 4px", borderRadius: "3px" }}>Ctrl+K</kbd> 打开命令面板
+                  </li>
+                  <li>
+                    想看更多站点与前后对比，<a href={STORE_URL} target="_blank" rel="noreferrer" style={{ color: "#38bdf8" }}>打开皮肤商店</a>
+                  </li>                </ol>
+              </div>
+            )}
+
+            <div
+              style={{
+                background: "#111114",
+                border: "1px solid rgba(255, 255, 255, 0.06)",
+                borderRadius: "10px",
+                padding: "10px 12px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+              }}
+            >
               <div>
                 <div style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255, 255, 255, 0.8)" }}>
-                  当前页面未收录重制皮肤
+                  当前页面不在重制范围
                 </div>
                 <div style={{ fontSize: "10px", color: "rgba(255, 255, 255, 0.4)", marginTop: "2px" }}>
-                  已收录 {SKIN_REGISTRY.length} 个经典站点，随时在下方浏览体验
+                  皮肤只对已收录站点生效，目前 {SKIN_REGISTRY.length} 个站点可用
                 </div>
               </div>
-            </div>
 
-            {/* 万能全局消除枪直控 */}
-            <button
-              type="button"
-              onClick={() => sendAction("toggle_zapper")}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                padding: "6px 10px",
-                borderRadius: "8px",
-                background: "rgba(244, 63, 94, 0.12)",
-                border: "1px solid rgba(244, 63, 94, 0.3)",
-                color: "#f43f5e",
-                fontSize: "11px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-              title="在当前任意网页启动 Arc 风格元素消除枪，持久化粉碎广告"
-            >
-              <Crosshair size={13} />
-              <span>启动万能消除枪 (Zap)</span>
-            </button>
+              {firstSkin && (
+                <button
+                  type="button"
+                  onClick={() => openUrl(firstSkin.targetUrl)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px",
+                    padding: "7px 10px",
+                    borderRadius: "8px",
+                    background: "rgba(56, 189, 248, 0.14)",
+                    border: "1px solid rgba(56, 189, 248, 0.35)",
+                    color: "#38bdf8",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                  title={`在新标签页打开 ${firstSkin.targetUrl}`}
+                >
+                  <ArrowRight size={13} />
+                  <span>打开 {firstSkin.name} 试试</span>
+                </button>
+              )}
+
+              {/* 万能全局消除枪直控（次要入口） */}
+              <button
+                type="button"
+                onClick={() => sendAction("toggle_zapper")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                  padding: "5px 10px",
+                  borderRadius: "8px",
+                  background: "transparent",
+                  border: "1px solid rgba(244, 63, 94, 0.22)",
+                  color: "rgba(244, 63, 94, 0.85)",
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+                title="在当前任意网页启动 Arc 风格元素消除枪，持久化粉碎广告"
+              >
+                <Crosshair size={12} />
+                <span>或在任意网页启动消除枪</span>
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -540,9 +637,34 @@ export const PopupApp: React.FC = () => {
             </div>
           );
         })}
+        {filteredSkins.length === 0 && (
+          <div
+            style={{
+              padding: "18px 6px",
+              textAlign: "center",
+              fontSize: "11px",
+              color: "rgba(255, 255, 255, 0.4)",
+            }}
+          >
+            没有匹配「{searchQuery}」的站点
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              style={{
+                display: "block",
+                margin: "6px auto 0",
+                background: "transparent",
+                border: "none",
+                color: "#38bdf8",
+                fontSize: "10px",
+                cursor: "pointer",
+              }}
+            >
+              清除搜索
+            </button>
+          </div>
+        )}
       </div>
-
-      {/* 底部导航链接 */}
       <div
         style={{
           marginTop: "10px",
@@ -571,7 +693,7 @@ export const PopupApp: React.FC = () => {
         </a>
 
         <a
-          href="./store.html"
+          href={STORE_URL}
           target="_blank"
           rel="noreferrer"
           style={{
